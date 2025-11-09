@@ -1,0 +1,8 @@
+//
+// Created by 김주환 on 25. 11. 9.
+//
+
+#ifndef DIFFICULTY_CALCULATOR_H
+#define DIFFICULTY_CALCULATOR_H
+
+#endif //DIFFICULTY_CALCULATOR_H

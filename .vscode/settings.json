@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "login.h": "c",
+        "struct.h": "c"
+    }
+}

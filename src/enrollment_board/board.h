@@ -5,4 +5,10 @@
 #ifndef ENROLLMENT_BOARD_H
 #define ENROLLMENT_BOARD_H
 
+#include "../struct.h"
+
+StatusCode create_post(BoardPost *result);
+
+StatusCode apply_post(BoardPost *post, int id);
+
 #endif //ENROLLMENT_BOARD_H

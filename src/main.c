@@ -1,3 +1,7 @@
 //
 // Created by 김주환 on 25. 11. 9.
 //
+
+int main() {
+    
+}

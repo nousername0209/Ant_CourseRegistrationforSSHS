@@ -1,6 +1,9 @@
 #ifndef STRUCT_H
 #define STRUCT_H
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #define PATH_LENGTH 100
 #define NAME_LENGTH 100
 #define SEMESTER_NUM 6

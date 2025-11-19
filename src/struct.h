@@ -3,7 +3,38 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <conio.h>
 
+
+// UI 관련
+#define ANSI_RESET "\x1B[0m"
+#define ANSI_INVERSE "\x1B[7m"
+
+
+typedef enum _Arrow {
+    LEFT_ARROW = 75,
+    RIGHT_ARROW = 77,
+    UP_ARROW = 72,
+    DOWN_ARROW = 80,
+    ENTER = '\r',
+    BACKSPACE = '\b'} Arrow;
+
+#define CONSOLE_WIDTH 80
+#define UI_WIDTH 50 // UI 요소가 차지하는 대략적인 가로 길이 (제목 포함)
+#define START_X ((CONSOLE_WIDTH - UI_WIDTH) / 2) // UI 시작점 X 좌표
+#define START_Y
+
+void goto_ansi(int x, int y) {
+    printf("\x1B[%d;%dH", y, x);
+}
+
+void print_center(const char* title, int len, int y_pos) {
+    goto_ansi(START_X + (UI_WIDTH - len) / 2, START_Y + y_pos);
+    printf("%s", title);
+}
+
+// 프로그램 관련
 #define PATH_LENGTH 100
 #define NAME_LENGTH 100
 #define SEMESTER_NUM 6

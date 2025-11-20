@@ -75,7 +75,7 @@ Subject* load_data_from_file(const char* filename) {
 
 void save_user_data(User* user) {
     char filename[100];
-    sprintf(filename, "user_%d.txt", user->id);
+    sprintf(filename, "dataset/course_io/user/user_%d.txt", user->id);
     
     FILE* fp = fopen(filename, "w");
     if (fp == NULL) {
@@ -106,7 +106,7 @@ void save_user_data(User* user) {
 
 void load_user_data(User* user, int id) {
     char filename[100];
-    sprintf(filename, "user_%d.txt", id);
+    sprintf(filename, "dataset/course_io/user/user_%d.txt", id);
     
     user->id = id;
     user->current_sem = 0; 
@@ -468,7 +468,7 @@ void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3],
 }
 
 void run_registration(int student_id, int init_sem) {
-    Subject* root = load_data_from_file("subjects.txt");
+    Subject* root = load_data_from_file("dataset/course_io/subjects.txt");
     
     User user;
     load_user_data(&user, student_id);

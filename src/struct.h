@@ -8,22 +8,28 @@
 
 
 // UI 관련
-#define ANSI_RESET "\x1B[0m"
-#define ANSI_INVERSE "\x1B[7m"
+#define UI_RESET "\x1B[0m"
+#define UI_REVERSE "\x1B[7m"
+#define UI_DIM "\x1B[2m"
+#define UI_BOLD "\x1B[1m"
+#define UI_COLOR_CYAN "\x1B[36m"
+#define UI_COLOR_YELLOW "\x1B[33m"
+#define UI_COLOR_GREEN "\x1B[32m"
 
-
-typedef enum _Arrow {
+typedef enum _Key {
     LEFT_ARROW = 75,
     RIGHT_ARROW = 77,
     UP_ARROW = 72,
     DOWN_ARROW = 80,
     ENTER = '\r',
-    BACKSPACE = '\b'} Arrow;
+    BACKSPACE = '\b',
+    ESC = 27
+} Key;
 
 #define CONSOLE_WIDTH 80
 #define UI_WIDTH 50 // UI 요소가 차지하는 대략적인 가로 길이 (제목 포함)
 #define START_X ((CONSOLE_WIDTH - UI_WIDTH) / 2) // UI 시작점 X 좌표
-#define START_Y
+#define START_Y 0
 
 void goto_ansi(int x, int y) {
     printf("\x1B[%d;%dH", y, x);
@@ -50,6 +56,7 @@ typedef struct _subject{
     int isFile, n, id;
     int year;
     int semester;
+    int credit;
     double mean_raw_score;
     double stdev_raw_score;
     char name[NAME_LENGTH];
@@ -86,7 +93,7 @@ typedef struct {
 
 typedef struct {
     int id;
-    char pw[PW_LENGTH];
+    int current_sem;
     TimeTable *table[SEMESTER_NUM];
     BoardPost *apply[MAX_APPLY_NUM];
     SubjectZScore z_array[MAX_SUBJECT_NUM];

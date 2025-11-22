@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <dirent.h>
 #include <conio.h>
 
 
@@ -41,7 +42,7 @@ void print_center(const char* title, int len, int y_pos) {
 }
 
 // 프로그램 관련
-#define PATH_LENGTH 100
+#define PATH_LENGTH 300
 #define NAME_LENGTH 100
 #define SEMESTER_NUM 6
 #define MAX_SUBJECT_NUM 50

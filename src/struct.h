@@ -51,7 +51,37 @@ void print_center(const char* title, int len, int y_pos) {
 #define PW_LENGTH 30
 #define MAX_APPLY_NUM 50
 
+//선수과목의 최대 개수
+#define MAX_PREREQ 10
+
+//과목 통계 정보의 최대 개수
+#define MAX_SUBJECT_STATS 100
+
 // 구조체
+
+// 특정 과목의 각 년도, 학기 별 원점수의 통계 정보를 담은 구조체
+typedef struct {
+    int year;
+    int semester;
+    double mean_raw_score;
+    double stdev_raw_score;
+} SubjectStats;
+
+typedef struct {
+    int id;
+    char name[NAME_LENGTH];
+
+    //과목 학점(일주일 수업 횟수)
+    int credit; 
+
+    //선수과목 개수 및 ID 목록
+    int prereq_count;
+    int prereq_ids[MAX_PREREQ];
+
+    //과목의 연도별, 학기별 성적 통계 정보
+    int stats_count;
+    SubjectStats stats[MAX_SUBJECT_STATS];
+} SubjectInfo;
 
 typedef struct _subject{
     int isFile, n, id;
@@ -65,26 +95,26 @@ typedef struct _subject{
 } Subject;
 
 typedef struct {
-    int n;
-    Subject *subjects[MAX_SUBJECT_NUM];
-    double difficulty;
-    Subject *argmax_load;
-    Subject (*argmax_synergy)[2];
+int n;
+Subject *subjects[MAX_SUBJECT_NUM];
+double difficulty;
+Subject *argmax_load;
+Subject (*argmax_synergy)[2];
 } TimeTable;
 
 typedef struct {
-    int id, n;
-    char name[NAME_LENGTH];
-    Subject *subject_arr[MAX_SUBJECT_NUM];
-    int weight[MAX_SUBJECT_NUM];
+int id, n;
+char name[NAME_LENGTH];
+Subject *subject_arr[MAX_SUBJECT_NUM];
+int weight[MAX_SUBJECT_NUM];
 } TechTree;
 
 typedef struct {
-    int id;
-    Subject *subject;
-    int current_students, target_students;
-    int students_id[ID_NUM];
-    char promo_message[MESSAGE_LENGTH];
+int id;
+Subject *subject;
+int current_students, target_students;
+int students_id[ID_NUM];
+char promo_message[MESSAGE_LENGTH];
 } BoardPost;
 
 typedef struct {

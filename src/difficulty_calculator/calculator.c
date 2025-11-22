@@ -3,7 +3,7 @@
 //
 
 #include "../struct.h" 
-#include "../login/login.h"
+// #include "../login/login.h"
 #include "calculator.h"
 
 /**
@@ -11,7 +11,7 @@
  * dir_path에 있는 데이터셋을 바탕으로 Load(단일 과목 난이도)를 로드한다.
  */
 StatusCode preprocess_load(double (*Load)[MAX_SUBJECT_NUM]) {
-    char dir_path[PATH_LENGTH] = "../../dataset/difficulty_calculator";
+    char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
     char file_path[PATH_LENGTH + 20];
     char data_path[PATH_LENGTH + 40];
     FILE *fp = NULL;
@@ -63,7 +63,7 @@ StatusCode preprocess_load(double (*Load)[MAX_SUBJECT_NUM]) {
  * dir_path에 있는 데이터셋을 바탕으로 Synergy(과목 간 시너지/교차 난이도)를 로드한다
  */
 StatusCode preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM]) {
-    char dir_path[PATH_LENGTH] = "../../dataset/difficulty_calculator";
+    char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
     char file_path[PATH_LENGTH + 20];
     char data_path[PATH_LENGTH + 40];
     FILE *fp = NULL;
@@ -145,7 +145,7 @@ StatusCode calculate_difficulty(const TimeTable* table,
     }
 
     FILE *fp = NULL;
-    char dir_path[PATH_LENGTH] = "../../dataset/difficulty_calulator";
+    char dir_path[PATH_LENGTH] = "./dataset/difficulty_calulator";
     char file_path[PATH_LENGTH];
 
     double Load[MAX_SUBJECT_NUM];
@@ -202,11 +202,11 @@ StatusCode calculate_difficulty(const TimeTable* table,
  * 필요한 정보(ID, 값 등)는 함수 내부에서 사용자로부터 입력받는다.
  */
 StatusCode add_difficulty_db() {
-    char dir_path[PATH_LENGTH] = "../../dataset/difficulty_calculator";
+    char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
     char file_path[PATH_LENGTH + 20];
     int num_of_data;
     int total_difficulty;
-
+    
     FILE *fp = NULL;
     sprintf(file_path, "%s/num_of_data.dat", dir_path);
     fp = fopen(file_path, "rb");
@@ -242,12 +242,12 @@ StatusCode add_difficulty_db() {
     sprintf(file_path, "%s/data%:03d.txt", dir_path, num_of_data);
     fp = fopen(file_path, "w");
 
-    int num_of_subject, total_difficulty;
-    fprintf(fp, "%d %d\n", num_of_subject, total_difficulty);
+    int num_of_subject;
     scanf("%d %d", &num_of_subject, &total_difficulty);
+    fprintf(fp, "%d %d\n", num_of_subject, total_difficulty);
     for(int i=0;i<num_of_subject;i++){
         int subject, cur_difficulty;
-        scanf("%d %d", &subject, cur_difficulty);
+        scanf("%d %d", &subject, &cur_difficulty);
         fprintf(fp, "%d %d\n", subject, cur_difficulty);
     }
     fclose(fp);
@@ -258,6 +258,11 @@ StatusCode add_difficulty_db() {
     fp = fopen(file_path, "wb");
     fwrite(&num_of_data, sizeof(int), 1, fp);
     fclose(fp);
+    
+
+    double Load[MAX_SUBJECT_NUM], Synergy[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM];
+    preprocess_load(&Load);
+    preprocess_synergy(&Synergy);
 
     return SUCCESS;
 }

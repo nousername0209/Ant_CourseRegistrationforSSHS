@@ -109,7 +109,7 @@ StatusCode preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM
         }
         fclose(fp);
         expect_hard /= n;
-        average_synergy =(total_hard-expect_hard)*2/(n*(n+1));
+        average_synergy =(total_hard-expect_hard)*2/(n*(n-1));
 
         for(int i=0;i<n;i++){
             for(int j=0;j<n;j++){
@@ -204,51 +204,60 @@ StatusCode calculate_difficulty(const TimeTable* table,
 StatusCode add_difficulty_db() {
     char dir_path[PATH_LENGTH] = "../../dataset/difficulty_calculator";
     char file_path[PATH_LENGTH + 20];
-    int choice;
-    
-    printf("데이터 추가 모드 선택 (1: Load, 2: Synergy): ");
-    if (scanf("%d", &choice) != 1) return ERROR_INVALID_INPUT;
+    int num_of_data;
+    int total_difficulty;
 
-    if (choice == 1) {
-        // Load 데이터 추가
-        snprintf(file_path, sizeof(file_path), "%s/load.txt", path);
-        FILE *fp = fopen(file_path, "a"); // append 모드로 열기
-        if (fp == NULL) return ERROR_FILE_NOT_FOUND;
-
-        int id;
-        double val;
-        printf("추가할 과목 ID와 Load 값을 입력하세요 (예: 3 10.5): ");
-        if (scanf("%d %lf", &id, &val) == 2) {
-            fprintf(fp, "%d %lf\n", id, val);
-            printf("Load 데이터가 추가되었습니다.\n");
-        } else {
-            fclose(fp);
-            return ERROR_INVALID_INPUT;
-        }
-        fclose(fp);
-
-    } else if (choice == 2) {
-        // Synergy 데이터 추가
-        snprintf(file_path, sizeof(file_path), "%s/synergy.txt", path);
-        FILE *fp = fopen(file_path, "a"); // append 모드로 열기
-        if (fp == NULL) return ERROR_FILE_NOT_FOUND;
-
-        int id1, id2;
-        double val;
-        printf("추가할 두 과목 ID와 Synergy 값을 입력하세요 (예: 3 5 2.0): ");
-        if (scanf("%d %d %lf", &id1, &id2, &val) == 3) {
-            fprintf(fp, "%d %d %lf\n", id1, id2, val);
-            printf("Synergy 데이터가 추가되었습니다.\n");
-        } else {
-            fclose(fp);
-            return ERROR_INVALID_INPUT;
-        }
-        fclose(fp);
-
-    } else {
-        printf("잘못된 선택입니다.\n");
-        return ERROR_INVALID_INPUT;
+    FILE *fp = NULL;
+    sprintf(file_path, "%s/num_of_data.dat", dir_path);
+    fp = fopen(file_path, "rb");
+    if(fp == NULL){
+        num_of_data = 0;
+        fp = fopen(file_path, "wb");
+        fwrite(&num_of_data, sizeof(int), 1, fp);
     }
+    else{
+        fread(&num_of_data, sizeof(int), 1, fp);
+    }
+    fclose(fp);
+
+    // TimeTable table;
+    // StatusCode result = get_timetable(&table);
+    // if(result != SUCCESS)
+    //     return result;
+    // printf("해당 시간표의 난이도를 0~10의 정수로 입력해주세요 : ");
+    // scanf("%d", &total_difficulty);
+
+    // sprintf(file_path, "%s/data%:03d.txt", dir_path, num_of_data);
+    // fp = fopen(file_path, "w");
+
+    // fprintf(fp, "%d %d\n", table.n, total_difficulty);
+    // for(int i=0;i<table.n;i++){
+    //     int cur_difficulty;
+    //     printf("과목 %s의 난이도를 0~10의 정수로 입력해주세요 : ", table.subjects[i]->name);
+    //     scanf("%d", &cur_difficulty);
+    //     fprintf(fp, "%d %d\n", table.subjects[i]->id, cur_difficulty);
+    // }
+    // fclose(fp);
+
+    sprintf(file_path, "%s/data%:03d.txt", dir_path, num_of_data);
+    fp = fopen(file_path, "w");
+
+    int num_of_subject, total_difficulty;
+    fprintf(fp, "%d %d\n", num_of_subject, total_difficulty);
+    scanf("%d %d", &num_of_subject, &total_difficulty);
+    for(int i=0;i<num_of_subject;i++){
+        int subject, cur_difficulty;
+        scanf("%d %d", &subject, cur_difficulty);
+        fprintf(fp, "%d %d\n", subject, cur_difficulty);
+    }
+    fclose(fp);
+
+    num_of_data++;
+
+    sprintf(file_path, "%s/num_of_data.dat", dir_path);
+    fp = fopen(file_path, "wb");
+    fwrite(&num_of_data, sizeof(int), 1, fp);
+    fclose(fp);
 
     return SUCCESS;
 }

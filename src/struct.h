@@ -65,26 +65,26 @@ typedef struct _subject{
 } Subject;
 
 typedef struct {
-int n;
-Subject *subjects[MAX_SUBJECT_NUM];
-double difficulty;
-Subject *argmax_load;
-Subject (*argmax_synergy)[2];
+    int n;
+    Subject *subjects[MAX_SUBJECT_NUM];
+    double difficulty;
+    Subject *argmax_load;
+    Subject (*argmax_synergy)[2];
 } TimeTable;
 
 typedef struct {
-int id, n;
-char name[NAME_LENGTH];
-Subject *subject_arr[MAX_SUBJECT_NUM];
-int weight[MAX_SUBJECT_NUM];
+    int id, n;
+    char name[NAME_LENGTH];
+    Subject *subject_arr[MAX_SUBJECT_NUM];
+    int weight[MAX_SUBJECT_NUM];
 } TechTree;
 
 typedef struct {
-int id;
-Subject *subject;
-int current_students, target_students;
-int students_id[ID_NUM];
-char promo_message[MESSAGE_LENGTH];
+    int id;
+    Subject *subject;
+    int current_students, target_students;
+    int students_id[ID_NUM];
+    char promo_message[MESSAGE_LENGTH];
 } BoardPost;
 
 typedef struct {

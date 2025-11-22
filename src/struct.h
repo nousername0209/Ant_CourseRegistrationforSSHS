@@ -1,3 +1,6 @@
+// modified by 장민준 on 2025.11.23. SubjectStats, SubjectInfo 구조체 추가
+
+
 #ifndef STRUCT_H
 #define STRUCT_H
 

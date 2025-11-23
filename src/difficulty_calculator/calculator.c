@@ -21,16 +21,18 @@ StatusCode preprocess_load(double (*Load)[MAX_SUBJECT_NUM]) {
     for (int i = 0; i < MAX_SUBJECT_NUM; i++) {
         (*Load)[i] = 0.0;
         count[i]=0;
-    }   
+    }
 
-    sprintf(data_path, "%s/data");
+    sprintf(data_path, "%s/data", dir_path);
     dir = opendir(data_path);
     if(dir==NULL)
         return ERROR_FILE_NOT_FOUND;
     
     struct dirent *ent = NULL;
     while ((ent=readdir(dir))!=NULL) {
-        sprintf(file_path, "%s/%s", dir_path, ent->d_name);
+        if(strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0)
+            continue;
+        sprintf(file_path, "%s/%s", data_path, ent->d_name);
         fp = fopen(file_path, "r");
         if (fp == NULL)
             return ERROR_FILE_NOT_FOUND;
@@ -47,6 +49,8 @@ StatusCode preprocess_load(double (*Load)[MAX_SUBJECT_NUM]) {
     closedir(dir);
 
     for(int i = 0 ; i < MAX_SUBJECT_NUM ; i++){
+        if (count[i]==0)
+            continue;
         (*Load)[i]/=count[i];
     }
 
@@ -69,13 +73,7 @@ StatusCode preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM
     FILE *fp = NULL;
     DIR *dir = NULL;
     int subject[MAX_SUBJECT_NUM];
-    int Load[MAX_SUBJECT_NUM];
-
-    for (int i = 0; i < MAX_SUBJECT_NUM; i++) {
-        for (int j = 0; j < MAX_SUBJECT_NUM; j++) {
-            (*Synergy)[i][j] = 0.0;
-        }
-    }
+    double Load[MAX_SUBJECT_NUM];
 
     int id1, id2;
     double val;
@@ -84,9 +82,8 @@ StatusCode preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM
     fp = fopen(file_path, "rb");
     if(fp ==NULL)
         return ERROR_FILE_NOT_FOUND;
-    fread(Load, sizeof(int), MAX_SUBJECT_NUM, fp);
+    fread(Load, sizeof(double), MAX_SUBJECT_NUM, fp);
     fclose(fp);
-
 
     sprintf(data_path, "%s/data", dir_path);
     dir = opendir(data_path);
@@ -95,7 +92,9 @@ StatusCode preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM
     
     struct dirent *ent = NULL;
     while ((ent=readdir(dir))!=NULL) {
-        sprintf(file_path, "%s/%s", dir_path, ent->d_name);
+        if(strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0)
+            continue;
+        sprintf(file_path, "%s/%s", data_path, ent->d_name);
         fp = fopen(file_path, "r");
         if (fp == NULL)
             return ERROR_FILE_NOT_FOUND;
@@ -145,22 +144,34 @@ StatusCode calculate_difficulty(const TimeTable* table,
     }
 
     FILE *fp = NULL;
-    char dir_path[PATH_LENGTH] = "./dataset/difficulty_calulator";
-    char file_path[PATH_LENGTH];
+    char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
+    char data_path[PATH_LENGTH + 40];
+    char file_path[PATH_LENGTH + 40];
 
     double Load[MAX_SUBJECT_NUM];
     double Synergy[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM];
     *total_difficulty = 0;
+
+    sprintf(data_path, "%s/data", dir_path);
     
     sprintf(file_path, "%s/load.dat", dir_path);
     fp = fopen(file_path, "rb");
+    if (fp==NULL){
+        return ERROR_FILE_NOT_FOUND;
+    }
     fread(Load, sizeof(double), MAX_SUBJECT_NUM, fp);
     fclose(fp);
 
     sprintf(file_path, "%s/synergy.dat", dir_path);
     fp = fopen(file_path, "rb");
-    fread(Synergy, sizeof(double), MAX_SUBJECT_NUM, fp);
+    if (fp==NULL){
+        return ERROR_FILE_NOT_FOUND;
+    }
+    fread(Synergy, sizeof(double), MAX_SUBJECT_NUM*MAX_SUBJECT_NUM, fp);
     fclose(fp);
+
+    
+
 
 
     *argmax_load = *(table->subjects[0]);
@@ -227,7 +238,7 @@ StatusCode add_difficulty_db() {
     // printf("해당 시간표의 난이도를 0~10의 정수로 입력해주세요 : ");
     // scanf("%d", &total_difficulty);
 
-    // sprintf(file_path, "%s/data%:03d.txt", dir_path, num_of_data);
+    // sprintf(file_path, "%s/data/data%:03d.txt", dir_path, num_of_data);
     // fp = fopen(file_path, "w");
 
     // fprintf(fp, "%d %d\n", table.n, total_difficulty);
@@ -239,7 +250,7 @@ StatusCode add_difficulty_db() {
     // }
     // fclose(fp);
 
-    sprintf(file_path, "%s/data%:03d.txt", dir_path, num_of_data);
+    sprintf(file_path, "%s/data/data%:03d.txt", dir_path, num_of_data);
     fp = fopen(file_path, "w");
 
     int num_of_subject;

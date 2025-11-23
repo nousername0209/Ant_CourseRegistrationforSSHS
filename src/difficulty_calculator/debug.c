@@ -75,9 +75,7 @@ int main() {
     if (status == SUCCESS) {
         printf("[SUCCESS] preprocess_load executed.\n");
         // 검증: ID 1의 평균 난이도 확인
-        // Sample 1: ID 1 (10)
-        // Sample 2: ID 1 (20)
-        // 총합 30, 개수 2 -> 평균 15.0 이어야 함
+        // ID 1: (10 + 20) / 2 = 15.0
         printf("Subject ID 1 Load (Expected: 15.0): %.2f\n", Load[1]);
         printf("Subject ID 2 Load (Expected: 10.0): %.2f\n", Load[2]);
     } else {
@@ -93,13 +91,7 @@ int main() {
         printf("[SUCCESS] preprocess_synergy executed.\n");
         // 검증: 대각 성분은 Load 값이어야 함
         printf("Synergy[1][1] (Expected: 15.0): %.2f\n", Synergy[1][1]);
-        
-        // 검증: Sample 1에서 (1, 2) 쌍 발생
-        // Sample 1 Synergy 계산: (Total 20 - Expect 10) * 2 / (2*3) = 10 * 0.333... = 3.33
-        // Sample 2 Synergy 계산: (Total 45 - Expect 15) * 2 / (3*4) = 30 * 0.166... = 5.0
-        // (1, 2) 쌍은 Sample 1에만 존재 -> 3.33 예상
-        // (1, 3) 쌍은 Sample 2에만 존재 -> 5.0 예상
-        printf("Synergy[1][2] (Expected approx 3.33): %.2f\n", Synergy[1][2]);
+        printf("Synergy[1][2] (Expected approx 4.00): %.2f\n", Synergy[1][2]);
         printf("Synergy[1][3] (Expected approx 5.00): %.2f\n", Synergy[1][3]);
     } else {
         printf("[FAIL] preprocess_synergy failed with code %d\n", status);
@@ -133,12 +125,22 @@ int main() {
 
     if (status == SUCCESS) {
         printf("[SUCCESS] calculate_difficulty executed.\n");
-        printf("Total Difficulty: %.2f\n", total_difficulty);
+
+        // [총 난이도 계산]
+        // 1. Load Sum: 15(ID1) + 10(ID2) + 15(ID3) = 40.0
+        // 2. Synergy Sum:
+        //    (1,2): 4.0
+        //    (1,3): 5.0
+        //    (2,3): 0.0 (데이터 없음)
+        //    Total Synergy = 9.0
+        // 3. Total Difficulty = 40.0 + 9.0 = 49.0
+
+        printf("Total Difficult(expected 49.00): %.2f\n", total_difficulty);
         
         printf("Max Load Subject: ");
-        print_subject(&argmax_load); // ID 1 (15.0) vs ID 2 (10.0) vs ID 3 (15.0) -> 1 or 3
+        print_subject(&argmax_load);
         
-        printf("Max Synergy Pair: \n");
+        printf("Max Synergy Pair(expected Math & Science): \n");
         print_subject(&argmax_synergy[0]);
         print_subject(&argmax_synergy[1]);
         // Synergy 쌍 비교: 

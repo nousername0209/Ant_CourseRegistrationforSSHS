@@ -3,32 +3,6 @@
 #define COL_WIDTH 25
 #define COL_Y 4
 
-Subject* create_node(const char* name, int isFile, int credit) {
-    Subject* s = (Subject*)malloc(sizeof(Subject));
-    if (s == NULL) return NULL;
-    strcpy(s->name, name);
-    s->isFile = isFile;     
-    s->credit = credit;     
-    s->n = 0;
-    s->id = rand() % 1000; 
-    s->semester = 0;
-    s->mean_raw_score = 0.0;
-    s->stdev_raw_score = 0.0;
-    for(int i=0; i<MAX_SUBJECT_NUM; i++) s->arr[i] = NULL;
-    return s;
-}
-
-void add_child(Subject* parent, Subject* child) {
-    if (parent->n < MAX_SUBJECT_NUM) {
-        parent->arr[parent->n++] = child;
-    }
-}
-
-void trim_newline(char* str) {
-    int len = strlen(str);
-    if (len > 0 && (str[len-1] == '\n' || str[len-1] == '\r')) str[len-1] = '\0';
-}
-
 Subject* load_data_from_file(const char* filename) {
     FILE* fp = fopen(filename, "r");
 

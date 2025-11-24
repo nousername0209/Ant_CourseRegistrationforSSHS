@@ -167,63 +167,31 @@ typedef enum {
     ERROR_MEMORY_ALLOC
 } StatusCode;
 
-void load_user_data(User* user, int id, int *is_first) {
-    char filename[100];
-    sprintf(filename, "dataset/course_io/user/user_%d.txt", id);
-    
-    user->id = id;
-    user->current_sem = 0; 
-    for(int i=0; i<SEMESTER_NUM; i++) user->table[i] = NULL;
+// 함수 선언 및 정의
+Subject* create_node(const char* name, int isFile, int credit) {
+    Subject* s = (Subject*)malloc(sizeof(Subject));
+    if (s == NULL) return NULL;
+    strcpy(s->name, name);
+    s->isFile = isFile;     
+    s->credit = credit;     
+    s->n = 0;
+    s->id = rand() % 1000; 
+    s->semester = 0;
+    s->mean_raw_score = 0.0;
+    s->stdev_raw_score = 0.0;
+    for(int i=0; i<MAX_SUBJECT_NUM; i++) s->arr[i] = NULL;
+    return s;
+}
 
-    FILE* fp = fopen(filename, "r");
-    if (fp == NULL) {
-        *is_first = 1; return;
+void add_child(Subject* parent, Subject* child) {
+    if (parent->n < MAX_SUBJECT_NUM) {
+        parent->arr[parent->n++] = child;
     }
+}
 
-    *is_first = 0;
-    
-    char line[256];
-    int current_sem_idx = -1;
-    int subjects_to_read = 0;
-
-    while (fgets(line, sizeof(line), fp)) {
-        trim_newline(line);
-        
-        if (strncmp(line, "ID:", 3) == 0) {
-            continue;
-        }
-        else if (strncmp(line, "CUR_SEM:", 8) == 0) {
-            sscanf(line, "CUR_SEM:%d", &user->current_sem);
-        }
-        else if (strncmp(line, "SEM|", 4) == 0) {
-            int sem_num, count;
-            sscanf(line, "SEM|%d|%d", &sem_num, &count);
-            
-            current_sem_idx = sem_num - 1; 
-            subjects_to_read = count;
-
-            if (user->table[current_sem_idx] == NULL) {
-                user->table[current_sem_idx] = (TimeTable*)calloc(1, sizeof(TimeTable));
-            }
-        }
-        else if (current_sem_idx != -1 && subjects_to_read > 0) {
-            char name[NAME_LENGTH];
-            int credit, sub_id;
-            
-            if (sscanf(line, "%[^|]|%d|%d", name, &credit, &sub_id) == 3) {
-                Subject* s = create_node(name, 1, credit);
-                s->id = sub_id;
-                s->semester = current_sem_idx + 1;
-                
-                TimeTable* t = user->table[current_sem_idx];
-                if (t != NULL && t->n < MAX_SUBJECT_NUM) {
-                    t->subjects[t->n++] = s;
-                }
-                subjects_to_read--;
-            }
-        }
-    }
-    fclose(fp);
+void trim_newline(char* str) {
+    int len = strlen(str);
+    if (len > 0 && (str[len-1] == '\n' || str[len-1] == '\r')) str[len-1] = '\0';
 }
 
 void load_user_data(User* user, int id, int *is_first) {

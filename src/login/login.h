@@ -5,8 +5,13 @@
 
 #include "../struct.h"
 
-StatusCode find_user(const char path[PATH_LENGTH], User *user);
-
 typedef enum _Select {ID_FIELD, LOGIN_BUTTON} Select;
+
+StatusCode draw_ui(Select select, const char* id_buffer);
+StatusCode show_login_screen(char *id_buffer, int max_len);
+
+// to main:
+StatusCode login(int *user_id);
+
 
 #endif //COURSE_INPUT_H

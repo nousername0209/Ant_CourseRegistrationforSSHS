@@ -1,5 +1,213 @@
-//
-// Created by ê¹€ì£¼í™˜ on 25. 11. 9.
-//
-
 #include "output.h"
+
+void popup_show_message(const char* title, const char* msg) {
+    int box_w = 40;
+    int box_h = 7;
+    int start_x = (CONSOLE_WIDTH - box_w) / 2;
+    int start_y = 10;
+
+    // ¹è°æ Áö¿ì±â ¹× ¹Ú½º
+    for(int i=0; i<box_h; i++) {
+        goto_ansi(start_x, start_y + i);
+        printf("%s%*s%s", UI_REVERSE, box_w, "", UI_RESET); 
+    }
+
+    goto_ansi(start_x + 2, start_y + 2);
+    printf("%s[%s]%s", UI_BOLD, title, UI_RESET);
+    
+    goto_ansi(start_x + 2, start_y + 3);
+    printf("%s%s%s", UI_REVERSE, msg, UI_RESET);
+
+    goto_ansi(start_x + 2, start_y + 5);
+    printf("%s[ ¿£ÅÍ Å°¸¦ ´­·¯ È®ÀÎ ]%s", UI_DIM, UI_RESET);
+
+    while(1) {
+        int ch = _getch();
+        if (ch == ENTER || ch == ESC) break;
+    }
+    
+    // ÆË¾÷ ´Ý±â (È­¸é º¹±¸´Â draw_screen¿¡¼­ Ã³¸®µÊ)
+}
+
+void popup_show_difficulty_result(int sem, Subject *load, Subject (*synergy)[2], double diff) {
+    int box_w = 50;
+    int box_h = 12;
+    int start_x = (CONSOLE_WIDTH - box_w) / 2;
+    int start_y = 8;
+
+    // ¹è°æ
+    for(int i=0; i<box_h; i++) {
+        goto_ansi(start_x, start_y + i);
+        printf("%s%*s%s", UI_REVERSE, box_w, "", UI_RESET); 
+    }
+
+    goto_ansi(start_x + 2, start_y + 1);
+    printf("%s %dÇÐ±â ³­ÀÌµµ ºÐ¼® °á°ú %s", UI_BOLD, sem, UI_RESET);
+
+    goto_ansi(start_x + 2, start_y + 3);
+    printf("%s1. ÃÖ°í ³­ÀÌµµ °ú¸ñ (argmax_load)%s", UI_COLOR_YELLOW, UI_RESET);
+    goto_ansi(start_x + 5, start_y + 4);
+    printf("-> %s (%dÇÐÁ¡)", load->name, load->credit);
+
+    goto_ansi(start_x + 2, start_y + 6);
+    printf("%s2. ÃÖ¾ÇÀÇ Á¶ÇÕ (argmax_synergy)%s", UI_COLOR_YELLOW, UI_RESET);
+    goto_ansi(start_x + 5, start_y + 7);
+    if (strcmp(synergy[0]->name, "N/A") == 0) {
+        printf("-> °ú¸ñÀÌ ºÎÁ·ÇÏ¿© ºÐ¼® ºÒ°¡");
+    } else {
+        printf("-> %s + %s", (*synergy)[0].name, (*synergy)[1].name);
+    }
+
+    goto_ansi(start_x + 2, start_y + 9);
+    printf("%s3. ÃÑ ³­ÀÌµµ (total_difficulty)%s: %.1f / 10.0", UI_COLOR_YELLOW, UI_RESET, diff);
+
+    goto_ansi(start_x + 12, start_y + 11);
+    printf("%s[ È®ÀÎ ]%s", UI_BOLD, UI_RESET);
+
+    while(1) {
+        int ch = _getch();
+        if (ch == ENTER || ch == ESC) break;
+    }
+}
+
+void draw_output_view(User* user, int btn_idx) {
+    system("cls");
+
+    // 1. Çì´õ
+    printf("================================================================================\n");
+    printf("  ³» ½Ã°£Ç¥ È®ÀÎ                                    %sID: %5d%s\n", 
+            UI_BOLD, user->id, UI_RESET);
+    printf("================================================================================\n");
+
+    int start_table_row = 4;
+    int box_w = 26; // ÄÃ·³ ³Êºñ
+
+    // 2. ÇÐ±âº° ½Ã°£Ç¥ Ãâ·Â (2Çà 3¿­ ±×¸®µå)
+    for (int sem = 0; sem < SEMESTER_NUM; sem++) {
+        int col = sem % 3;
+        int row = sem / 3;
+        int box_x = 2 + (col * box_w);
+        int box_y = start_table_row + (row * 8); // °£°Ý ³Ë³ËÇÏ°Ô
+
+        goto_ansi(box_x, box_y);
+        // ÇÐ±â Å¸ÀÌÆ²
+        if ((sem + 1) <= user->current_sem) 
+            printf("%s[%d ÇÐ±â (ÀÌ¼ö)]%s", UI_DIM, sem + 1, UI_RESET);
+        else 
+            printf("%s[%d ÇÐ±â (¼ö°­)]%s", UI_COLOR_CYAN, sem + 1, UI_RESET);
+
+        TimeTable* t = user->table[sem];
+        int sem_credits = 0;
+
+        if (t == NULL || t->n == 0) {
+            goto_ansi(box_x, box_y + 1);
+            printf("%s(ºñ¾îÀÖÀ½)%s", UI_DIM, UI_RESET);
+        } else {
+            for (int i = 0; i < t->n; i++) {
+                if (i >= 4) { // 6°³±îÁö¸¸ Ç¥½Ã
+                    goto_ansi(box_x, box_y + 1 + i);
+                    printf("...¿Ü %d°Ç", t->n - i);
+                    break;
+                }
+                goto_ansi(box_x, box_y + 1 + i);
+                printf("- %s (%d)", t->subjects[i]->name, t->subjects[i]->credit);
+                sem_credits += t->subjects[i]->credit;
+            }
+        }
+        
+        // ÇÐ±âº° ÇÐÁ¡ ÇÕ°è
+        goto_ansi(box_x + 16, box_y);
+        printf("(%dÇÐÁ¡)", sem_credits);
+    }
+
+    // 3. ³­ÀÌµµ ¹× Åë°è ¿µ¿ª (ÇÏ´Ü)
+    int stats_y = 21;
+    goto_ansi(2, stats_y);
+    printf("--------------------------------------------------------------------------------");
+    
+    double diff_score = 100;
+
+    // 4. ÇÏ´Ü ¹öÆ° ¿µ¿ª
+    int btn_y = 26;
+    int btn_spacing = 30;
+    int btn_start_x = (CONSOLE_WIDTH - (btn_spacing * 2)) / 2 + 5;
+    const char* labels[3] = { " ½Ã°£Ç¥ ¼öÁ¤ ", " ³­ÀÌµµ ºÐ¼® ", " µ¥ÀÌÅÍ Ãß°¡ ", "  È¨À¸·Î   "};
+
+    for (int i = 0; i < 3; i++) {
+        goto_ansi(btn_start_x + (i * btn_spacing), btn_y);
+        if (btn_idx == i) {
+            printf("%s [ %s ] %s", UI_REVERSE, labels[i], UI_RESET);
+        } else {
+            printf(" [ %s ] ", labels[i]);
+        }
+    }
+}
+
+Page run_output(int student_id) {
+    User user;
+    int is_first;
+    
+    load_user_data(&user, student_id, &is_first);
+
+    int btn_idx = 0; // 0:¼öÁ¤, 1:°è»ê, 2:Ãß°¡, 3:È¨
+    int ch;
+
+    while (1) {
+        draw_output_view(&user, btn_idx);
+        
+        goto_ansi(1, 1);
+        ch = _getch();
+
+        if (ch == 224 || ch == 0) {
+            ch = _getch();
+            if (ch == LEFT_ARROW) {
+                if (btn_idx > 0) btn_idx--;
+            }
+            else if (ch == RIGHT_ARROW) {
+                if (btn_idx < 3) btn_idx++;
+            }
+        }
+        else if (ch == ENTER) {
+            if (btn_idx == 0) {
+                return INPUT_PAGE; // ½Ã°£Ç¥ ¼öÁ¤
+            } 
+            else if (btn_idx == 1 || btn_idx == 2) { 
+                // [³­ÀÌµµ °è»ê] ¶Ç´Â [µ¥ÀÌÅÍ Ãß°¡]
+                
+                // 1. ÇÐ±â ¼±ÅÃ (course_reg.c¿¡ ÀÖ´Â ÇÔ¼ö Àç»ç¿ë)
+                int selected_sem = popup_select_semester(1, SEMESTER_NUM, "ÀÛ¾÷ÇÒ ÇÐ±â ¼±ÅÃ");
+                
+                if (selected_sem != -1) {
+                    TimeTable* t = user.table[selected_sem - 1];
+                    
+                    // µ¥ÀÌÅÍ°¡ ¾ø´Â °æ¿ì Ã³¸®
+                    if (t == NULL || t->n == 0) {
+                        popup_show_message("¿À·ù", "¼±ÅÃÇÑ ÇÐ±â¿¡ µî·ÏµÈ °ú¸ñÀÌ ¾ø½À´Ï´Ù.");
+                    } 
+                    else {
+                        if (btn_idx == 1) { 
+                            // [³­ÀÌµµ °è»ê] ·ÎÁ÷
+                            Subject argmax_load;
+                            Subject argmax_synergy[2];
+                            double total_diff;
+                            
+                            // calculate_difficulty(t, &argmax_load, &argmax_synergy, &total_diff);
+                            popup_show_difficulty_result(selected_sem, &argmax_load, &argmax_synergy, total_diff);
+                        } 
+                        else { 
+                            // [µ¥ÀÌÅÍ Ãß°¡] ·ÎÁ÷
+                            add_difficulty_db(t);
+                            popup_show_message("¿Ï·á", "µ¥ÀÌÅÍº£ÀÌ½º¿¡ ¼º°øÀûÀ¸·Î Ãß°¡µÇ¾ú½À´Ï´Ù.");
+                        }
+                    }
+                }
+            } 
+            else { // btn_idx == 3
+                return HOME_PAGE;  // È¨À¸·Î
+            }
+        }
+        else if (ch == ESC) {
+            return HOME_PAGE;
+        }
+    }
+}

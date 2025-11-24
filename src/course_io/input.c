@@ -3,7 +3,6 @@
 #define COL_WIDTH 25
 #define COL_Y 4
 
-// --- 유틸리티 함수 ---
 Subject* create_node(const char* name, int isFile, int credit) {
     Subject* s = (Subject*)malloc(sizeof(Subject));
     if (s == NULL) return NULL;
@@ -19,15 +18,6 @@ Subject* create_node(const char* name, int isFile, int credit) {
     return s;
 }
 
-Subject* copy_subject(Subject* original) {
-    Subject* copy = (Subject*)malloc(sizeof(Subject));
-    if (copy == NULL) return NULL;
-    *copy = *original; 
-    copy->n = 0; 
-    for(int i=0; i<MAX_SUBJECT_NUM; i++) copy->arr[i] = NULL;
-    return copy;
-}
-
 void add_child(Subject* parent, Subject* child) {
     if (parent->n < MAX_SUBJECT_NUM) {
         parent->arr[parent->n++] = child;
@@ -37,19 +27,10 @@ void add_child(Subject* parent, Subject* child) {
 void trim_newline(char* str) {
     int len = strlen(str);
     if (len > 0 && (str[len-1] == '\n' || str[len-1] == '\r')) str[len-1] = '\0';
-    len = strlen(str); 
-    if (len > 0 && (str[len-1] == '\n' || str[len-1] == '\r')) str[len-1] = '\0';
 }
 
 Subject* load_data_from_file(const char* filename) {
     FILE* fp = fopen(filename, "r");
-    if (fp == NULL) {
-        Subject* root = create_node("ROOT", 0, 0);
-        Subject* math = create_node("수학", 0, 0);
-        add_child(root, math);
-        add_child(math, create_node("미적분학", 1, 3));
-        return root;
-    }
 
     Subject* root = create_node("ROOT", 0, 0);
     Subject* parents[10];
@@ -101,61 +82,6 @@ void save_user_data(User* user) {
     }
     
     fflush(fp);
-    fclose(fp);
-}
-
-void load_user_data(User* user, int id) {
-    char filename[100];
-    sprintf(filename, "dataset/course_io/user/user_%d.txt", id);
-    
-    user->id = id;
-    user->current_sem = 0; 
-    for(int i=0; i<SEMESTER_NUM; i++) user->table[i] = NULL;
-
-    FILE* fp = fopen(filename, "r");
-    if (fp == NULL) return; 
-
-    char line[256];
-    int current_sem_idx = -1;
-    int subjects_to_read = 0;
-
-    while (fgets(line, sizeof(line), fp)) {
-        trim_newline(line);
-        
-        if (strncmp(line, "ID:", 3) == 0) {
-            continue; 
-        }
-        else if (strncmp(line, "CUR_SEM:", 8) == 0) {
-            sscanf(line, "CUR_SEM:%d", &user->current_sem);
-        }
-        else if (strncmp(line, "SEM|", 4) == 0) {
-            int sem_num, count;
-            sscanf(line, "SEM|%d|%d", &sem_num, &count);
-            
-            current_sem_idx = sem_num - 1; 
-            subjects_to_read = count;
-
-            if (user->table[current_sem_idx] == NULL) {
-                user->table[current_sem_idx] = (TimeTable*)calloc(1, sizeof(TimeTable));
-            }
-        }
-        else if (current_sem_idx != -1 && subjects_to_read > 0) {
-            char name[NAME_LENGTH];
-            int credit, sub_id;
-            
-            if (sscanf(line, "%[^|]|%d|%d", name, &credit, &sub_id) == 3) {
-                Subject* s = create_node(name, 1, credit);
-                s->id = sub_id;
-                s->semester = current_sem_idx + 1;
-                
-                TimeTable* t = user->table[current_sem_idx];
-                if (t != NULL && t->n < MAX_SUBJECT_NUM) {
-                    t->subjects[t->n++] = s;
-                }
-                subjects_to_read--;
-            }
-        }
-    }
     fclose(fp);
 }
 
@@ -389,7 +315,7 @@ void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3],
     const char* labels[3] = { 
         "  모드 변경  ", 
         "이수 학기 변경", 
-        " 저장 및 종료 " 
+        "    확정     " 
     };
     for (int i = 0; i < 3; i++) {
         goto_ansi(btn_start_x + (i * btn_spacing), btn_y);
@@ -401,7 +327,7 @@ void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3],
     }
 
     // 5. 시간표 요약 및 그리드
-    int table_y = btn_y + 3;
+    int table_y = btn_y + 3;   
     int total_credits = 0;
     int total_subjects = 0;
     // 전체 과목 수 계산
@@ -442,12 +368,9 @@ void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3],
             printf("%s(비어있음)%s", UI_DIM, UI_RESET);
         } else {
             for (int i = 0; i < t->n; i++) {
-                if (i >= 5) {
+                if (i >= 4) {
                     goto_ansi(box_x, box_y + 1 + i);
                     printf("...외 %d건", t->n - i);
-                    // 생략된 아이템도 인덱스 카운트에 포함 (네비게이션 로직 단순화를 위해)
-                    // 다만 여기서는 화면에 안보이면 선택 불가능하게 할 수도 있음
-                    // 편의상 생략된 건 선택 불가로 처리하기 위해 루프 탈출
                     current_item_idx += (t->n - i); 
                     break; 
                 }
@@ -467,13 +390,13 @@ void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3],
     }
 }
 
-void run_registration(int student_id, int init_sem) {
+void run_registration(int student_id) {
     Subject* root = load_data_from_file("dataset/course_io/subjects.txt");
     
     User user;
-    load_user_data(&user, student_id);
-    
-    if (user.current_sem == 0 && init_sem > 0) user.current_sem = init_sem;
+    int is_first;
+
+    load_user_data(&user, student_id, &is_first);
 
     int col_idx = 0;
     int row_indices[3] = {0, 0, 0};
@@ -484,6 +407,11 @@ void run_registration(int student_id, int init_sem) {
     int timetable_select_idx = 0;
 
     int edit_mode = 0; 
+
+    if (is_first) {
+        user.current_sem = popup_select_semester(0, SEMESTER_NUM - 1, "현재 이수 학기를 선택하세요");
+        edit_mode = 1;
+    }
 
     Key ch;
     while (1) {
@@ -521,7 +449,7 @@ void run_registration(int student_id, int init_sem) {
                 if (col_idx == 1) current_parent = root->arr[row_indices[0]];
                 if (col_idx == 2) current_parent = root->arr[row_indices[0]]->arr[row_indices[1]];
                 int list_count = (current_parent && current_parent->isFile == 0) ? current_parent->n : 0;
-                
+            
                 switch (ch) {
                     case UP_ARROW:
                         if (row_indices[col_idx] > 0) row_indices[col_idx]--;
@@ -641,10 +569,7 @@ void run_registration(int student_id, int init_sem) {
     }
 }
 
-StatusCode input(int id, int is_first, int current_sem) {
-    if (current_sem < 0) current_sem = 0;
-    if (current_sem > 5) current_sem = 5; // 6학기제 가정
-
-    run_registration(id, current_sem);
+StatusCode input(int id) {
+    run_registration(id);
     return SUCCESS;
 }

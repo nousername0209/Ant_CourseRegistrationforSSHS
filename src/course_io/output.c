@@ -1,13 +1,11 @@
 #include "output.h"
 #include "../difficulty_calculator/calculator.h"
 
-// --- [UI 헬퍼] 입력값 유효성 검사 (0~10) ---
 int is_valid_difficulty_input(const char* buf) {
     int val = atoi(buf);
     return (val >= 0 && val <= 10);
 }
 
-// --- [UI 헬퍼] 난이도 입력 팝업 화면 그리기 ---
 void draw_input_difficulty_popup(TimeTable* table, int semester, int total_difficulty_input, int subject_difficulties[], int current_idx, int box_w, int box_h, int start_x, int start_y) {
     system("cls");
     int cursor_y;
@@ -52,8 +50,6 @@ void draw_input_difficulty_popup(TimeTable* table, int semester, int total_diffi
     printf("%s[ ↑/↓: 이동 | 숫자: 입력 | ENTER: 저장 | ESC: 취소 ]%s", UI_BOLD, UI_RESET);
 }
 
-
-// --- [UI] 메시지 알림 팝업 ---
 void popup_show_message(const char* title, const char* msg) {
     int box_w = 40;
     int box_h = 7;
@@ -83,7 +79,6 @@ void popup_show_message(const char* title, const char* msg) {
     // 팝업 닫기 (화면 복구는 draw_screen에서 처리됨)
 }
 
-// --- [UI] 난이도 결과 팝업 ---
 void popup_show_difficulty_result(int sem, Subject *load, Subject (*synergy)[2], double diff) {
     int box_w = 50;
     int box_h = 12;
@@ -138,16 +133,26 @@ StatusCode popup_input_difficulty(TimeTable* table, int student_id, int semester
     int start_x = (CONSOLE_WIDTH - box_w) / 2;
     int start_y = 3;
 
-    int total_difficulty_input = -1;
+    
+    char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
+    char file_path[PATH_LENGTH + 40];
+    int num_of_data;
+    int total_difficulty = -1;
     int subject_difficulties[MAX_SUBJECT_NUM];
     char input_buffer[10];
 
-    // 파일 저장 경로 (Mock)
-    char file_path[256];
-    int num_of_data = 1; // 데이터 파일 번호 (1부터 시작한다고 가정)
-    sprintf(file_path, "difficulty_data_%d_%d.txt", student_id, semester); 
-    
     FILE *fp = NULL;
+    sprintf(file_path, "%s/num_of_data.dat", dir_path);
+    fp = fopen(file_path, "rb");
+    if(fp == NULL){
+        num_of_data = 0;
+        fp = fopen(file_path, "wb");
+        fwrite(&num_of_data, sizeof(int), 1, fp);
+    }
+    else{
+        fread(&num_of_data, sizeof(int), 1, fp);
+    }
+    fclose(fp); 
 
     // 초기값 설정
     int current_input_idx = -1; // -1: 총 난이도, 0~n-1: 과목별 난이도
@@ -156,7 +161,7 @@ StatusCode popup_input_difficulty(TimeTable* table, int student_id, int semester
     // 입력 필드 순회
     while (1) {
         // draw_popup 대신 외부 함수 호출
-        draw_input_difficulty_popup(table, semester, total_difficulty_input, subject_difficulties, 
+        draw_input_difficulty_popup(table, semester, total_difficulty, subject_difficulties, 
                                     current_input_idx, box_w, box_h, start_x, start_y);
 
         // 입력 대기
@@ -173,7 +178,7 @@ StatusCode popup_input_difficulty(TimeTable* table, int student_id, int semester
             }
         } else if (ch == ENTER) {
             // 모든 필드 입력 확인
-            if (total_difficulty_input == -1) {
+            if (total_difficulty == -1) {
                  popup_show_message("오류", "총 난이도를 입력해 주세요.");
                  continue;
             }
@@ -190,23 +195,14 @@ StatusCode popup_input_difficulty(TimeTable* table, int student_id, int semester
             }
             
             // 파일 저장 로직 실행
+            sprintf(file_path, "%s/data/data%:03d.txt", dir_path, num_of_data);
             fp = fopen(file_path, "w");
-            if (fp == NULL) {
-                return ERROR_FILE_NOT_FOUND; // 파일 열기 실패
-            }
 
-            // 1. TimeTable 크기 (n)과 총 난이도 저장
-            fprintf(fp, "%d %d\n", table->n, total_difficulty_input);
-            
-            // 2. 과목 ID와 과목별 난이도 저장
-            for(int i=0;i<table->n;i++){
+            fprintf(fp, "%d %d\n", table->n, total_difficulty);
+            for (int i = 0; i < table->n; i++) {
                 fprintf(fp, "%d %d\n", table->subjects[i]->id, subject_difficulties[i]);
             }
-            
             fclose(fp);
-            
-            // TimeTable 구조체 난이도 업데이트
-            add_difficulty_db(table);
 
             // 성공 메시지 팝업 후 종료
             popup_show_message("완료", "난이도 정보가 성공적으로 저장되었습니다.");
@@ -220,7 +216,7 @@ StatusCode popup_input_difficulty(TimeTable* table, int student_id, int semester
             if (is_valid_difficulty_input(input_buffer)) {
                 int input_val = atoi(input_buffer);
                 if (current_input_idx == -1) {
-                    total_difficulty_input = input_val;
+                    total_difficulty = input_val;
                 } else {
                     subject_difficulties[current_input_idx] = input_val;
                 }
@@ -296,10 +292,6 @@ void draw_output_view(User* user, int btn_idx) {
             printf(" [ %s ] ", labels[i]);
         }
     }
-    
-    // 안내 메시지
-    goto_ansi(5, btn_y + 3);
-    printf("%s[TIP]%s 방향키로 버튼을 선택하고 Enter를 누르세요.", UI_BOLD, UI_RESET);
 }
 
 // Output 모드 실행 함수

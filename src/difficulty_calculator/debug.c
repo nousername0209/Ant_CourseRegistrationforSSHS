@@ -121,7 +121,7 @@ int main() {
     Subject argmax_synergy[2];
     double total_difficulty;
 
-    status = calculate_difficulty(&table, &argmax_load, &argmax_synergy, &total_difficulty);
+    status = calculate_difficulty(&table);
 
     if (status == SUCCESS) {
         printf("[SUCCESS] calculate_difficulty executed.\n");

@@ -110,7 +110,7 @@ int popup_select_semester(int start_sem, int end_sem, const char* title) {
                 goto_ansi(start_x, start_y + i);
                 printf("%*s", box_w, ""); 
             }
-            return -1;
+            return -    1;
         }
     }
 }

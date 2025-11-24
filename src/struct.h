@@ -1,4 +1,4 @@
-// modified by ?¥ë¯¼ì?? on 2025.11.23. SubjectStats, SubjectInfo êµ¬ì¡°ì²? ì¶”ê??
+// modified by ?ï¿½ï¿½ë¯¼ï¿½?? on 2025.11.23. SubjectStats, SubjectInfo êµ¬ì¡°ï¿½? ì¶”ï¿½??
 
 
 #ifndef STRUCT_H
@@ -30,7 +30,7 @@ static inline int getch(void) {
 }
 #endif
 
-// UI ê´?? ¨
+// UI ï¿½??ï¿½ï¿½
 #define UI_RESET "\x1B[0m"
 #define UI_REVERSE "\x1B[7m"
 #define UI_DIM "\x1B[2m"
@@ -58,8 +58,8 @@ typedef enum _Page {
 } Page;
 
 #define CONSOLE_WIDTH 80
-#define UI_WIDTH 50 // UI ?š”?†Œê°? ì°¨ì???•˜?Š” ????µ? ?¸ ê°?ë¡? ê¸¸ì´ (? œëª? ?¬?•¨)
-#define START_X ((CONSOLE_WIDTH - UI_WIDTH) / 2) // UI ?‹œ?‘?  X ì¢Œí‘œ
+#define UI_WIDTH 50 // UI ?ï¿½ï¿½?ï¿½ï¿½ï¿½? ì°¨ï¿½???ï¿½ï¿½?ï¿½ï¿½ ????ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ï¿½?ï¿½? ê¸¸ì´ (?ï¿½ï¿½ï¿½? ?ï¿½ï¿½?ï¿½ï¿½)
+#define START_X ((CONSOLE_WIDTH - UI_WIDTH) / 2) // UI ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ X ì¢Œí‘œ
 #define START_Y 0
 
 static inline void goto_ansi(int x, int y) {
@@ -71,7 +71,7 @@ static inline void print_center(const char* title, int len, int y_pos) {
     printf("%s", title);
 }
 
-// ?”„ë¡œê·¸?¨ ê´?? ¨
+// ?ï¿½ï¿½ë¡œê·¸?ï¿½ï¿½ ï¿½??ï¿½ï¿½
 #define PATH_LENGTH 300
 #define NAME_LENGTH 100
 #define SEMESTER_NUM 6
@@ -81,15 +81,15 @@ static inline void print_center(const char* title, int len, int y_pos) {
 #define PW_LENGTH 30
 #define MAX_APPLY_NUM 50
 
-//?„ ?ˆ˜ê³¼ëª©?˜ ìµœë?? ê°œìˆ˜
+//?ï¿½ï¿½?ï¿½ï¿½ê³¼ëª©?ï¿½ï¿½ ìµœï¿½?? ê°œìˆ˜
 #define MAX_PREREQ 10
 
-//ê³¼ëª© ?†µê³? ? •ë³´ì˜ ìµœë?? ê°œìˆ˜
+//ê³¼ëª© ?ï¿½ï¿½ï¿½? ?ï¿½ï¿½ë³´ì˜ ìµœï¿½?? ê°œìˆ˜
 #define MAX_SUBJECT_STATS 100
 
-// êµ¬ì¡°ì²?
+// êµ¬ì¡°ï¿½?
 
-// ?Š¹? • ê³¼ëª©?˜ ê°? ?…„?„, ?•™ê¸? ë³? ?›? ?ˆ˜?˜ ?†µê³? ? •ë³´ë?? ?‹´??? êµ¬ì¡°ì²?
+// ?ï¿½ï¿½?ï¿½ï¿½ ê³¼ëª©?ï¿½ï¿½ ï¿½? ?ï¿½ï¿½?ï¿½ï¿½, ?ï¿½ï¿½ï¿½? ï¿½? ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½ï¿½? ?ï¿½ï¿½ë³´ï¿½?? ?ï¿½ï¿½??? êµ¬ì¡°ï¿½?
 typedef struct {
     int year;
     int semester;
@@ -101,14 +101,14 @@ typedef struct {
     int id;
     char name[NAME_LENGTH];
 
-    //ê³¼ëª© ?•™? (?¼ì£¼ì¼ ?ˆ˜?—… ?šŸ?ˆ˜)
+    //ê³¼ëª© ?ï¿½ï¿½?ï¿½ï¿½(?ï¿½ï¿½ì£¼ì¼ ?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½)
     int credit; 
 
-    //?„ ?ˆ˜ê³¼ëª© ê°œìˆ˜ ë°? ID ëª©ë¡
+    //?ï¿½ï¿½?ï¿½ï¿½ê³¼ëª© ê°œìˆ˜ ï¿½? ID ëª©ë¡
     int prereq_count;
     int prereq_ids[MAX_PREREQ];
 
-    //ê³¼ëª©?˜ ?—°?„ë³?, ?•™ê¸°ë³„ ?„±?  ?†µê³? ? •ë³?
+    //ê³¼ëª©?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½ï¿½?, ?ï¿½ï¿½ê¸°ë³„ ?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½ï¿½? ?ï¿½ï¿½ï¿½?
     int stats_count;
     SubjectStats stats[MAX_SUBJECT_STATS];
 } SubjectInfo;
@@ -160,7 +160,7 @@ typedef struct {
     SubjectZScore z_array[MAX_SUBJECT_NUM];
 } User;
 
-// ê³µìš©ì²?
+// ê³µìš©ï¿½?
 
 typedef union {
     Subject *subject;
@@ -169,7 +169,7 @@ typedef union {
     BoardPost *board_post;
 } DataPointer;
 
-// ?—´ê±°í˜•
+// ?ï¿½ï¿½ê±°í˜•
 typedef enum {
     MENU_STATE_MAIN,
     MENU_STATE_CALCULATOR,
@@ -284,8 +284,5 @@ Subject* copy_subject(Subject* original) {
     for(int i=0; i<MAX_SUBJECT_NUM; i++) copy->arr[i] = NULL;
     return copy;
 }
-
-// dummy data
-
 
 #endif //STRUCT_H

@@ -3,7 +3,7 @@
 //
 
 #include "../struct.h" 
-// #include "../login/login.h"
+#include "../login/login.h"
 #include "calculator.h"
 
 /**
@@ -135,11 +135,8 @@ StatusCode preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM
  * 주어진 Load와 Synergy를 바탕으로 TimeTable의 난이도 요소를 계산한다.
  * 가장 Load가 큰 과목(argmax_load)과 Synergy가 가장 높은 과목 쌍(argmax_synergy)을 찾는다.
  */
-StatusCode calculate_difficulty(const TimeTable* table,
-                                Subject *argmax_load,
-                                Subject (*argmax_synergy)[2],
-                                double *total_difficulty) {
-    if (table == NULL || argmax_load == NULL || argmax_synergy == NULL || table->n ==0) {
+StatusCode calculate_difficulty(TimeTable* table) {
+    if (table == NULL || table->n ==0) {
         return ERROR_INVALID_INPUT;
     }
 
@@ -150,7 +147,7 @@ StatusCode calculate_difficulty(const TimeTable* table,
 
     double Load[MAX_SUBJECT_NUM];
     double Synergy[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM];
-    *total_difficulty = 0;
+    table->difficulty = 0;
 
     sprintf(data_path, "%s/data", dir_path);
     
@@ -170,33 +167,33 @@ StatusCode calculate_difficulty(const TimeTable* table,
     fread(Synergy, sizeof(double), MAX_SUBJECT_NUM*MAX_SUBJECT_NUM, fp);
     fclose(fp);
 
-    *argmax_load = *(table->subjects[0]);
+    *(table->argmax_load) = *(table->subjects[0]);
     for (int i = 0; i < table->n; i++) {
         Subject *cur_subject = table->subjects[i];
         if(cur_subject == NULL ||
            cur_subject->id < 0 || cur_subject->id >=MAX_SUBJECT_NUM )
             return ERROR_INVALID_INPUT;
         
-        if(Load[cur_subject->id] > Load[argmax_load->id])
-            *argmax_load = *cur_subject;
-        *total_difficulty += Load[cur_subject->id];
+        if(Load[cur_subject->id] > Load[table->argmax_load->id])
+            *(table->argmax_load) = *cur_subject;
+        table->difficulty += Load[cur_subject->id];
     }
 
     if(table->n==1){
-        (*argmax_synergy)[0] = *(table->subjects[0]);
-        (*argmax_synergy)[1] = *(table->subjects[0]);
+        (*(table->argmax_synergy))[0] = *(table->subjects[0]);
+        (*(table->argmax_synergy))[1] = *(table->subjects[0]);
     }
     else{
-        (*argmax_synergy)[0] = *(table->subjects[0]);
-        (*argmax_synergy)[1] = *(table->subjects[1]);
+        (*(table->argmax_synergy))[0] = *(table->subjects[0]);
+        (*(table->argmax_synergy))[1] = *(table->subjects[1]);
         for(int i = 0 ; i < table->n ; i++){
             for(int j = i+1 ; j< table->n ; j++){
                 if(Synergy[table->subjects[i]->id][table->subjects[j]->id] >
-                   Synergy[(*argmax_synergy)[0].id][(*argmax_synergy)[1].id]){
-                    (*argmax_synergy)[0] = *(table->subjects[i]);
-                    (*argmax_synergy)[1] = *(table->subjects[j]);
+                   Synergy[(*(table->argmax_synergy))[0].id][(*(table->argmax_synergy))[1].id]){
+                    (*(table->argmax_synergy))[0] = *(table->subjects[i]);
+                    (*(table->argmax_synergy))[1] = *(table->subjects[j]);
                 }
-                *total_difficulty += Synergy[table->subjects[i]->id][table->subjects[j]->id];
+                table->difficulty += Synergy[table->subjects[i]->id][table->subjects[j]->id];
             }
         }
     }
@@ -208,7 +205,7 @@ StatusCode calculate_difficulty(const TimeTable* table,
  * 지정된 path에 difficulty 데이터베이스를 추가한다.
  * 필요한 정보(ID, 값 등)는 함수 내부에서 사용자로부터 입력받는다.
  */
-StatusCode add_difficulty_db() {
+StatusCode add_difficulty_db(const TimeTable *table) {
     char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
     char file_path[PATH_LENGTH + 20];
     int num_of_data;
@@ -227,37 +224,33 @@ StatusCode add_difficulty_db() {
     }
     fclose(fp);
 
-    // TimeTable table;
-    // StatusCode result = get_timetable(&table);
-    // if(result != SUCCESS)
-    //     return result;
-    // printf("해당 시간표의 난이도를 0~10의 정수로 입력해주세요 : ");
-    // scanf("%d", &total_difficulty);
-
-    // sprintf(file_path, "%s/data/data%:03d.txt", dir_path, num_of_data);
-    // fp = fopen(file_path, "w");
-
-    // fprintf(fp, "%d %d\n", table.n, total_difficulty);
-    // for(int i=0;i<table.n;i++){
-    //     int cur_difficulty;
-    //     printf("과목 %s의 난이도를 0~10의 정수로 입력해주세요 : ", table.subjects[i]->name);
-    //     scanf("%d", &cur_difficulty);
-    //     fprintf(fp, "%d %d\n", table.subjects[i]->id, cur_difficulty);
-    // }
-    // fclose(fp);
+    printf("해당 시간표의 난이도를 0~10의 정수로 입력해주세요 : ");
+    scanf("%d", &total_difficulty);
 
     sprintf(file_path, "%s/data/data%:03d.txt", dir_path, num_of_data);
     fp = fopen(file_path, "w");
 
-    int num_of_subject;
-    scanf("%d %d", &num_of_subject, &total_difficulty);
-    fprintf(fp, "%d %d\n", num_of_subject, total_difficulty);
-    for(int i=0;i<num_of_subject;i++){
-        int subject, cur_difficulty;
-        scanf("%d %d", &subject, &cur_difficulty);
-        fprintf(fp, "%d %d\n", subject, cur_difficulty);
+    fprintf(fp, "%d %d\n", table->n, total_difficulty);
+    for(int i=0;i<table->n;i++){
+        int cur_difficulty;
+        printf("과목 %s의 난이도를 0~10의 정수로 입력해주세요 : ", table->subjects[i]->name);
+        scanf("%d", &cur_difficulty);
+        fprintf(fp, "%d %d\n", table->subjects[i]->id, cur_difficulty);
     }
     fclose(fp);
+
+    // sprintf(file_path, "%s/data/data%:03d.txt", dir_path, num_of_data);
+    // fp = fopen(file_path, "w");
+
+    // int num_of_subject;
+    // scanf("%d %d", &num_of_subject, &total_difficulty);
+    // fprintf(fp, "%d %d\n", num_of_subject, total_difficulty);
+    // for(int i=0;i<num_of_subject;i++){
+    //     int subject, cur_difficulty;
+    //     scanf("%d %d", &subject, &cur_difficulty);
+    //     fprintf(fp, "%d %d\n", subject, cur_difficulty);
+    // }
+    // fclose(fp);
 
     num_of_data++;
 

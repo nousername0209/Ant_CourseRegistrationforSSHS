@@ -2,6 +2,7 @@
 // Created by 김주환 on 25. 11. 9.
 //
 // modified by 장민준 on 2025.11.23. find_subject_stats, add_subject_stats, has_prereq 함수 추가
+// modified by 장민준 on 2025.11.24. 
 
 #ifndef RECOMMENDER_H
 #define RECOMMENDER_H
@@ -19,19 +20,21 @@
  */
 const SubjectStats *find_subject_stats(const SubjectInfo *subject_info, int year, int semester);
 
-/*
+
+/**
  * @brief SubjectInfo에 새로운 통계(SubjectStats)를 하나 추가한다.
  *
- * @param subject_info  통계를 추가할 과목 SubjectInfo 구조체 포인터
- * @param year          연도
- * @param semester      학기
+ * @param subject_info    통계를 추가할 과목 SubjectInfo 구조체 포인터
+ * @param year            연도
+ * @param semester        학기
  * @param mean_raw_score  해당 연도/학기의 원점수 평균
  * @param stdev_raw_score 해당 연도/학기의 원점수 표준편차
- * @return int
- *         - 1: 추가 성공
- *         - 0: 실패 (subject_info가 NULL이거나, MAX_SUBJECT_STATS를 초과했을 때 등)
+ * @return StatusCode
+ *         - SUCCESS: 추가 성공
+ *         - ERROR_INVALID_INPUT: subject_info가 NULL일 때
+ *         - ERROR_INDEX_OUT: MAX_SUBJECT_STATS를 초과했을 때 등
  */
-int add_subject_stats(SubjectInfo *subject_info, int year, int semester, double mean_raw_score, double stdev_raw_score);
+StatusCode add_subject_stats(SubjectInfo *subject_info, int year, int semester, double mean_raw_score, double stdev_raw_score);
 
 /**
  * @brief 학생이 특정 과목의 선수과목들을 모두 들었는지 검사한다.
@@ -73,5 +76,40 @@ StatusCode get_z_score(const SubjectInfo *subject_info, int year, int semester, 
  *         - ERROR_INVALID_INPUT: 인자 이상 등
  */
 StatusCode recommend_techtree(const SubjectZScore *z_array, int z_count, const TechTree *trees, int tree_count, TechTree *recommended_tree);
+
+/**
+ * @brief SubjectInfo 배열을 이진 파일로 저장한다.
+ *
+ * 파일 포맷:
+ *   [int count]
+ *   [SubjectInfo x count]
+ *
+ * @param subjects   저장할 SubjectInfo 배열 포인터
+ * @param count      subjects 배열에 들어 있는 과목 개수
+ * @param path       저장할 파일 경로 (예: "data/subject_infos.dat")
+ * @return StatusCode
+ *         - SUCCESS: 저장 성공
+ *         - ERROR_INVALID_INPUT: 포인터가 NULL이거나 count가 음수일 때
+ *         - ERROR_FILE_NOT_FOUND: 파일을 열지 못한 경우(경로/권한 문제 등)
+ */
+StatusCode save_subject_infos(const SubjectInfo *subjects, int count, const char *path);
+
+/**
+ * @brief 이진 파일에서 SubjectInfo 배열을 로드한다.
+ *
+ * 파일 포맷:
+ *   [int count]
+ *   [SubjectInfo x count]
+ *
+ * @param subjects    데이터를 읽어올 SubjectInfo 배열 포인터
+ * @param max_count   subjects 배열이 수용 가능한 최대 과목 수
+ * @param out_count   실제로 읽어온 과목 수를 돌려줄 정수 포인터
+ * @param path        읽어 올 파일 경로 (예: "data/subject_infos.dat")
+ * @return StatusCode
+ *         - SUCCESS: 로드 성공
+ *         - ERROR_FILE_NOT_FOUND: 파일이 없거나 열기 실패
+ *         - ERROR_INVALID_INPUT: 포인터 NULL, 파일 포맷 이상, max_count 초과 등
+ */
+StatusCode load_subject_infos(SubjectInfo *subjects, int max_count, int *out_count, const char *path);
 
 #endif

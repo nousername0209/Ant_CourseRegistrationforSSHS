@@ -135,11 +135,8 @@ StatusCode preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM
  * 주어진 Load와 Synergy를 바탕으로 TimeTable의 난이도 요소를 계산한다.
  * 가장 Load가 큰 과목(argmax_load)과 Synergy가 가장 높은 과목 쌍(argmax_synergy)을 찾는다.
  */
-StatusCode calculate_difficulty(const TimeTable* table,
-                                Subject *argmax_load,
-                                Subject (*argmax_synergy)[2],
-                                double *total_difficulty) {
-    if (table == NULL || argmax_load == NULL || argmax_synergy == NULL || table->n ==0) {
+StatusCode calculate_difficulty(TimeTable* table) {
+    if (table == NULL || table->n ==0) {
         return ERROR_INVALID_INPUT;
     }
 
@@ -150,7 +147,7 @@ StatusCode calculate_difficulty(const TimeTable* table,
 
     double Load[MAX_SUBJECT_NUM];
     double Synergy[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM];
-    *total_difficulty = 0;
+    table->difficulty = 0;
 
     sprintf(data_path, "%s/data", dir_path);
     
@@ -174,33 +171,33 @@ StatusCode calculate_difficulty(const TimeTable* table,
 
 
 
-    *argmax_load = *(table->subjects[0]);
+    *(table->argmax_load) = *(table->subjects[0]);
     for (int i = 0; i < table->n; i++) {
         Subject *cur_subject = table->subjects[i];
         if(cur_subject == NULL ||
            cur_subject->id < 0 || cur_subject->id >=MAX_SUBJECT_NUM )
             return ERROR_INVALID_INPUT;
         
-        if(Load[cur_subject->id] > Load[argmax_load->id])
-            *argmax_load = *cur_subject;
-        *total_difficulty += Load[cur_subject->id];
+        if(Load[cur_subject->id] > Load[table->argmax_load->id])
+            *(table->argmax_load) = *cur_subject;
+        table->difficulty += Load[cur_subject->id];
     }
 
     if(table->n==1){
-        (*argmax_synergy)[0] = *(table->subjects[0]);
-        (*argmax_synergy)[1] = *(table->subjects[0]);
+        (*(table->argmax_synergy))[0] = *(table->subjects[0]);
+        (*(table->argmax_synergy))[1] = *(table->subjects[0]);
     }
     else{
-        (*argmax_synergy)[0] = *(table->subjects[0]);
-        (*argmax_synergy)[1] = *(table->subjects[1]);
+        (*(table->argmax_synergy))[0] = *(table->subjects[0]);
+        (*(table->argmax_synergy))[1] = *(table->subjects[1]);
         for(int i = 0 ; i < table->n ; i++){
             for(int j = i+1 ; j< table->n ; j++){
                 if(Synergy[table->subjects[i]->id][table->subjects[j]->id] >
-                   Synergy[(*argmax_synergy)[0].id][(*argmax_synergy)[1].id]){
-                    (*argmax_synergy)[0] = *(table->subjects[i]);
-                    (*argmax_synergy)[1] = *(table->subjects[j]);
+                   Synergy[(*(table->argmax_synergy))[0].id][(*(table->argmax_synergy))[1].id]){
+                    (*(table->argmax_synergy))[0] = *(table->subjects[i]);
+                    (*(table->argmax_synergy))[1] = *(table->subjects[j]);
                 }
-                *total_difficulty += Synergy[table->subjects[i]->id][table->subjects[j]->id];
+                table->difficulty += Synergy[table->subjects[i]->id][table->subjects[j]->id];
             }
         }
     }

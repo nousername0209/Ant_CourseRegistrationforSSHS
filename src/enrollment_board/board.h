@@ -11,4 +11,8 @@ StatusCode create_post(BoardPost *result);
 
 StatusCode apply_post(BoardPost *post, int id);
 
+StatusCode cancel_post(BoardPost *post, int id);
+
+int is_user_applied(const BoardPost *post, int id);
+
 #endif //ENROLLMENT_BOARD_H

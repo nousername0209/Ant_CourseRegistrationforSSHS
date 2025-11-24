@@ -3,7 +3,7 @@
 //
 
 #include "../struct.h" 
-// #include "../login/login.h"
+#include "../login/login.h"
 #include "calculator.h"
 
 /**
@@ -212,7 +212,7 @@ StatusCode calculate_difficulty(const TimeTable* table,
  * 지정된 path에 difficulty 데이터베이스를 추가한다.
  * 필요한 정보(ID, 값 등)는 함수 내부에서 사용자로부터 입력받는다.
  */
-StatusCode add_difficulty_db() {
+StatusCode add_difficulty_db(const TimeTable *table) {
     char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
     char file_path[PATH_LENGTH + 20];
     int num_of_data;
@@ -231,37 +231,33 @@ StatusCode add_difficulty_db() {
     }
     fclose(fp);
 
-    // TimeTable table;
-    // StatusCode result = get_timetable(&table);
-    // if(result != SUCCESS)
-    //     return result;
-    // printf("해당 시간표의 난이도를 0~10의 정수로 입력해주세요 : ");
-    // scanf("%d", &total_difficulty);
-
-    // sprintf(file_path, "%s/data/data%:03d.txt", dir_path, num_of_data);
-    // fp = fopen(file_path, "w");
-
-    // fprintf(fp, "%d %d\n", table.n, total_difficulty);
-    // for(int i=0;i<table.n;i++){
-    //     int cur_difficulty;
-    //     printf("과목 %s의 난이도를 0~10의 정수로 입력해주세요 : ", table.subjects[i]->name);
-    //     scanf("%d", &cur_difficulty);
-    //     fprintf(fp, "%d %d\n", table.subjects[i]->id, cur_difficulty);
-    // }
-    // fclose(fp);
+    printf("해당 시간표의 난이도를 0~10의 정수로 입력해주세요 : ");
+    scanf("%d", &total_difficulty);
 
     sprintf(file_path, "%s/data/data%:03d.txt", dir_path, num_of_data);
     fp = fopen(file_path, "w");
 
-    int num_of_subject;
-    scanf("%d %d", &num_of_subject, &total_difficulty);
-    fprintf(fp, "%d %d\n", num_of_subject, total_difficulty);
-    for(int i=0;i<num_of_subject;i++){
-        int subject, cur_difficulty;
-        scanf("%d %d", &subject, &cur_difficulty);
-        fprintf(fp, "%d %d\n", subject, cur_difficulty);
+    fprintf(fp, "%d %d\n", table->n, total_difficulty);
+    for(int i=0;i<table->n;i++){
+        int cur_difficulty;
+        printf("과목 %s의 난이도를 0~10의 정수로 입력해주세요 : ", table->subjects[i]->name);
+        scanf("%d", &cur_difficulty);
+        fprintf(fp, "%d %d\n", table->subjects[i]->id, cur_difficulty);
     }
     fclose(fp);
+
+    // sprintf(file_path, "%s/data/data%:03d.txt", dir_path, num_of_data);
+    // fp = fopen(file_path, "w");
+
+    // int num_of_subject;
+    // scanf("%d %d", &num_of_subject, &total_difficulty);
+    // fprintf(fp, "%d %d\n", num_of_subject, total_difficulty);
+    // for(int i=0;i<num_of_subject;i++){
+    //     int subject, cur_difficulty;
+    //     scanf("%d %d", &subject, &cur_difficulty);
+    //     fprintf(fp, "%d %d\n", subject, cur_difficulty);
+    // }
+    // fclose(fp);
 
     num_of_data++;
 

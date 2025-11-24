@@ -170,10 +170,6 @@ StatusCode calculate_difficulty(const TimeTable* table,
     fread(Synergy, sizeof(double), MAX_SUBJECT_NUM*MAX_SUBJECT_NUM, fp);
     fclose(fp);
 
-    
-
-
-
     *argmax_load = *(table->subjects[0]);
     for (int i = 0; i < table->n; i++) {
         Subject *cur_subject = table->subjects[i];

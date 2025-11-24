@@ -9,7 +9,7 @@
 
 StatusCode preprocess_load(double (*Load)[MAX_SUBJECT_NUM]);
 StatusCode preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM]);
-StatusCode calculate_difficulty(const TimeTable* table, Subject *argmax_load, Subject (*argmax_synergy)[2], double *total_difficulty);
-StatusCode add_difficulty_db();
+StatusCode calculate_difficulty(TimeTable* table);
+StatusCode add_difficulty_db(const TimeTable *table);
 
 #endif //DIFFICULTY_CALCULATOR_H

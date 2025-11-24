@@ -49,6 +49,14 @@ typedef enum _Key {
     ESC = 27
 } Key;
 
+typedef enum _Page {
+    HOME_PAGE,
+    LOGIN_PAGE,
+    INPUT_PAGE,
+    OUTPUT_PAGE,
+    ESC_PAGE
+} Page;
+
 #define CONSOLE_WIDTH 80
 #define UI_WIDTH 50 // UI ?š”?†Œê°? ì°¨ì???•˜?Š” ????žµ? ?¸ ê°?ë¡? ê¸¸ì´ (? œëª? ?¬?•¨)
 #define START_X ((CONSOLE_WIDTH - UI_WIDTH) / 2) // UI ?‹œ?ž‘?  X ì¢Œí‘œ
@@ -178,7 +186,138 @@ typedef enum {
     SUCCESS,
     ERROR_FILE_NOT_FOUND,
     ERROR_INVALID_INPUT,
-    ERROR_INDEX_OUT
+    ERROR_INDEX_OUT,
+    ERROR_MEMORY_ALLOC
 } StatusCode;
+
+void load_user_data(User* user, int id, int *is_first) {
+    char filename[100];
+    sprintf(filename, "dataset/course_io/user/user_%d.txt", id);
+    
+    user->id = id;
+    user->current_sem = 0; 
+    for(int i=0; i<SEMESTER_NUM; i++) user->table[i] = NULL;
+
+    FILE* fp = fopen(filename, "r");
+    if (fp == NULL) {
+        *is_first = 1; return;
+    }
+
+    *is_first = 0;
+    
+    char line[256];
+    int current_sem_idx = -1;
+    int subjects_to_read = 0;
+
+    while (fgets(line, sizeof(line), fp)) {
+        trim_newline(line);
+        
+        if (strncmp(line, "ID:", 3) == 0) {
+            continue;
+        }
+        else if (strncmp(line, "CUR_SEM:", 8) == 0) {
+            sscanf(line, "CUR_SEM:%d", &user->current_sem);
+        }
+        else if (strncmp(line, "SEM|", 4) == 0) {
+            int sem_num, count;
+            sscanf(line, "SEM|%d|%d", &sem_num, &count);
+            
+            current_sem_idx = sem_num - 1; 
+            subjects_to_read = count;
+
+            if (user->table[current_sem_idx] == NULL) {
+                user->table[current_sem_idx] = (TimeTable*)calloc(1, sizeof(TimeTable));
+            }
+        }
+        else if (current_sem_idx != -1 && subjects_to_read > 0) {
+            char name[NAME_LENGTH];
+            int credit, sub_id;
+            
+            if (sscanf(line, "%[^|]|%d|%d", name, &credit, &sub_id) == 3) {
+                Subject* s = create_node(name, 1, credit);
+                s->id = sub_id;
+                s->semester = current_sem_idx + 1;
+                
+                TimeTable* t = user->table[current_sem_idx];
+                if (t != NULL && t->n < MAX_SUBJECT_NUM) {
+                    t->subjects[t->n++] = s;
+                }
+                subjects_to_read--;
+            }
+        }
+    }
+    fclose(fp);
+}
+
+void load_user_data(User* user, int id, int *is_first) {
+    char filename[100];
+    sprintf(filename, "dataset/course_io/user/user_%d.txt", id);
+    
+    user->id = id;
+    user->current_sem = 0; 
+    for(int i=0; i<SEMESTER_NUM; i++) user->table[i] = NULL;
+
+    FILE* fp = fopen(filename, "r");
+    if (fp == NULL) {
+        *is_first = 1; return;
+    }
+
+    *is_first = 0;
+    
+    char line[256];
+    int current_sem_idx = -1;
+    int subjects_to_read = 0;
+
+    while (fgets(line, sizeof(line), fp)) {
+        trim_newline(line);
+        
+        if (strncmp(line, "ID:", 3) == 0) {
+            continue;
+        }
+        else if (strncmp(line, "CUR_SEM:", 8) == 0) {
+            sscanf(line, "CUR_SEM:%d", &user->current_sem);
+        }
+        else if (strncmp(line, "SEM|", 4) == 0) {
+            int sem_num, count;
+            sscanf(line, "SEM|%d|%d", &sem_num, &count);
+            
+            current_sem_idx = sem_num - 1; 
+            subjects_to_read = count;
+
+            if (user->table[current_sem_idx] == NULL) {
+                user->table[current_sem_idx] = (TimeTable*)calloc(1, sizeof(TimeTable));
+            }
+        }
+        else if (current_sem_idx != -1 && subjects_to_read > 0) {
+            char name[NAME_LENGTH];
+            int credit, sub_id;
+            
+            if (sscanf(line, "%[^|]|%d|%d", name, &credit, &sub_id) == 3) {
+                Subject* s = create_node(name, 1, credit);
+                s->id = sub_id;
+                s->semester = current_sem_idx + 1;
+                
+                TimeTable* t = user->table[current_sem_idx];
+                if (t != NULL && t->n < MAX_SUBJECT_NUM) {
+                    t->subjects[t->n++] = s;
+                }
+                subjects_to_read--;
+            }
+        }
+    }
+    fclose(fp);
+}
+
+Subject* copy_subject(Subject* original) {
+    Subject* copy = (Subject*)malloc(sizeof(Subject));
+    if (copy == NULL) return NULL;
+    *copy = *original; 
+    copy->n = 0; 
+    for(int i=0; i<MAX_SUBJECT_NUM; i++) copy->arr[i] = NULL;
+    return copy;
+}
+
+// dummy data
+
 
 #endif //STRUCT_H

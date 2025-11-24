@@ -71,17 +71,10 @@ StatusCode show_login_screen(char *id_buffer, int max_len) {
     return SUCCESS;
 }
 
-int login() {
-    char user_id[ID_LENGTH];
-
-    // HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    // SMALL_RECT windowSize = {0, 0, 80, 10};
-    // SetConsoleWindowInfo(hConsole, TRUE, &windowSize);
-    system("mode con cols=80 lines=30");
-
-    StatusCode s_show_login_screen = show_login_screen(user_id, ID_LENGTH);
-
+StatusCode login(int *user_id) {
     system("cls");
-
-    return atoi(user_id);
+    char id_str[ID_LENGTH];
+    StatusCode s_show_login_screen = show_login_screen(id_str, ID_LENGTH);
+    *user_id = atoi(id_str);
+    return SUCCESS;
 }

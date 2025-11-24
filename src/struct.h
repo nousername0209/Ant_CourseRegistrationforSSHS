@@ -1,4 +1,4 @@
-// modified by ì¥ë¯¼ì¤€ on 2025.11.23. SubjectStats, SubjectInfo êµ¬ì¡°ì²´ ì¶”ê°€
+// modified by ?¥ë¯¼ì?? on 2025.11.23. SubjectStats, SubjectInfo êµ¬ì¡°ì²? ì¶”ê??
 
 
 #ifndef STRUCT_H
@@ -8,10 +8,29 @@
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
+#ifdef _WIN32
 #include <conio.h>
+#else
+#include <termios.h>
+#include <unistd.h>
 
+static inline int getch(void) {
+    struct termios oldattr, newattr;
 
-// UI ê´€ë ¨
+    if (tcgetattr(STDIN_FILENO, &oldattr) != 0) return -1;
+
+    newattr = oldattr;
+    newattr.c_lflag &= ~(ICANON | ECHO);
+    if (tcsetattr(STDIN_FILENO, TCSANOW, &newattr) != 0) return -1;
+
+    int ch = getchar();
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
+
+    return ch;
+}
+#endif
+
+// UI ê´?? ¨
 #define UI_RESET "\x1B[0m"
 #define UI_REVERSE "\x1B[7m"
 #define UI_DIM "\x1B[2m"
@@ -31,20 +50,20 @@ typedef enum _Key {
 } Key;
 
 #define CONSOLE_WIDTH 80
-#define UI_WIDTH 50 // UI ìš”ì†Œê°€ ì°¨ì§€í•˜ëŠ” ëŒ€ëµì ì¸ ê°€ë¡œ ê¸¸ì´ (ì œëª© í¬í•¨)
-#define START_X ((CONSOLE_WIDTH - UI_WIDTH) / 2) // UI ì‹œì‘ì  X ì¢Œí‘œ
+#define UI_WIDTH 50 // UI ?š”?†Œê°? ì°¨ì???•˜?Š” ????µ? ?¸ ê°?ë¡? ê¸¸ì´ (? œëª? ?¬?•¨)
+#define START_X ((CONSOLE_WIDTH - UI_WIDTH) / 2) // UI ?‹œ?‘?  X ì¢Œí‘œ
 #define START_Y 0
 
-void goto_ansi(int x, int y) {
+static inline void goto_ansi(int x, int y) {
     printf("\x1B[%d;%dH", y, x);
 }
 
-void print_center(const char* title, int len, int y_pos) {
+static inline void print_center(const char* title, int len, int y_pos) {
     goto_ansi(START_X + (UI_WIDTH - len) / 2, START_Y + y_pos);
     printf("%s", title);
 }
 
-// í”„ë¡œê·¸ë¨ ê´€ë ¨
+// ?”„ë¡œê·¸?¨ ê´?? ¨
 #define PATH_LENGTH 300
 #define NAME_LENGTH 100
 #define SEMESTER_NUM 6
@@ -54,15 +73,15 @@ void print_center(const char* title, int len, int y_pos) {
 #define PW_LENGTH 30
 #define MAX_APPLY_NUM 50
 
-//ì„ ìˆ˜ê³¼ëª©ì˜ ìµœëŒ€ ê°œìˆ˜
+//?„ ?ˆ˜ê³¼ëª©?˜ ìµœë?? ê°œìˆ˜
 #define MAX_PREREQ 10
 
-//ê³¼ëª© í†µê³„ ì •ë³´ì˜ ìµœëŒ€ ê°œìˆ˜
+//ê³¼ëª© ?†µê³? ? •ë³´ì˜ ìµœë?? ê°œìˆ˜
 #define MAX_SUBJECT_STATS 100
 
-// êµ¬ì¡°ì²´
+// êµ¬ì¡°ì²?
 
-// íŠ¹ì • ê³¼ëª©ì˜ ê° ë…„ë„, í•™ê¸° ë³„ ì›ì ìˆ˜ì˜ í†µê³„ ì •ë³´ë¥¼ ë‹´ì€ êµ¬ì¡°ì²´
+// ?Š¹? • ê³¼ëª©?˜ ê°? ?…„?„, ?•™ê¸? ë³? ?›? ?ˆ˜?˜ ?†µê³? ? •ë³´ë?? ?‹´??? êµ¬ì¡°ì²?
 typedef struct {
     int year;
     int semester;
@@ -74,14 +93,14 @@ typedef struct {
     int id;
     char name[NAME_LENGTH];
 
-    //ê³¼ëª© í•™ì (ì¼ì£¼ì¼ ìˆ˜ì—… íšŸìˆ˜)
+    //ê³¼ëª© ?•™? (?¼ì£¼ì¼ ?ˆ˜?—… ?šŸ?ˆ˜)
     int credit; 
 
-    //ì„ ìˆ˜ê³¼ëª© ê°œìˆ˜ ë° ID ëª©ë¡
+    //?„ ?ˆ˜ê³¼ëª© ê°œìˆ˜ ë°? ID ëª©ë¡
     int prereq_count;
     int prereq_ids[MAX_PREREQ];
 
-    //ê³¼ëª©ì˜ ì—°ë„ë³„, í•™ê¸°ë³„ ì„±ì  í†µê³„ ì •ë³´
+    //ê³¼ëª©?˜ ?—°?„ë³?, ?•™ê¸°ë³„ ?„±?  ?†µê³? ? •ë³?
     int stats_count;
     SubjectStats stats[MAX_SUBJECT_STATS];
 } SubjectInfo;
@@ -133,7 +152,7 @@ typedef struct {
     SubjectZScore z_array[MAX_SUBJECT_NUM];
 } User;
 
-// ê³µìš©ì²´
+// ê³µìš©ì²?
 
 typedef union {
     Subject *subject;
@@ -142,14 +161,18 @@ typedef union {
     BoardPost *board_post;
 } DataPointer;
 
-// ì—´ê±°í˜•
+// ?—´ê±°í˜•
 typedef enum {
     MENU_STATE_MAIN,
-    MENU_STATE_CALCULATOR, 
+    MENU_STATE_CALCULATOR,
     MENU_STATE_TECH_TREE,
     MENU_STATE_BOARD,
     MENU_STATE_EXIT
 } MenuState;
+
+#ifdef ERROR_FILE_NOT_FOUND
+#undef ERROR_FILE_NOT_FOUND
+#endif
 
 typedef enum {
     SUCCESS,

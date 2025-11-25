@@ -74,6 +74,7 @@ StatusCode preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM
     DIR *dir = NULL;
     int subject[MAX_SUBJECT_NUM];
     double Load[MAX_SUBJECT_NUM];
+    int count[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM];
 
     int id1, id2;
     double val;
@@ -89,6 +90,13 @@ StatusCode preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM
     dir = opendir(data_path);
     if(dir==NULL)
         return ERROR_FILE_NOT_FOUND;
+
+    for(int i=0;i<MAX_SUBJECT_NUM;i++){
+        for(int j=0;j<MAX_SUBJECT_NUM;j++){
+            (*Synergy)[i][j]=0.0;
+            count[i][j]=0;
+        }
+    }
     
     struct dirent *ent = NULL;
     while ((ent=readdir(dir))!=NULL) {
@@ -115,7 +123,15 @@ StatusCode preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM
                 if(i==j)
                     continue;
                 (*Synergy)[subject[i]][subject[j]]+=average_synergy;
+                count[subject[i]][subject[j]]++;
             }
+        }
+    }
+    for(int i=0;i<MAX_SUBJECT_NUM;i++){
+        for(int j=0;j<MAX_SUBJECT_NUM;j++){
+            if (count[i][j]==0)
+                continue;
+            (*Synergy)[i][j]/=count[i][j];
         }
     }
     for(int i=0;i<MAX_SUBJECT_NUM;i++)

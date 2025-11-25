@@ -179,8 +179,7 @@ typedef enum {
     ERROR_MEMORY_ALLOC
 } StatusCode;
 
-// �Լ� ���� �� ����
- Subject* create_node(const char* name, int isFile, int credit) {
+static Subject* create_node(const char* name, int isFile, int credit) {
     Subject* s = (Subject*)malloc(sizeof(Subject));
     if (s == NULL) return NULL;
     strcpy(s->name, name);
@@ -195,18 +194,18 @@ typedef enum {
     return s;
 }
 
-void add_child(Subject* parent, Subject* child) {
+static void add_child(Subject* parent, Subject* child) {
     if (parent->n < MAX_SUBJECT_NUM) {
         parent->arr[parent->n++] = child;
     }
 }
 
-void trim_newline(char* str) {
+static void trim_newline(char* str) {
     int len = strlen(str);
     if (len > 0 && (str[len-1] == '\n' || str[len-1] == '\r')) str[len-1] = '\0';
 }
 
-void load_user_data(User* user, int id, int *is_first) {
+static void load_user_data(User* user, int id, int *is_first) {
     char filename[100];
     sprintf(filename, "dataset/course_io/user/user_%d.txt", id);
     
@@ -265,7 +264,7 @@ void load_user_data(User* user, int id, int *is_first) {
     fclose(fp);
 }
 
-Subject* copy_subject(Subject* original) {
+static Subject* copy_subject(Subject* original) {
     Subject* copy = (Subject*)malloc(sizeof(Subject));
     if (copy == NULL) return NULL;
     *copy = *original; 

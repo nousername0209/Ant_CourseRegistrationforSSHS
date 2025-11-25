@@ -384,7 +384,7 @@ void run_registration(int student_id) {
     int edit_mode = 0; 
 
     if (is_first) {
-        user.current_sem = popup_select_semester(0, SEMESTER_NUM - 1, "현재 이수 학기를 선택하세요");
+        user.current_sem = popup_select_semester(1, SEMESTER_NUM, "현재 이수 학기를 선택하세요");
         edit_mode = 1;
     }
 

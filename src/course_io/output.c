@@ -264,7 +264,7 @@ void draw_output_view(User* user, int btn_idx) {
 
     // 1. 헤더
     printf("================================================================================\n");
-    printf("  내 시간표 확인                                    %sID: %5d%s\n", 
+    printf("  내 시간표 확인                                                 %sID: %5d%s\n", 
             UI_BOLD, user->id, UI_RESET);
     printf("================================================================================\n");
 
@@ -280,9 +280,9 @@ void draw_output_view(User* user, int btn_idx) {
 
         goto_ansi(box_x, box_y);
         if ((sem + 1) <= user->current_sem) 
-            printf("%s[ %d 학기 (이수 완료) ]%s", UI_DIM, sem + 1, UI_RESET);
+            printf("%s[%d 학기 (완료)]%s", UI_DIM, sem + 1, UI_RESET);
         else 
-            printf("%s[ %d 학기 (수강 예정) ]%s", UI_COLOR_CYAN, sem + 1, UI_RESET);
+            printf("%s[%d 학기 (예정)]%s", UI_COLOR_CYAN, sem + 1, UI_RESET);
 
         TimeTable* t = user->table[sem];
         int sem_credits = 0;
@@ -312,7 +312,7 @@ void draw_output_view(User* user, int btn_idx) {
     int btn_start_x = (CONSOLE_WIDTH - (btn_spacing * 4)) / 2 + 2;
     
     // 버튼 라벨
-    const char* labels[4] = { "시간표 수정", "난이도 계산", "데이터 추가", "홈으로" };
+    const char* labels[4] = { "시간표 수정", "난이도 계산", "데이터 추가", "  홈으로  " };
 
     for (int i = 0; i < 4; i++) {
         goto_ansi(btn_start_x + (i * btn_spacing), btn_y);

@@ -1,6 +1,12 @@
 #include "login.h"
 #include "windows.h"
 
+/**
+ * @brief 기본적인 로그인 UI를 띄워준다.(매 틱마다 실행되어야 함)
+ * @param select 현재 커서가 올라와 있는 항목이다.(로그인/ 이름 수정)
+ * @param id_buffer 현재까지 입력한 id의 문자열이다.
+ * @return 성공 여부를 StatusCodeEnum으로 반환한다. 항상 SUCCESS를 반환한다.
+ */
 StatusCodeEnum draw_ui(SelectEnum select, const char* id_buffer) {
     system("cls");
     
@@ -25,6 +31,12 @@ StatusCodeEnum draw_ui(SelectEnum select, const char* id_buffer) {
     return SUCCESS;
 }
 
+/**
+ * @brief 로그인 UI를 띄우고 로그인 정보를 입력받는 함수이다.
+ * @param id_buffer 입력받은 id를 저장하고, 반환하는 문자열이다. 해당 포인터에 아이디가 저장된다.
+ * @param max_len 입력받을 id의 최대 길이이다.
+ * @return 성공 여부를 StatusCodeEnum으로 반환한다. 항상 SUCCESS를 반환한다.
+ */
 StatusCodeEnum show_login_screen(char *id_buffer, int max_len) {
     SelectEnum current = ID_FIELD;
     int id_index = 0;
@@ -71,6 +83,11 @@ StatusCodeEnum show_login_screen(char *id_buffer, int max_len) {
     return SUCCESS;
 }
 
+/**
+ * @brief 로그인 UI를 띄우고 로그인 정보를 입력받는 함수이다. show_login_screen에 필요한 기능들을 정리해놓은 함수이다.
+ * @param user_id 입력받은 id를 저장하고, 반환하는 문자열이다. 해당 포인터에 아이디가 저장된다.
+ * @return 성공 여부를 StatusCodeEnum으로 반환한다. 항상 SUCCESS를 반환한다.
+ */
 StatusCodeEnum login(int *user_id) {
     system("cls");
     char id_str[ID_LENGTH];

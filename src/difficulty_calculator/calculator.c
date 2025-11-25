@@ -1,14 +1,18 @@
 //
-// Created by �??주환 on 25. 11. 9.
+// Created by 김주환 on 25. 11. 9.
 //
 
 #include "../struct.h" 
-// #include "../login/login.h"
 #include "calculator.h"
 
 /**
- * preprocess_load
- * dir_path?�� ?��?�� ?��?��?��?��?�� 바탕?���?? Load(?��?�� 과목 ?��?��?��)�?? 로드?��?��.
+ * @brief 데이터베이스를 바탕으로 Load를 계산, 성공여부를 반환한다.
+ *
+ * @param Load Load를 계산한 후 이를 저장할 배열의 포인터이다.
+ *           - 함수 외부에서 double Load[MAX_SUBJECT_NUM을]을 선언하고 &Load를 파라미터로 넣어주면 작동한다.
+ * @return 성공 여부를 StatusCodeEnum으로 반환한다.
+ *       - SUCCESS: 성공
+ *       - ERROR_FILE_NOT_FOUND: 주소 오류(data 디렉토리 없음)
  */
 StatusCodeEnum preprocess_load(double (*Load)[MAX_SUBJECT_NUM]) {
     char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
@@ -63,8 +67,14 @@ StatusCodeEnum preprocess_load(double (*Load)[MAX_SUBJECT_NUM]) {
 }
 
 /**
- * preprocess_synergy
- * dir_path?�� ?��?�� ?��?��?��?��?�� 바탕?���?? Synergy(과목 �?? ?��?���??/교차 ?��?��?��)�?? 로드?��?��
+ * @brief 데이터베이스를 바탕으로 Synergy를 계산, 성공여부를 반환한다.
+ *
+ * @param Synergy Synergy를 계산한 후 이를 저장할 2차원 배열의 포인터이다.
+ *           - 함수 외부에서 double Synergy[MAX_SUBJECT_NUM을][MAX_SUBJECT_NUM]을 선언하고 &Synergy를 파라미터로 넣어주면 작동한다.
+ *           - preprocess_synergy를 호출한 후에 호출해야 정상 작동한다.
+ * @return 성공 여부를 StatusCodeEnum으로 반환한다.
+ *       - SUCCESS: 성공
+ *       - ERROR_FILE_NOT_FOUND: 주소 오류(data 디렉토리 없음 or load.dat 없음)
  */
 StatusCodeEnum preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM]) {
     char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
@@ -147,9 +157,15 @@ StatusCodeEnum preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT
 }
 
 /**
- * calculate_difficulty
- * 주어�?? Load??? Synergy�?? 바탕?���?? TimeTable?�� ?��?��?�� ?��?���?? 계산?��?��.
- * �???�� Load�?? ?�� 과목(argmax_load)�?? Synergy�?? �???�� ?��??? 과목 ?��(argmax_synergy)?�� 찾는?��.
+ * @brief table을 입력하면 해당 table의 난이도, 가장 load가 높은 과목, 가장 synergy가 높은 과목 쌍을 반환한다.
+ *      - 사전에 preprocess 코드가 모두 실행되어야 한다.
+ *      - 가장 load가 높은 과목 등은 table 내 변수로 반환된다.
+ *
+ * @param table 난이도를 계산할 시간표의 포인터이다.
+ * @return 성공 여부를 StatusCodeEnum으로 반환한다.
+ *       - SUCCESS: 성공
+ *       - ERROR_INVALID_INPUT: table 오류(포인터가 NULL 포인터 혹은 table의 크기가 0)
+ *       - ERROR_FILE_NOT_FOUND: load.dat, synergy.dat 등의 파일이 없는 경우
  */
 StatusCodeEnum calculate_difficulty(TimeTable* table) {
     if (table == NULL || table->n ==0) {

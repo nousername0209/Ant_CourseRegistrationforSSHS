@@ -25,25 +25,8 @@ int main() {
                 page = run_output(user_id);
                 break;
             case HOME_PAGE:
-                system("cls");
-                print_center("=== HOME PAGE ===", 17, 10);
-                print_center("[1] 시간표 입력/수정", 20, 12);
-                print_center("[2] 난이도 분석 및 추가", 22, 13);
-                print_center("[3] 수강 신청 게시판", 20, 14);
-                print_center("[ESC] 종료", 10, 16);
-
-                int ch = _getch();
-                if (ch == '1') {
-                    page = INPUT_PAGE;
-                } else if (ch == '2') {
-                    page = OUTPUT_PAGE;
-                } else if (ch == '3') {
-                    page = BOARD_PAGE;
-                } else if (ch == ESC) {
-                    flag = 1;
-                }
+                page = run_home_page();
                 break;
-
             case ESC_PAGE:
                 system("cls");
                 flag = 1;

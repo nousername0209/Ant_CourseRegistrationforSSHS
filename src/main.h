@@ -7,5 +7,6 @@
 #include "login/login.c"
 #include "tech_tree/recommender.c"
 #include "enrollment_board/board.c"
+#include "home/home.c"
 
 #endif //MAIN_H

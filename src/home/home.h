@@ -3,4 +3,6 @@
 
 #include "../struct.h"
 
-#endif //HOME_H
+PageEnum run_home_page(void);
+
+#endif // HOME_H

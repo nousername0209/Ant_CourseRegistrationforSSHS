@@ -1,12 +1,14 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include "course_io/input.c"
-#include "course_io/output.c"
-#include "difficulty_calculator/calculator.c"
-#include "login/login.c"
-#include "tech_tree/recommender.c"
-#include "enrollment_board/board.c"
-#include "home/home.c"
+#include "struct.h"
 
-#endif //MAIN_H
+#include "course_io/input.h"
+#include "course_io/output.h"
+#include "difficulty_calculator/calculator.h"
+#include "enrollment_board/board.h"
+#include "home/home.h"
+#include "login/login.h"
+#include "tech_tree/recommender.h"
+
+#endif // MAIN_H

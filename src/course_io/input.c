@@ -1,23 +1,24 @@
-#include "input.h" 
+#include "input.h"
 
 #define COL_WIDTH 25
 #define COL_Y 4
 
-Subject* load_data_from_file(const char* filename) {
-    FILE* fp = fopen(filename, "r");
+Subject *load_data_from_file(const char *filename) {
+    FILE *fp = fopen(filename, "r");
 
-    Subject* root = create_node("ROOT", 0, 0);
-    Subject* parents[10];
+    Subject *root = create_node("ROOT", 0, 0);
+    Subject *parents[10];
     parents[0] = root;
 
     char line[256];
-    int depth, isFile, credit, sub_id; 
+    int depth, isFile, credit, sub_id;
     char name_buffer[NAME_LENGTH];
 
     while (fgets(line, sizeof(line), fp)) {
-        if (sscanf(line, "%d|%d|%d|%d|%[^\n]", &depth, &isFile, &credit, &sub_id, name_buffer) == 5) {
+        if (sscanf(line, "%d|%d|%d|%d|%[^\n]", &depth, &isFile, &credit, &sub_id, name_buffer) ==
+            5) {
             trim_newline(name_buffer);
-            Subject* new_node = create_node(name_buffer, isFile, credit);
+            Subject *new_node = create_node(name_buffer, isFile, credit);
             new_node->id = sub_id;
             if (depth > 0 && depth < 10) {
                 add_child(parents[depth - 1], new_node);
@@ -29,225 +30,257 @@ Subject* load_data_from_file(const char* filename) {
     return root;
 }
 
-void save_user_data(User* user) {
+void save_user_data(User *user) {
     char filename[100];
     sprintf(filename, "dataset/course_io/user/user_%d.txt", user->id);
-    
-    FILE* fp = fopen(filename, "w");
+
+    FILE *fp = fopen(filename, "w");
     if (fp == NULL) {
         system("cls");
-        printf("¿À·ù: ÆÄÀÏÀ» ÀúÀåÇÒ ¼ö ¾ø½À´Ï´Ù (%s).\n", filename);
-        _getch();
-        return;
-    }
 
-    fprintf(fp, "ID:%d\n", user->id);
-    fprintf(fp, "CUR_SEM:%d\n", user->current_sem);
-    
-    for (int i = 0; i < SEMESTER_NUM; i++) {
-        if (user->table[i] != NULL && user->table[i]->n > 0) {
-            fprintf(fp, "SEM|%d|%d\n", i + 1, user->table[i]->n); 
-            
-            for (int j = 0; j < user->table[i]->n; j++) {
-                Subject* s = user->table[i]->subjects[j];
-                if (s == NULL) continue;
-                fprintf(fp, "%s|%d|%d\n", s->name, s->credit, s->id);
-            }
-        }
-    }
-    
-    fflush(fp);
-    fclose(fp);
-}
+            fprintf(fp, "SEM|%d|%d\n", i + 1, user->table[i]->n);
 
-int popup_select_semester(int start_sem, int end_sem, const char* title) {
-    if (start_sem > end_sem) return -1;
+                Subject *s = user->table[i]->subjects[j];
+                if (s == NULL)
+                    continue;
 
-    int selected_idx = 0;
-    int count = end_sem - start_sem + 1;
-    int box_w = 35;
-    int box_h = count + 4;
-    int start_x = (CONSOLE_WIDTH - box_w) / 2;
-    int start_y = 8;
+int popup_select_semester(int start_sem, int end_sem, const char *title) {
+    if (start_sem > end_sem)
+        return -1;
+    for (int i = 0; i < box_h; i++) {
+        printf("%s%*s%s", UI_REVERSE, box_w, "", UI_RESET);
+    while (1) {
+        printf("%s %s %s", UI_BOLD, title, UI_RESET);
+        for (int i = 0; i < count; i++) {
 
-    for(int i=0; i<box_h; i++) {
-        goto_ansi(start_x, start_y + i);
-        printf("%s%*s%s", UI_REVERSE, box_w, "", UI_RESET); 
-    }
 
-    int ch;
-    while(1) {
-        goto_ansi(start_x + 2, start_y + 1);
-        printf("%s %s %s", UI_BOLD, title, UI_RESET); 
-
-        for(int i=0; i<count; i++) {
-            int target_sem = start_sem + i;
-            goto_ansi(start_x + 2, start_y + 3 + i);
-            
-            if (i == selected_idx) {
-                printf("%s%s > %d ÇĞ±â %s", UI_REVERSE, UI_COLOR_YELLOW, target_sem, UI_RESET);
-            } else {
-                printf("%s   %d ÇĞ±â %s", UI_REVERSE, target_sem, UI_RESET);
-            }
-        }
-        
-        goto_ansi(1, 1);
-        ch = _getch();
-
-        if (ch == 224 || ch == 0) {
-            ch = _getch();
-            if (ch == UP_ARROW && selected_idx > 0) selected_idx--;
-            if (ch == DOWN_ARROW && selected_idx < count - 1) selected_idx++;
-        }
-        else if (ch == ENTER) {
-            for(int i=0; i<box_h; i++) {
-                goto_ansi(start_x, start_y + i);
-                printf("%*s", box_w, ""); 
-            }
-            return start_sem + selected_idx;
-        }
-        else if (ch == ESC) {
-            for(int i=0; i<box_h; i++) {
-                goto_ansi(start_x, start_y + i);
-                printf("%*s", box_w, ""); 
-            }
-            return -    1;
-        }
-    }
-}
-
-int popup_edit_menu() {
-    int selected_idx = 0;
-    const char* menus[] = { "1. ÇĞ±â ¼öÁ¤", "2. °ú¸ñ »èÁ¦", "3. Ãë¼Ò" };
-    int menu_cnt = 3;
-    
-    int box_w = 20;
-    int box_h = menu_cnt + 4;
-    int start_x = (CONSOLE_WIDTH - box_w) / 2;
-    int start_y = 10;
-
-    // ¹è°æ
-    for(int i=0; i<box_h; i++) {
-        goto_ansi(start_x, start_y + i);
-        printf("%s%*s%s", UI_REVERSE, box_w, "", UI_RESET); 
-    }
-
-    int ch;
-    while(1) {
-        goto_ansi(start_x + 2, start_y + 1);
-        printf("%s °ú¸ñ °ü¸® %s", UI_BOLD, UI_RESET); 
-
-        for(int i=0; i<menu_cnt; i++) {
-            goto_ansi(start_x + 2, start_y + 3 + i);
-            if (i == selected_idx) {
-                printf("%s%s > %s %s", UI_REVERSE, UI_COLOR_YELLOW, menus[i], UI_RESET);
-            } else {
-                printf("%s   %s %s", UI_REVERSE, menus[i], UI_RESET);
-            }
-        }
-        
-        goto_ansi(1, 1);
-        ch = _getch();
-        if (ch == 224 || ch == 0) {
-            ch = _getch();
-            if (ch == UP_ARROW && selected_idx > 0) selected_idx--;
-            if (ch == DOWN_ARROW && selected_idx < menu_cnt - 1) selected_idx++;
+            if (ch == UP_ARROW && selected_idx > 0)
+                selected_idx--;
+            if (ch == DOWN_ARROW && selected_idx < count - 1)
+                selected_idx++;
         } else if (ch == ENTER) {
-            // Áö¿ì±â
-            for(int i=0; i<box_h; i++) {
-                goto_ansi(start_x, start_y + i);
-                printf("%*s", box_w, ""); 
-            }
-            return selected_idx + 1; // 1, 2, 3 ¹İÈ¯
+            for (int i = 0; i < box_h; i++) {
+                printf("%*s", box_w, "");
         } else if (ch == ESC) {
-            for(int i=0; i<box_h; i++) {
-                goto_ansi(start_x, start_y + i);
-                printf("%*s", box_w, ""); 
-            }
-            return 0;
-        }
-    }
-}
+            for (int i = 0; i < box_h; i++) {
+                printf("%*s", box_w, "");
+            return -1;
 
-// [Ãß°¡] °ú¸ñ »èÁ¦ ÇÔ¼ö
-void delete_subject(User* user, int sem_idx, int sub_idx) {
-    TimeTable* t = user->table[sem_idx];
-    if (t == NULL || sub_idx >= t->n) return;
+    int selected_idx = 0;
+    const char *menus[] = {"1. Ğ± ", "2.  ", "3. "};
 
-    // ¸Ş¸ğ¸® ÇØÁ¦
-    free(t->subjects[sub_idx]);
-    
-    // ¹è¿­ ´ç±â±â
-    for (int i = sub_idx; i < t->n - 1; i++) {
-        t->subjects[i] = t->subjects[i+1];
-    }
-    t->subjects[t->n - 1] = NULL; // ¸¶Áö¸· Æ÷ÀÎÅÍ ÃÊ±âÈ­
-    t->n--;
-}
+    for (int i = 0; i < box_h; i++) {
+        printf("%s%*s%s", UI_REVERSE, box_w, "", UI_RESET);
+    while (1) {
+        printf("%s   %s", UI_BOLD, UI_RESET);
+        for (int i = 0; i < menu_cnt; i++) {
 
-// [Ãß°¡] °ú¸ñ ¼öÁ¤ ÇÔ¼ö (ÇĞ±â ÀÌµ¿)
-void modify_subject(User* user, int old_sem_idx, int sub_idx, int new_sem) {
-    if (old_sem_idx == new_sem - 1) return; // °°Àº ÇĞ±â¸é ¹«½Ã
+            if (ch == UP_ARROW && selected_idx > 0)
+                selected_idx--;
+            if (ch == DOWN_ARROW && selected_idx < menu_cnt - 1)
+                selected_idx++;
+            for (int i = 0; i < box_h; i++) {
+                printf("%*s", box_w, "");
+            for (int i = 0; i < box_h; i++) {
+                printf("%*s", box_w, "");
+void delete_subject(User *user, int sem_idx, int sub_idx) {
+    TimeTable *t = user->table[sem_idx];
+    if (t == NULL || sub_idx >= t->n)
+        return;
 
-    TimeTable* old_t = user->table[old_sem_idx];
-    if (old_t == NULL || sub_idx >= old_t->n) return;
+        t->subjects[i] = t->subjects[i + 1];
+void modify_subject(User *user, int old_sem_idx, int sub_idx, int new_sem) {
+    if (old_sem_idx == new_sem - 1)
+        return; //  Ğ± 
+    TimeTable *old_t = user->table[old_sem_idx];
+    if (old_t == NULL || sub_idx >= old_t->n)
+        return;
+    Subject *target = old_t->subjects[sub_idx];
 
-    // ±âÁ¸ °ú¸ñ Æ÷ÀÎÅÍ °¡Á®¿À±â
-    Subject* target = old_t->subjects[sub_idx];
-    
-    // »õ ÇĞ±â Å×ÀÌºí È®ÀÎ ¹× »ı¼º
-    int new_sem_idx = new_sem - 1;
-    if (user->table[new_sem_idx] == NULL) {
-        user->table[new_sem_idx] = (TimeTable*)calloc(1, sizeof(TimeTable));
-    }
-    TimeTable* new_t = user->table[new_sem_idx];
+        user->table[new_sem_idx] = (TimeTable *)calloc(1, sizeof(TimeTable));
+    TimeTable *new_t = user->table[new_sem_idx];
 
-    if (new_t->n < MAX_SUBJECT_NUM) {
-        // Á¤º¸ ¾÷µ¥ÀÌÆ®
-        target->semester = new_sem;
-        // »õ Å×ÀÌºí¿¡ Ãß°¡
-        new_t->subjects[new_t->n++] = target;
-        
-        // ±âÁ¸ Å×ÀÌºí¿¡¼­ Á¦°Å (¸Ş¸ğ¸® ÇØÁ¦ ¾øÀÌ Æ÷ÀÎÅÍ¸¸ ÀÌµ¿ÇÏ¹Ç·Î ¹è¿­¸¸ ´ç±è)
-        for (int i = sub_idx; i < old_t->n - 1; i++) {
+            old_t->subjects[i] = old_t->subjects[i + 1];
+
+void draw_screen(User *user, Subject *root, int col_idx, int row_indices[3], int focus_area,
+                 int btn_idx, int edit_mode, int timetable_select_idx) {
+    printf("  Ã» | %s%s%s |  Ì¼ Ğ±: %dĞ±                     %sID: %5d%s\n",
+           color_code, mode_str, UI_RESET, user->current_sem, UI_BOLD, user->id, UI_RESET);
+    Subject *cols[3] = {root, NULL, NULL};
+    if (cols[0]->n > 0 && row_indices[0] < cols[0]->n)
+    if (cols[1] != NULL && cols[1]->isFile == 0 && cols[1]->n > 0 && row_indices[1] < cols[1]->n)
+
+        if (c == col_idx && focus_area == 0)
+        else
+        if (c < 2)
+            printf("|");
+        if (cols[c] == NULL || cols[c]->isFile == 1)
+            continue;
+            Subject *item = cols[c]->arr[i];
+
+            if (item->isFile == 1)
+                sprintf(display_name, "%s(%d)", item->name, item->credit);
+            else
+                strcpy(display_name, item->name);
+                if (item->isFile == 0)
+                    printf(" >");
+            } else if (c < col_idx && i == row_indices[c]) {
+            } else {
+
+    const char *labels[3] = {"     ", "Ì¼ Ğ± ", "    È®     "};
+    int table_y = btn_y + 3;
+
+
+        if ((sem + 1) <= user->current_sem)
+            printf("%s[%d Ğ± (Ì¼)]%s", UI_DIM, sem + 1, UI_RESET);
+        else
+            printf("%s[%d Ğ± ()]%s", UI_COLOR_YELLOW, sem + 1, UI_RESET);
+        TimeTable *t = user->table[sem];
+                    current_item_idx += (t->n - i);
+                    break;
+
+
+
+    Subject *root = load_data_from_file("dataset/course_io/subjects.txt");
+
+
+    int focus_area = 0;
+    int btn_idx = 0;
+    int edit_mode = 0;
+        draw_screen(&user, root, col_idx, row_indices, focus_area, btn_idx, edit_mode,
+                    timetable_select_idx);
+
+
+        for (int i = 0; i < SEMESTER_NUM; i++)
+            if (user.table[i])
+                total_subjects += user.table[i]->n;
+            ch = _getch();
+                if (ch == UP_ARROW)
+                    focus_area = 0;
+                } else if (ch == LEFT_ARROW) {
+                    if (btn_idx > 0)
+                        btn_idx--;
+                } else if (ch == RIGHT_ARROW) {
+                    if (btn_idx < 2)
+                        btn_idx++;
+            } else if (focus_area == 2) { // Ã°Ç¥ Ä¿
+                if (ch == UP_ARROW)
+                    focus_area = 1;
+                else if (ch == LEFT_ARROW) {
+                    if (timetable_select_idx > 0)
+                        timetable_select_idx--;
+                } else if (ch == RIGHT_ARROW) {
+                    if (timetable_select_idx < total_subjects - 1)
+                        timetable_select_idx++;
+                }
+            } else { // Æ® Ä¿
+                Subject *current_parent = root;
+                if (col_idx == 1)
+                    current_parent = root->arr[row_indices[0]];
+                if (col_idx == 2)
+                    current_parent = root->arr[row_indices[0]]->arr[row_indices[1]];
+                int list_count =
+                    (current_parent && current_parent->isFile == 0) ? current_parent->n : 0;
+
+                case UP_ARROW:
+                    if (row_indices[col_idx] > 0)
+                        row_indices[col_idx]--;
+                    break;
+                case DOWN_ARROW:
+                    if (list_count > 0 && row_indices[col_idx] >= list_count - 1)
+                        focus_area = 1;
+                    else if (list_count > 0 && row_indices[col_idx] < list_count - 1)
+                        row_indices[col_idx]++;
+                    break;
+                case LEFT_ARROW:
+                    if (col_idx > 0)
+                        col_idx--;
+                    break;
+                case RIGHT_ARROW:
+                    if (col_idx < 2 && current_parent && current_parent->n > 0) {
+                        Subject *selected_item = current_parent->arr[row_indices[col_idx]];
+                        if (selected_item->isFile == 0) {
+                            col_idx++;
+                            row_indices[col_idx] = 0;
+                    }
+                    break;
+        } else if (ch == ENTER) {
+                if (btn_idx == 0) {
+                    edit_mode = !edit_mode;
+                } else if (btn_idx == 1) {
+                    int new_sem =
+                        popup_select_semester(0, SEMESTER_NUM - 1, " Ì¼ Ğ±â¸¦ Ï¼");
+                    if (new_sem != -1)
+                        user.current_sem = new_sem;
+                } else if (btn_idx == 2) {
+                    save_user_data(&user);
+            } else if (focus_area == 2) { // Ã°Ç¥ ×¸  -> / Ë¾
+
+                    for (int s = 0; s < SEMESTER_NUM; s++) {
+                        if (user.table[s] == NULL)
+                            continue;
+                        if (current_idx + user.table[s]->n > timetable_select_idx) {
+                            if (timetable_select_idx >= total_subjects - 1)
+                                timetable_select_idx--;
+                            if (timetable_select_idx < 0)
+                                timetable_select_idx = 0;
+                            if (edit_mode == 0) {
+                                start_s = user.current_sem + 1;
+                                end_s = SEMESTER_NUM;
+                            } else {
+                                start_s = 1;
+                                end_s = user.current_sem;
+            } else if (focus_area == 0 && col_idx == 2) { //  ß°
+                Subject *parent = root->arr[row_indices[0]]->arr[row_indices[1]];
+                Subject *target = parent->arr[row_indices[2]];
+                    if (edit_mode == 0) {
+                        start_s = user.current_sem + 1;
+                        end_s = SEMESTER_NUM;
+                    } else {
+                        start_s = 1;
+                        end_s = user.current_sem;
+                        if (sem != -1) {
+                                user.table[sem_idx] = (TimeTable *)calloc(1, sizeof(TimeTable));
+                            TimeTable *t = user.table[sem_idx];
+                                Subject *new_subj = copy_subject(target);
             old_t->subjects[i] = old_t->subjects[i+1];
         }
         old_t->subjects[old_t->n - 1] = NULL;
         old_t->n--;
     } else {
-        // ²Ë Â÷¼­ ÀÌµ¿ ºÒ°¡ ¾Ë¸² µî (»ı·«)
+        // ê½‰ ì°¨ì„œ ì´ë™ ë¶ˆê°€ ì•Œë¦¼ ë“± (ìƒëµ)
     }
 }
 
-// [¼öÁ¤] È­¸é ±×¸®±â (focus_area: 0=Tree, 1=Buttons, 2=Timetable)
+// [ìˆ˜ì •] í™”ë©´ ê·¸ë¦¬ê¸° (focus_area: 0=Tree, 1=Buttons, 2=Timetable)
 void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3], 
                  int focus_area, int btn_idx, int edit_mode, int timetable_select_idx) {
     system("cls");
 
-    // 1. »ó´Ü¹Ù
+    // 1. ìƒë‹¨ë°”
     char mode_str[50];
     char color_code[10];
     if (edit_mode == 0) {
-        strcpy(mode_str, "¼ö°­ ¿¹Á¤");
+        strcpy(mode_str, "ìˆ˜ê°• ì˜ˆì •");
         strcpy(color_code, UI_COLOR_GREEN);
     } else {
-        strcpy(mode_str, "¼ö°­ ¿Ï·á");
+        strcpy(mode_str, "ìˆ˜ê°• ì™„ë£Œ");
         strcpy(color_code, UI_COLOR_YELLOW);
     }
 
     printf("================================================================================\n");
-    printf("  ¼ö°­½ÅÃ» | %s%s%s | ÇöÀç ÀÌ¼ö ÇĞ±â: %dÇĞ±â                     %sID: %5d%s\n", 
+    printf("  ìˆ˜ê°•ì‹ ì²­ | %s%s%s | í˜„ì¬ ì´ìˆ˜ í•™ê¸°: %dí•™ê¸°                     %sID: %5d%s\n", 
             color_code, mode_str, UI_RESET, user->current_sem, UI_BOLD, user->id, UI_RESET);
     printf("================================================================================\n");
 
-    // 2. Æ®¸® µ¥ÀÌÅÍ ÁØºñ
+    // 2. íŠ¸ë¦¬ ë°ì´í„° ì¤€ë¹„
     Subject* cols[3] = {root, NULL, NULL};
     if (cols[0]->n > 0 && row_indices[0] < cols[0]->n) 
         cols[1] = cols[0]->arr[row_indices[0]];
     if (cols[1] != NULL && cols[1]->isFile == 0 && cols[1]->n > 0 && row_indices[1] < cols[1]->n) 
         cols[2] = cols[1]->arr[row_indices[1]];
 
-    // 3. ÄÃ·³ ±×¸®±â
+    // 3. ì»¬ëŸ¼ ê·¸ë¦¬ê¸°
     for (int c = 0; c < 3; c++) {
         int x_pos = 2 + (c * COL_WIDTH);
         goto_ansi(x_pos, COL_Y);
@@ -283,14 +316,14 @@ void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3],
         }
     }
 
-    // 4. ÇÏ´Ü ¹öÆ° ¿µ¿ª
+    // 4. í•˜ë‹¨ ë²„íŠ¼ ì˜ì—­
     int btn_y = START_Y + 12;
     int btn_spacing = 22;
     int btn_start_x = (CONSOLE_WIDTH - (btn_spacing * 3)) / 2 + 2;
     const char* labels[3] = { 
-        "  ¸ğµå º¯°æ  ", 
-        "ÀÌ¼ö ÇĞ±â º¯°æ", 
-        "    È®Á¤     " 
+        "  ëª¨ë“œ ë³€ê²½  ", 
+        "ì´ìˆ˜ í•™ê¸° ë³€ê²½", 
+        "    í™•ì •     " 
     };
     for (int i = 0; i < 3; i++) {
         goto_ansi(btn_start_x + (i * btn_spacing), btn_y);
@@ -301,11 +334,11 @@ void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3],
         }
     }
 
-    // 5. ½Ã°£Ç¥ ¿ä¾à ¹× ±×¸®µå
+    // 5. ì‹œê°„í‘œ ìš”ì•½ ë° ê·¸ë¦¬ë“œ
     int table_y = btn_y + 3;   
     int total_credits = 0;
     int total_subjects = 0;
-    // ÀüÃ¼ °ú¸ñ ¼ö °è»ê
+    // ì „ì²´ ê³¼ëª© ìˆ˜ ê³„ì‚°
     for (int i = 0; i < SEMESTER_NUM; i++) {
         if (user->table[i] != NULL) {
             total_subjects += user->table[i]->n;
@@ -319,12 +352,12 @@ void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3],
     goto_ansi(2, table_y);
     printf("--------------------------------------------------------------------------------");
     goto_ansi(2, table_y + 1);
-    printf("[ ÀüÃ¼ ½Ã°£Ç¥ ¿ä¾à | ÃÑ %d°ú¸ñ | ÃÑ %dÇĞÁ¡ ]", total_subjects, total_credits);
+    printf("[ ì „ì²´ ì‹œê°„í‘œ ìš”ì•½ | ì´ %dê³¼ëª© | ì´ %dí•™ì  ]", total_subjects, total_credits);
     
     int box_w = 26;
     int start_table_row = table_y + 3;
     
-    // ½Ã°£Ç¥ ¾ÆÀÌÅÛ ÀÎµ¦½Ì¿ë Ä«¿îÅÍ
+    // ì‹œê°„í‘œ ì•„ì´í…œ ì¸ë±ì‹±ìš© ì¹´ìš´í„°
     int current_item_idx = 0;
 
     for (int sem = 0; sem < SEMESTER_NUM; sem++) {
@@ -334,25 +367,25 @@ void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3],
         int box_y = start_table_row + (row * 6);
 
         goto_ansi(box_x, box_y);
-        if ((sem + 1) <= user->current_sem) printf("%s[%d ÇĞ±â (ÀÌ¼ö)]%s", UI_DIM, sem + 1, UI_RESET);
-        else printf("%s[%d ÇĞ±â (¿¹Á¤)]%s", UI_COLOR_YELLOW, sem + 1, UI_RESET);
+        if ((sem + 1) <= user->current_sem) printf("%s[%d í•™ê¸° (ì´ìˆ˜)]%s", UI_DIM, sem + 1, UI_RESET);
+        else printf("%s[%d í•™ê¸° (ì˜ˆì •)]%s", UI_COLOR_YELLOW, sem + 1, UI_RESET);
 
         TimeTable* t = user->table[sem];
         if (t == NULL || t->n == 0) {
             goto_ansi(box_x, box_y + 1);
-            printf("%s(ºñ¾îÀÖÀ½)%s", UI_DIM, UI_RESET);
+            printf("%s(ë¹„ì–´ìˆìŒ)%s", UI_DIM, UI_RESET);
         } else {
             for (int i = 0; i < t->n; i++) {
                 if (i >= 4) {
                     goto_ansi(box_x, box_y + 1 + i);
-                    printf("...¿Ü %d°Ç", t->n - i);
+                    printf("...ì™¸ %dê±´", t->n - i);
                     current_item_idx += (t->n - i); 
                     break; 
                 }
                 
                 goto_ansi(box_x, box_y + 1 + i);
                 
-                // ½Ã°£Ç¥ ¿µ¿ª Æ÷Ä¿½º ½Ã ÇÏÀÌ¶óÀÌÆ®
+                // ì‹œê°„í‘œ ì˜ì—­ í¬ì»¤ìŠ¤ ì‹œ í•˜ì´ë¼ì´íŠ¸
                 if (focus_area == 2 && current_item_idx == timetable_select_idx) {
                     printf("%s- %s%s", UI_REVERSE, t->subjects[i]->name, UI_RESET);
                 } else {
@@ -384,7 +417,7 @@ void run_registration(int student_id) {
     int edit_mode = 0; 
 
     if (is_first) {
-        user.current_sem = popup_select_semester(1, SEMESTER_NUM, "ÇöÀç ÀÌ¼ö ÇĞ±â¸¦ ¼±ÅÃÇÏ¼¼¿ä");
+        user.current_sem = popup_select_semester(1, SEMESTER_NUM, "í˜„ì¬ ì´ìˆ˜ í•™ê¸°ë¥¼ ì„ íƒí•˜ì„¸ìš”");
         edit_mode = 1;
     }
 
@@ -395,7 +428,7 @@ void run_registration(int student_id) {
         goto_ansi(1, 1);
         ch = _getch();
         
-        // ÃÑ µî·Ï °ú¸ñ ¼ö °è»ê (½Ã°£Ç¥ ³×ºñ°ÔÀÌ¼Ç¿ë)
+        // ì´ ë“±ë¡ ê³¼ëª© ìˆ˜ ê³„ì‚° (ì‹œê°„í‘œ ë„¤ë¹„ê²Œì´ì…˜ìš©)
         int total_subjects = 0;
         for(int i=0; i<SEMESTER_NUM; i++) 
             if(user.table[i]) total_subjects += user.table[i]->n;
@@ -403,7 +436,7 @@ void run_registration(int student_id) {
         if (ch == 224 || ch == 0) {
             ch = _getch(); 
 
-            if (focus_area == 1) { // ¹öÆ° Æ÷Ä¿½º
+            if (focus_area == 1) { // ë²„íŠ¼ í¬ì»¤ìŠ¤
                 if (ch == UP_ARROW) focus_area = 0; 
                 else if (ch == DOWN_ARROW) {
                     if (total_subjects > 0) {
@@ -414,12 +447,12 @@ void run_registration(int student_id) {
                 else if (ch == LEFT_ARROW) { if (btn_idx > 0) btn_idx--; }
                 else if (ch == RIGHT_ARROW) { if (btn_idx < 2) btn_idx++; }
             } 
-            else if (focus_area == 2) { // ½Ã°£Ç¥ Æ÷Ä¿½º
+            else if (focus_area == 2) { // ì‹œê°„í‘œ í¬ì»¤ìŠ¤
                 if (ch == UP_ARROW) focus_area = 1;
                 else if (ch == LEFT_ARROW) { if (timetable_select_idx > 0) timetable_select_idx--; }
                 else if (ch == RIGHT_ARROW) { if (timetable_select_idx < total_subjects - 1) timetable_select_idx++; }
             }
-            else { // Æ®¸® Æ÷Ä¿½º
+            else { // íŠ¸ë¦¬ í¬ì»¤ìŠ¤
                 Subject* current_parent = root;
                 if (col_idx == 1) current_parent = root->arr[row_indices[0]];
                 if (col_idx == 2) current_parent = root->arr[row_indices[0]]->arr[row_indices[1]];
@@ -449,23 +482,23 @@ void run_registration(int student_id) {
             }
         }
         else if (ch == ENTER) {
-            if (focus_area == 1) { // ¹öÆ° Å¬¸¯
+            if (focus_area == 1) { // ë²„íŠ¼ í´ë¦­
                 if (btn_idx == 0) { edit_mode = !edit_mode; }
                 else if (btn_idx == 1) { 
-                    int new_sem = popup_select_semester(0, SEMESTER_NUM - 1, "ÇöÀç ÀÌ¼ö ÇĞ±â¸¦ ¼±ÅÃÇÏ¼¼¿ä");
+                    int new_sem = popup_select_semester(0, SEMESTER_NUM - 1, "í˜„ì¬ ì´ìˆ˜ í•™ê¸°ë¥¼ ì„ íƒí•˜ì„¸ìš”");
                     if (new_sem != -1) user.current_sem = new_sem;
                 }
                 else if (btn_idx == 2) { 
                     save_user_data(&user); 
                     system("cls");
-                    printf("\nÀúÀå ¿Ï·á (ID: %d). ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n", user.id);
+                    printf("\nì €ì¥ ì™„ë£Œ (ID: %d). í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n", user.id);
                     break;
                 }
             }
-            else if (focus_area == 2) { // ½Ã°£Ç¥ Ç×¸ñ ¼±ÅÃ -> ¼öÁ¤/»èÁ¦ ÆË¾÷
+            else if (focus_area == 2) { // ì‹œê°„í‘œ í•­ëª© ì„ íƒ -> ìˆ˜ì •/ì‚­ì œ íŒì—…
                 int action = popup_edit_menu();
-                if (action == 1 || action == 2) { // ¼öÁ¤ or »èÁ¦
-                    // ¼±ÅÃµÈ ÀÎµ¦½º(linear)¸¦ (ÇĞ±â, °ú¸ñ) ÀÎµ¦½º·Î º¯È¯
+                if (action == 1 || action == 2) { // ìˆ˜ì • or ì‚­ì œ
+                    // ì„ íƒëœ ì¸ë±ìŠ¤(linear)ë¥¼ (í•™ê¸°, ê³¼ëª©) ì¸ë±ìŠ¤ë¡œ ë³€í™˜
                     int current_idx = 0;
                     int target_sem = -1, target_sub = -1;
                     
@@ -480,20 +513,20 @@ void run_registration(int student_id) {
                     }
 
                     if (target_sem != -1) {
-                        if (action == 2) { // »èÁ¦
+                        if (action == 2) { // ì‚­ì œ
                             delete_subject(&user, target_sem, target_sub);
-                            // ÀÎµ¦½º Á¶Á¤ (»èÁ¦ ÈÄ ¹üÀ§ ÃÊ°ú ¹æÁö)
+                            // ì¸ë±ìŠ¤ ì¡°ì • (ì‚­ì œ í›„ ë²”ìœ„ ì´ˆê³¼ ë°©ì§€)
                             if (timetable_select_idx >= total_subjects - 1) timetable_select_idx--;
                             if (timetable_select_idx < 0) timetable_select_idx = 0;
-                        } else { // ¼öÁ¤
+                        } else { // ìˆ˜ì •
                             int start_s, end_s;
                             char title[50];
                             if (edit_mode == 0) { 
                                 start_s = user.current_sem + 1; end_s = SEMESTER_NUM;
-                                strcpy(title, "ÀÌµ¿ÇÒ ÇĞ±â ¼±ÅÃ (¿¹Á¤)");
+                                strcpy(title, "ì´ë™í•  í•™ê¸° ì„ íƒ (ì˜ˆì •)");
                             } else { 
                                 start_s = 1; end_s = user.current_sem;
-                                strcpy(title, "ÀÌµ¿ÇÒ ÇĞ±â ¼±ÅÃ (±âÀÌ¼ö)");
+                                strcpy(title, "ì´ë™í•  í•™ê¸° ì„ íƒ (ê¸°ì´ìˆ˜)");
                             }
 
                             if (start_s <= end_s) {
@@ -506,7 +539,7 @@ void run_registration(int student_id) {
                     }
                 }
             }
-            else if (focus_area == 0 && col_idx == 2) { // °ú¸ñ Ãß°¡
+            else if (focus_area == 0 && col_idx == 2) { // ê³¼ëª© ì¶”ê°€
                 Subject* parent = root->arr[row_indices[0]]->arr[row_indices[1]];
                 Subject* target = parent->arr[row_indices[2]];
 
@@ -515,10 +548,10 @@ void run_registration(int student_id) {
                     char title[50];
                     if (edit_mode == 0) { 
                         start_s = user.current_sem + 1; end_s = SEMESTER_NUM;
-                        strcpy(title, "¼ö°­ÇÒ ÇĞ±â ¼±ÅÃ (¿¹Á¤)");
+                        strcpy(title, "ìˆ˜ê°•í•  í•™ê¸° ì„ íƒ (ì˜ˆì •)");
                     } else { 
                         start_s = 1; end_s = user.current_sem;
-                        strcpy(title, "¼ö°­Çß´ø ÇĞ±â ¼±ÅÃ (±âÀÌ¼ö)");
+                        strcpy(title, "ìˆ˜ê°•í–ˆë˜ í•™ê¸° ì„ íƒ (ê¸°ì´ìˆ˜)");
                     }
 
                     if (start_s <= end_s) {

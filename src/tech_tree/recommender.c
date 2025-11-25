@@ -3,12 +3,13 @@
 //
 // Modified by 장민준 on 2025.11.24. (파일 저장/로드 함수 추가)
 
-#include "../struct.h"
 #include "recommender.h"
+#include "../struct.h"
 #include <string.h>
 
 /**
- * @brief SubjectInfo 안에서 특정 year/semester에 해당하는 원점수 평균/표준편차 통계(SubjectStats)를 찾는다.
+ * @brief SubjectInfo 안에서 특정 year/semester에 해당하는 원점수 평균/표준편차 통계(SubjectStats)를
+ * 찾는다.
  *
  * @param subject_info  통계를 찾을 과목 SubjectInfo 구조체 포인터
  * @param year          찾고자 하는 연도
@@ -18,9 +19,9 @@
  *         - 없으면 NULL
  */
 
-const SubjectStats *find_subject_stats(const SubjectInfo *subject_info, int year, int semester)
-{
-    if (subject_info == NULL) return NULL;
+const SubjectStats *find_subject_stats(const SubjectInfo *subject_info, int year, int semester) {
+    if (subject_info == NULL)
+        return NULL;
 
     for (int i = 0; i < subject_info->stats_count; i++) {
         const SubjectStats *st = &subject_info->stats[i];
@@ -45,8 +46,8 @@ const SubjectStats *find_subject_stats(const SubjectInfo *subject_info, int year
  *         - ERROR_INVALID_INPUT: subject_info가 NULL일 때
  *         - ERROR_INDEX_OUT: MAX_SUBJECT_STATS를 초과했을 때 등
  */
-StatusCodeEnum add_subject_stats(SubjectInfo *subject_info, int year, int semester, double mean_raw_score, double stdev_raw_score)
-{
+StatusCodeEnum add_subject_stats(SubjectInfo *subject_info, int year, int semester,
+                                 double mean_raw_score, double stdev_raw_score) {
     if (subject_info == NULL) {
         return ERROR_INVALID_INPUT;
     }
@@ -74,8 +75,7 @@ StatusCodeEnum add_subject_stats(SubjectInfo *subject_info, int year, int semest
  *         - 1: 모든 선수과목 id가 taken_ids 안에 있음 (선수요건 만족)
  *         - 0: 하나라도 빠져 있음 (선수요건 불만족)
  */
-int meets_prereq(const SubjectInfo *subject_info, const int taken_ids[], int taken_count)
-{
+int meets_prereq(const SubjectInfo *subject_info, const int taken_ids[], int taken_count) {
     if (subject_info == NULL || taken_ids == NULL) {
         return 0;
     }
@@ -92,11 +92,11 @@ int meets_prereq(const SubjectInfo *subject_info, const int taken_ids[], int tak
         }
 
         if (!found) {
-            return 0;   // 하나라도 없으면 선수요건 불만족
+            return 0; // 하나라도 없으면 선수요건 불만족
         }
     }
 
-    return 1;           // 전부 포함
+    return 1; // 전부 포함
 }
 
 /* ============================================================
@@ -117,11 +117,8 @@ int meets_prereq(const SubjectInfo *subject_info, const int taken_ids[], int tak
  *         - ERROR_INVALID_INPUT: subject_info나 z_array가 NULL, 통계를 찾지 못했을 때 등
  *         - ERROR_INDEX_OUT: z_index가 배열 범위를 벗어났을 때
  */
-StatusCodeEnum get_z_score(const SubjectInfo *subject_info,
-                       int year, int semester,
-                       double raw_score,
-                       SubjectZScore *z_array, int z_index)
-{
+StatusCodeEnum get_z_score(const SubjectInfo *subject_info, int year, int semester,
+                           double raw_score, SubjectZScore *z_array, int z_index) {
     if (subject_info == NULL || z_array == NULL) {
         return ERROR_INVALID_INPUT;
     }
@@ -134,7 +131,7 @@ StatusCodeEnum get_z_score(const SubjectInfo *subject_info,
         return ERROR_INVALID_INPUT;
     }
 
-    double mean  = stats->mean_raw_score;
+    double mean = stats->mean_raw_score;
     double stdev = stats->stdev_raw_score;
     double z = 0.0;
 
@@ -162,7 +159,6 @@ StatusCodeEnum get_z_score(const SubjectInfo *subject_info,
     return SUCCESS;
 }
 
-
 /**
  * @brief 내부 유틸: z_array에서 특정 과목 id의 z-score를 찾는다.
  *
@@ -173,9 +169,9 @@ StatusCodeEnum get_z_score(const SubjectInfo *subject_info,
  *         - 과목이 있으면 해당 z-score
  *         - 없으면 0.0
  */
-static double find_z_by_id(const SubjectZScore *z_array, int z_count, int subject_id)
-{
-    if (z_array == NULL) return 0.0;
+static double find_z_by_id(const SubjectZScore *z_array, int z_count, int subject_id) {
+    if (z_array == NULL)
+        return 0.0;
 
     for (int i = 0; i < z_count; i++) {
         if (z_array[i].subject.id == subject_id) {
@@ -184,7 +180,6 @@ static double find_z_by_id(const SubjectZScore *z_array, int z_count, int subjec
     }
     return 0.0;
 }
-
 
 /* ============================================================
  *  TechTree 추천 관련 함수
@@ -204,12 +199,8 @@ static double find_z_by_id(const SubjectZScore *z_array, int z_count, int subjec
  *         - SUCCESS: 추천 성공
  *         - ERROR_INVALID_INPUT: 인자 이상 등
  */
-StatusCodeEnum recommend_techtree(const SubjectZScore *z_array,
-                              int z_count,
-                              const TechTree *trees,
-                              int tree_count,
-                              TechTree *recommended_tree)
-{
+StatusCodeEnum recommend_techtree(const SubjectZScore *z_array, int z_count, const TechTree *trees,
+                                  int tree_count, TechTree *recommended_tree) {
     if (z_array == NULL || trees == NULL || recommended_tree == NULL) {
         return ERROR_INVALID_INPUT;
     }
@@ -222,11 +213,12 @@ StatusCodeEnum recommend_techtree(const SubjectZScore *z_array,
 
     for (int t = 0; t < tree_count; t++) {
         const TechTree *tree = &trees[t];
-        if (tree->n < 0) continue;
+        if (tree->n < 0)
+            continue;
 
         int subject_num = tree->n;
         if (subject_num > MAX_SUBJECT_NUM) {
-            subject_num = MAX_SUBJECT_NUM;  // 방어적인 상한
+            subject_num = MAX_SUBJECT_NUM; // 방어적인 상한
         }
 
         double score = 0.0;
@@ -235,7 +227,8 @@ StatusCodeEnum recommend_techtree(const SubjectZScore *z_array,
             Subject *sub = tree->subject_arr[i];
             int weight = tree->weight[i];
 
-            if (sub == NULL) continue;
+            if (sub == NULL)
+                continue;
 
             double user_z = find_z_by_id(z_array, z_count, sub->id);
             score += user_z * (double)weight;
@@ -274,8 +267,7 @@ StatusCodeEnum recommend_techtree(const SubjectZScore *z_array,
  *         - ERROR_INVALID_INPUT: 포인터가 NULL이거나 count가 음수일 때
  *         - ERROR_FILE_NOT_FOUND: 파일을 열지 못한 경우(경로/권한 문제 등)
  */
-StatusCodeEnum save_subject_infos(const SubjectInfo *subjects, int count, const char *path)
-{
+StatusCodeEnum save_subject_infos(const SubjectInfo *subjects, int count, const char *path) {
     if (subjects == NULL || path == NULL) {
         return ERROR_INVALID_INPUT;
     }
@@ -323,8 +315,8 @@ StatusCodeEnum save_subject_infos(const SubjectInfo *subjects, int count, const 
  *         - ERROR_FILE_NOT_FOUND: 파일이 없거나 열기 실패
  *         - ERROR_INVALID_INPUT: 포인터 NULL, 파일 포맷 이상, max_count 초과 등
  */
-StatusCodeEnum load_subject_infos(SubjectInfo *subjects, int max_count, int *out_count, const char *path)
-{
+StatusCodeEnum load_subject_infos(SubjectInfo *subjects, int max_count, int *out_count,
+                                  const char *path) {
     if (subjects == NULL || out_count == NULL || path == NULL) {
         return ERROR_INVALID_INPUT;
     }

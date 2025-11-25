@@ -2,7 +2,7 @@
 // Created by �??주환 on 25. 11. 9.
 //
 
-#include "../struct.h" 
+#include "../struct.h"
 // #include "../login/login.h"
 #include "calculator.h"
 
@@ -20,17 +20,17 @@ StatusCodeEnum preprocess_load(double (*Load)[MAX_SUBJECT_NUM]) {
 
     for (int i = 0; i < MAX_SUBJECT_NUM; i++) {
         (*Load)[i] = 0.0;
-        count[i]=0;
+        count[i] = 0;
     }
 
     sprintf(data_path, "%s/data", dir_path);
     dir = opendir(data_path);
-    if(dir==NULL)
+    if (dir == NULL)
         return ERROR_FILE_NOT_FOUND;
-    
+
     struct dirent *ent = NULL;
-    while ((ent=readdir(dir))!=NULL) {
-        if(strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0)
+    while ((ent = readdir(dir)) != NULL) {
+        if (strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0)
             continue;
         sprintf(file_path, "%s/%s", data_path, ent->d_name);
         fp = fopen(file_path, "r");
@@ -38,20 +38,20 @@ StatusCodeEnum preprocess_load(double (*Load)[MAX_SUBJECT_NUM]) {
             return ERROR_FILE_NOT_FOUND;
         int n, tmp;
         fscanf(fp, "%d %d", &n, &tmp);
-        for(int i = 0 ; i < n ; i++){
+        for (int i = 0; i < n; i++) {
             int subject, hard;
             fscanf(fp, "%d %d", &subject, &hard);
-            (*Load)[subject]+=hard;
+            (*Load)[subject] += hard;
             count[subject]++;
         }
         fclose(fp);
     }
     closedir(dir);
 
-    for(int i = 0 ; i < MAX_SUBJECT_NUM ; i++){
-        if (count[i]==0)
+    for (int i = 0; i < MAX_SUBJECT_NUM; i++) {
+        if (count[i] == 0)
             continue;
-        (*Load)[i]/=count[i];
+        (*Load)[i] /= count[i];
     }
 
     sprintf(file_path, "%s/load.dat", dir_path);
@@ -64,7 +64,8 @@ StatusCodeEnum preprocess_load(double (*Load)[MAX_SUBJECT_NUM]) {
 
 /**
  * preprocess_synergy
- * dir_path?�� ?��?�� ?��?��?��?��?�� 바탕?���?? Synergy(과목 �?? ?��?���??/교차 ?��?��?��)�?? 로드?��?��
+ * dir_path?�� ?��?�� ?��?��?��?��?�� 바탕?���?? Synergy(과목 �?? ?��?���??/교차 ?��?��?��)�??
+ * 로드?��?��
  */
 StatusCodeEnum preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM]) {
     char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
@@ -81,60 +82,60 @@ StatusCodeEnum preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT
 
     sprintf(file_path, "%s/load.dat", dir_path);
     fp = fopen(file_path, "rb");
-    if(fp ==NULL)
+    if (fp == NULL)
         return ERROR_FILE_NOT_FOUND;
     fread(Load, sizeof(double), MAX_SUBJECT_NUM, fp);
     fclose(fp);
 
     sprintf(data_path, "%s/data", dir_path);
     dir = opendir(data_path);
-    if(dir==NULL)
+    if (dir == NULL)
         return ERROR_FILE_NOT_FOUND;
 
-    for(int i=0;i<MAX_SUBJECT_NUM;i++){
-        for(int j=0;j<MAX_SUBJECT_NUM;j++){
-            (*Synergy)[i][j]=0.0;
-            count[i][j]=0;
+    for (int i = 0; i < MAX_SUBJECT_NUM; i++) {
+        for (int j = 0; j < MAX_SUBJECT_NUM; j++) {
+            (*Synergy)[i][j] = 0.0;
+            count[i][j] = 0;
         }
     }
-    
+
     struct dirent *ent = NULL;
-    while ((ent=readdir(dir))!=NULL) {
-        if(strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0)
+    while ((ent = readdir(dir)) != NULL) {
+        if (strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0)
             continue;
         sprintf(file_path, "%s/%s", data_path, ent->d_name);
         fp = fopen(file_path, "r");
         if (fp == NULL)
             return ERROR_FILE_NOT_FOUND;
         int n, total_hard;
-        double expect_hard=0, average_synergy;
+        double expect_hard = 0, average_synergy;
         fscanf(fp, "%d %d", &n, &total_hard);
-        for(int i=0;i<n;i++){
+        for (int i = 0; i < n; i++) {
             int hard;
             fscanf(fp, "%d %d", &subject[i], &hard);
             expect_hard += hard;
         }
         fclose(fp);
         expect_hard /= n;
-        average_synergy =(total_hard-expect_hard)*2/(n*(n-1));
+        average_synergy = (total_hard - expect_hard) * 2 / (n * (n - 1));
 
-        for(int i=0;i<n;i++){
-            for(int j=0;j<n;j++){
-                if(i==j)
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == j)
                     continue;
-                (*Synergy)[subject[i]][subject[j]]+=average_synergy;
+                (*Synergy)[subject[i]][subject[j]] += average_synergy;
                 count[subject[i]][subject[j]]++;
             }
         }
     }
-    for(int i=0;i<MAX_SUBJECT_NUM;i++){
-        for(int j=0;j<MAX_SUBJECT_NUM;j++){
-            if (count[i][j]==0)
+    for (int i = 0; i < MAX_SUBJECT_NUM; i++) {
+        for (int j = 0; j < MAX_SUBJECT_NUM; j++) {
+            if (count[i][j] == 0)
                 continue;
-            (*Synergy)[i][j]/=count[i][j];
+            (*Synergy)[i][j] /= count[i][j];
         }
     }
-    for(int i=0;i<MAX_SUBJECT_NUM;i++)
+    for (int i = 0; i < MAX_SUBJECT_NUM; i++)
         (*Synergy)[i][i] = Load[i];
     fclose(fp);
 
@@ -149,10 +150,11 @@ StatusCodeEnum preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT
 /**
  * calculate_difficulty
  * 주어�?? Load??? Synergy�?? 바탕?���?? TimeTable?�� ?��?��?�� ?��?���?? 계산?��?��.
- * �???�� Load�?? ?�� 과목(argmax_load)�?? Synergy�?? �???�� ?��??? 과목 ?��(argmax_synergy)?�� 찾는?��.
+ * �???�� Load�?? ?�� 과목(argmax_load)�?? Synergy�?? �???�� ?��??? 과목 ?��(argmax_synergy)?��
+ * 찾는?��.
  */
-StatusCodeEnum calculate_difficulty(TimeTable* table) {
-    if (table == NULL || table->n ==0) {
+StatusCodeEnum calculate_difficulty(TimeTable *table) {
+    if (table == NULL || table->n == 0) {
         return ERROR_INVALID_INPUT;
     }
 
@@ -165,13 +167,13 @@ StatusCodeEnum calculate_difficulty(TimeTable* table) {
     double Synergy[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM];
     table->difficulty = 0;
     table->argmax_load = (Subject *)malloc(sizeof(Subject));
-    table->argmax_synergy = (Subject (*)[2])malloc(sizeof(Subject)*2);
+    table->argmax_synergy = (Subject(*)[2])malloc(sizeof(Subject) * 2);
 
     sprintf(data_path, "%s/data", dir_path);
-    
+
     sprintf(file_path, "%s/load.dat", dir_path);
     fp = fopen(file_path, "rb");
-    if (fp==NULL){
+    if (fp == NULL) {
         return ERROR_FILE_NOT_FOUND;
     }
     fread(Load, sizeof(double), MAX_SUBJECT_NUM, fp);
@@ -179,36 +181,34 @@ StatusCodeEnum calculate_difficulty(TimeTable* table) {
 
     sprintf(file_path, "%s/synergy.dat", dir_path);
     fp = fopen(file_path, "rb");
-    if (fp==NULL){
+    if (fp == NULL) {
         return ERROR_FILE_NOT_FOUND;
     }
-    fread(Synergy, sizeof(double), MAX_SUBJECT_NUM*MAX_SUBJECT_NUM, fp);
+    fread(Synergy, sizeof(double), MAX_SUBJECT_NUM * MAX_SUBJECT_NUM, fp);
     fclose(fp);
 
     *(table->argmax_load) = *(table->subjects[0]);
     for (int i = 0; i < table->n; i++) {
         Subject *cur_subject = table->subjects[i];
-        if(cur_subject == NULL ||
-           cur_subject->id < 0 || cur_subject->id >=MAX_SUBJECT_NUM )
+        if (cur_subject == NULL || cur_subject->id < 0 || cur_subject->id >= MAX_SUBJECT_NUM)
             return ERROR_INVALID_INPUT;
-        
-        if(Load[cur_subject->id] > Load[table->argmax_load->id])
+
+        if (Load[cur_subject->id] > Load[table->argmax_load->id])
             *(table->argmax_load) = *cur_subject;
         table->difficulty += Load[cur_subject->id];
     }
 
-    if(table->n==1){
+    if (table->n == 1) {
         (*(table->argmax_synergy))[0] = *(table->subjects[0]);
         (*(table->argmax_synergy))[1] = *(table->subjects[0]);
-    }
-    else{
+    } else {
         (*(table->argmax_synergy))[0] = *(table->subjects[0]);
         (*(table->argmax_synergy))[1] = *(table->subjects[1]);
         table->difficulty /= table->n;
-        for(int i = 0 ; i < table->n ; i++){
-            for(int j = i+1 ; j< table->n ; j++){
-                if(Synergy[table->subjects[i]->id][table->subjects[j]->id] >
-                   Synergy[(*(table->argmax_synergy))[0].id][(*(table->argmax_synergy))[1].id]){
+        for (int i = 0; i < table->n; i++) {
+            for (int j = i + 1; j < table->n; j++) {
+                if (Synergy[table->subjects[i]->id][table->subjects[j]->id] >
+                    Synergy[(*(table->argmax_synergy))[0].id][(*(table->argmax_synergy))[1].id]) {
                     (*(table->argmax_synergy))[0] = *(table->subjects[i]);
                     (*(table->argmax_synergy))[1] = *(table->subjects[j]);
                 }
@@ -229,7 +229,7 @@ StatusCodeEnum calculate_difficulty(TimeTable* table) {
 //     char file_path[PATH_LENGTH + 20];
 //     int num_of_data;
 //     int total_difficulty;
-    
+
 //     FILE *fp = NULL;
 //     sprintf(file_path, "%s/num_of_data.dat", dir_path);
 //     fp = fopen(file_path, "rb");
@@ -252,9 +252,9 @@ StatusCodeEnum calculate_difficulty(TimeTable* table) {
 //     fprintf(fp, "%d %d\n", table->n, total_difficulty);
 //     for(int i=0;i<table->n;i++){
 //         int cur_difficulty;
-//         printf("과목 %s?�� ?��?��?���?? 0~10?�� ?��?���?? ?��?��?��주세?�� : ", table->subjects[i]->name);
-//         scanf("%d", &cur_difficulty);
-//         fprintf(fp, "%d %d\n", table->subjects[i]->id, cur_difficulty);
+//         printf("과목 %s?�� ?��?��?���?? 0~10?�� ?��?���?? ?��?��?��주세?�� : ",
+//         table->subjects[i]->name); scanf("%d", &cur_difficulty); fprintf(fp, "%d %d\n",
+//         table->subjects[i]->id, cur_difficulty);
 //     }
 //     fclose(fp);
 
@@ -277,7 +277,6 @@ StatusCodeEnum calculate_difficulty(TimeTable* table) {
 //     fp = fopen(file_path, "wb");
 //     fwrite(&num_of_data, sizeof(int), 1, fp);
 //     fclose(fp);
-    
 
 //     double Load[MAX_SUBJECT_NUM], Synergy[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM];
 //     preprocess_load(&Load);

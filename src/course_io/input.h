@@ -3,15 +3,23 @@
 
 #include "../struct.h"
 
-Subject* create_node(const char* name, int isFile, int credit);
+#define COL_WIDTH 25
+#define COL_Y 4
+#define TREE_DEPTH 3
+#define LINE_LENGTH 256
+#define STR_LENGTH 50
+#define PRE_INPUT1 0
+#define PRE_INPUT2 224
+#define BUTTON_NUM 3
 
-Subject* copy_subject(Subject* original);
+typedef enum {
+    TREE, BUTTON, EDIT
+} FocusEnum;
+typedef enum {
+    MODE, SEM, SAVE
+} ButtonEnum;
 
-void add_child(Subject* parent, Subject* child);
-
-void trim_newline(char* str);
-
-Subject* load_data_from_file(const char* filename);
+Subject* load_data_from_file();
 
 void save_user_data(User* user);
 
@@ -26,7 +34,7 @@ void delete_subject(User* user, int sem_idx, int sub_idx);
 void modify_subject(User* user, int old_sem_idx, int sub_idx, int new_sem);
 
 void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3], 
-                 int focus_area, int btn_idx, int edit_mode, int timetable_select_idx);
+                 FocusEnum focus_area, ButtonEnum btn_idx, int edit_mode, int timetable_select_idx);
 
 void run_registration(int student_id);
 

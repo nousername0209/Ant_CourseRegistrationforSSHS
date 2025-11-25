@@ -1,16 +1,19 @@
 #include "input.h" 
 
-#define COL_WIDTH 25
-#define COL_Y 4
-
-Subject* load_data_from_file(const char* filename) {
-    FILE* fp = fopen(filename, "r");
+/**
+ * @brief 과목에 대한 정보를 담은 파일에서 과목 데이터를 로드하여 트리 구조로 반환합니다.
+ *
+ * @return Subject*
+ *         - 파일에서 로드한 과목 트리의 루트 노드 포인터
+ */
+Subject* load_data_from_file() {
+    FILE* fp = fopen("dataset/course_io/subjects.txt", "r");
 
     Subject* root = create_node("ROOT", 0, 0);
-    Subject* parents[10];
+    Subject* parents[TREE_DEPTH];
     parents[0] = root;
 
-    char line[256];
+    char line[LINE_LENGTH];
     int depth, isFile, credit, sub_id; 
     char name_buffer[NAME_LENGTH];
 
@@ -19,7 +22,7 @@ Subject* load_data_from_file(const char* filename) {
             trim_newline(name_buffer);
             Subject* new_node = create_node(name_buffer, isFile, credit);
             new_node->id = sub_id;
-            if (depth > 0 && depth < 10) {
+            if (depth > 0 && depth <= TREE_DEPTH) {
                 add_child(parents[depth - 1], new_node);
                 parents[depth] = new_node;
             }
@@ -29,8 +32,15 @@ Subject* load_data_from_file(const char* filename) {
     return root;
 }
 
+/**
+ * @brief 사용자 데이터를 파일에 저장한다.
+ *
+ * @param user 저장하고자 하는 사용자의 포인터 
+ * 
+ * @return void
+ */
 void save_user_data(User* user) {
-    char filename[100];
+    char filename[PATH_LENGTH];
     sprintf(filename, "dataset/course_io/user/user_%d.txt", user->id);
     
     FILE* fp = fopen(filename, "w");
@@ -60,6 +70,15 @@ void save_user_data(User* user) {
     fclose(fp);
 }
 
+/**
+ * @brief 학기 선택 팝업을 표시하고 사용자가 선택한 학기를 반환한다.
+ * 
+ * @param start_sem 시작 학기 번호
+ * @param end_sem 종료 학기 번호
+ * @param title 팝업 제목
+ * 
+ * @return int 선택된 학기 번호, 취소 시 -1 반환
+ */
 int popup_select_semester(int start_sem, int end_sem, const char* title) {
     if (start_sem > end_sem) return -1;
 
@@ -116,6 +135,11 @@ int popup_select_semester(int start_sem, int end_sem, const char* title) {
     }
 }
 
+/**
+ * @brief 과목 수정 메뉴 팝업을 표시하고 사용자가 선택한 옵션을 반환한다.
+ * 
+ * @return int 선택된 옵션 번호 (1: 학기 이동, 2: 과목 삭제, 3: 취소), 취소 시 0 반환
+ */
 int popup_edit_menu() {
     int selected_idx = 0;
     const char* menus[] = { "1. 학기 이동", "2. 과목 삭제", "3. 취소" };
@@ -158,7 +182,7 @@ int popup_edit_menu() {
                 goto_ansi(start_x, start_y + i);
                 printf("%*s", box_w, ""); 
             }
-            return selected_idx + 1; // 1, 2, 3 반환
+            return selected_idx + 1;
         } else if (ch == ESC) {
             for(int i=0; i<box_h; i++) {
                 goto_ansi(start_x, start_y + i);
@@ -169,33 +193,46 @@ int popup_edit_menu() {
     }
 }
 
-// [추가] 과목 삭제 함수
+/**
+ * @brief user의 특정 학기에서 특정 과목을 삭제한다.
+ * 
+ * @param user 과목을 삭제할 사용자의 포인터
+ * @param sem_idx 삭제할 과목이 속한 학기 인덱스
+ * @param sub_idx 삭제할 과목의 인덱스
+ * 
+ * @return void
+ */
 void delete_subject(User* user, int sem_idx, int sub_idx) {
     TimeTable* t = user->table[sem_idx];
     if (t == NULL || sub_idx >= t->n) return;
 
-    // 메모리 해제
     free(t->subjects[sub_idx]);
     
-    // 배열 정리
     for (int i = sub_idx; i < t->n - 1; i++) {
         t->subjects[i] = t->subjects[i+1];
     }
-    t->subjects[t->n - 1] = NULL; // 마지막 포인터 초기화
+    t->subjects[t->n - 1] = NULL;
     t->n--;
 }
 
-// [추가] 과목 수정 함수 (학기 이동)
+/**
+ * @brief user의 특정 학기에서 특정 과목의 학기를 변경한다.
+ * 
+ * @param user 과목을 수정할 사용자의 포인터
+ * @param old_sem_idx 변경할 과목이 속한 기존 학기 인덱스
+ * @param sub_idx 변경할 과목의 인덱스
+ * @param new_sem 변경할 새로운 학기 번호
+ * 
+ * @return void
+ */
 void modify_subject(User* user, int old_sem_idx, int sub_idx, int new_sem) {
-    if (old_sem_idx == new_sem - 1) return; // 같은 학기면 무시
+    if (old_sem_idx == new_sem - 1) return;
 
     TimeTable* old_t = user->table[old_sem_idx];
     if (old_t == NULL || sub_idx >= old_t->n) return;
 
-    // 기존 과목 데이터 백업
     Subject* target = old_t->subjects[sub_idx];
     
-    // 새 학기 테이블 확인 및 생성
     int new_sem_idx = new_sem - 1;
     if (user->table[new_sem_idx] == NULL) {
         user->table[new_sem_idx] = (TimeTable*)calloc(1, sizeof(TimeTable));
@@ -203,30 +240,37 @@ void modify_subject(User* user, int old_sem_idx, int sub_idx, int new_sem) {
     TimeTable* new_t = user->table[new_sem_idx];
 
     if (new_t->n < MAX_SUBJECT_NUM) {
-        // 정보 업데이트
         target->semester = new_sem;
-        // 새 테이블에 추가
         new_t->subjects[new_t->n++] = target;
         
-        // 기존 테이블에서 삭제 (메모리 해제 없이 포인터만 이동하므로 배열만 정리)
         for (int i = sub_idx; i < old_t->n - 1; i++) {
             old_t->subjects[i] = old_t->subjects[i+1];
         }
         old_t->subjects[old_t->n - 1] = NULL;
         old_t->n--;
-    } else {
-        // 꽉 차서 이동 불가 알림 등 (생략)
     }
 }
 
-// [출력] 화면 그리기 (focus_area: 0=Tree, 1=Buttons, 2=Timetable)
+/**
+ * @brief UI를 그린다.
+ * 
+ * @param user 현재 사용자 포인터
+ * @param root 과목 트리의 루트 포인터
+ * @param col_idx 현재 선택된 열 인덱스
+ * @param row_indices 각 열 별 선택된 행 인덱스 배열
+ * @param focus_area 현재 선택한 영역 (0: 과목 트리, 1: 버튼, 2: 과목 수정)
+ * @param btn_idx 현재 선택된 버튼 인덱스
+ * @param edit_mode 현재 모드 (0: 수강 예정, 1: 수강 완료)
+ * @param timetable_select_idx 시간표 요약에서 선택된 과목 인덱스
+ * 
+ * @return void
+ */
 void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3], 
-                 int focus_area, int btn_idx, int edit_mode, int timetable_select_idx) {
+                 FocusEnum focus_area, ButtonEnum btn_idx, int edit_mode, int timetable_select_idx) {
     system("cls");
 
-    // 1. 상단부
-    char mode_str[50];
-    char color_code[10];
+    char mode_str[LINE_LENGTH];
+    char color_code[STR_LENGTH];
     if (edit_mode == 0) {
         strcpy(mode_str, "수강 신청");
         strcpy(color_code, UI_COLOR_GREEN);
@@ -240,19 +284,17 @@ void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3],
             color_code, mode_str, UI_RESET, user->current_sem, UI_BOLD, user->id, UI_RESET);
     printf("================================================================================\n");
 
-    // 2. 트리 데이터 준비
     Subject* cols[3] = {root, NULL, NULL};
     if (cols[0]->n > 0 && row_indices[0] < cols[0]->n) 
         cols[1] = cols[0]->arr[row_indices[0]];
     if (cols[1] != NULL && cols[1]->isFile == 0 && cols[1]->n > 0 && row_indices[1] < cols[1]->n) 
         cols[2] = cols[1]->arr[row_indices[1]];
 
-    // 3. 컬럼 그리기
     for (int c = 0; c < 3; c++) {
         int x_pos = 2 + (c * COL_WIDTH);
         goto_ansi(x_pos, COL_Y);
         
-        if (c == col_idx && focus_area == 0) 
+        if (c == col_idx && focus_area == TREE) 
             printf("%s v Step %d%s", UI_COLOR_CYAN, c + 1, UI_RESET);
         else 
             printf("  Step %d", c + 1);
@@ -266,11 +308,11 @@ void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3],
             goto_ansi(x_pos, COL_Y + 1 + i);
             Subject* item = cols[c]->arr[i];
             
-            char display_name[50];
+            char display_name[STR_LENGTH];
             if (item->isFile == 1) sprintf(display_name, "%s(%d)", item->name, item->credit);
             else strcpy(display_name, item->name);
 
-            if (c == col_idx && i == row_indices[c] && focus_area == 0) {
+            if (c == col_idx && i == row_indices[c] && focus_area == TREE) {
                 printf("%s %-15s %s", UI_REVERSE, display_name, UI_RESET);
                 if (item->isFile == 0) printf(" >");
             } 
@@ -283,7 +325,6 @@ void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3],
         }
     }
 
-    // 4. 하단 버튼 영역
     int btn_y = START_Y + 12;
     int btn_spacing = 22;
     int btn_start_x = (CONSOLE_WIDTH - (btn_spacing * 3)) / 2 + 2;
@@ -294,18 +335,17 @@ void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3],
     };
     for (int i = 0; i < 3; i++) {
         goto_ansi(btn_start_x + (i * btn_spacing), btn_y);
-        if (focus_area == 1 && btn_idx == i) {
+        if (focus_area == BUTTON && btn_idx == i) {
             printf("%s [ %s ] %s", UI_REVERSE, labels[i], UI_RESET);
         } else {
             printf(" [ %s ] ", labels[i]);
         }
     }
 
-    // 5. 시간표 요약 및 그리기
     int table_y = btn_y + 3;   
     int total_credits = 0;
     int total_subjects = 0;
-    // 전체 통계 합산
+
     for (int i = 0; i < SEMESTER_NUM; i++) {
         if (user->table[i] != NULL) {
             total_subjects += user->table[i]->n;
@@ -324,7 +364,6 @@ void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3],
     int box_w = 26;
     int start_table_row = table_y + 3;
     
-    // 시간표 항목 인덱싱용 카운터
     int current_item_idx = 0;
 
     for (int sem = 0; sem < SEMESTER_NUM; sem++) {
@@ -352,8 +391,7 @@ void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3],
                 
                 goto_ansi(box_x, box_y + 1 + i);
                 
-                // 시간표 영역 커서일 때 하이라이트
-                if (focus_area == 2 && current_item_idx == timetable_select_idx) {
+                if (focus_area == EDIT && current_item_idx == timetable_select_idx) {
                     printf("%s- %s%s", UI_REVERSE, t->subjects[i]->name, UI_RESET);
                 } else {
                     printf("- %s", t->subjects[i]->name);
@@ -365,8 +403,15 @@ void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3],
     }
 }
 
+/**
+ * @brief 수강신청 프로그램을 실행한다.
+ * 
+ * @param student_id 현재 사용자의 학번
+ * 
+ * @return void
+ */
 void run_registration(int student_id) {
-    Subject* root = load_data_from_file("dataset/course_io/subjects.txt");
+    Subject* root = load_data_from_file();
     
     User user;
     int is_first;
@@ -374,11 +419,10 @@ void run_registration(int student_id) {
     load_user_data(&user, student_id, &is_first);
 
     int col_idx = 0;
-    int row_indices[3] = {0, 0, 0};
+    int row_indices[TREE_DEPTH] = {0, 0, 0};
     
-    // 0:Tree, 1:Buttons, 2:Timetable
-    int focus_area = 0; 
-    int btn_idx = 0; 
+    FocusEnum focus_area = TREE; 
+    ButtonEnum btn_idx = MODE; 
     int timetable_select_idx = 0;
 
     int edit_mode = 0; 
@@ -395,31 +439,33 @@ void run_registration(int student_id) {
         goto_ansi(1, 1);
         ch = _getch();
         
-        // 키 입력 처리 전 계산 (시간표 네비게이션용)
         int total_subjects = 0;
-        for(int i=0; i<SEMESTER_NUM; i++) 
+        for(int i = 0; i<SEMESTER_NUM; i++) 
             if(user.table[i]) total_subjects += user.table[i]->n;
 
-        if (ch == 224 || ch == 0) {
+        if (ch == PRE_INPUT1 || ch == PRE_INPUT2) {
             ch = _getch(); 
 
-            if (focus_area == 1) { // 버튼 커서
-                if (ch == UP_ARROW) focus_area = 0; 
+            if (focus_area == BUTTON) {
+                if (ch == UP_ARROW) focus_area = TREE; 
                 else if (ch == DOWN_ARROW) {
                     if (total_subjects > 0) {
-                        focus_area = 2;
+                        focus_area = EDIT;
                         timetable_select_idx = 0;
                     }
                 }
                 else if (ch == LEFT_ARROW) { if (btn_idx > 0) btn_idx--; }
-                else if (ch == RIGHT_ARROW) { if (btn_idx < 2) btn_idx++; }
+                else if (ch == RIGHT_ARROW) { if (btn_idx < BUTTON_NUM - 1) btn_idx++; }
             } 
-            else if (focus_area == 2) { // 시간표 커서
-                if (ch == UP_ARROW) focus_area = 1;
-                else if (ch == LEFT_ARROW) { if (timetable_select_idx > 0) timetable_select_idx--; }
-                else if (ch == RIGHT_ARROW) { if (timetable_select_idx < total_subjects - 1) timetable_select_idx++; }
+            else if (focus_area == EDIT) {
+                if (ch == UP_ARROW) focus_area = BUTTON;
+                else if (ch == LEFT_ARROW) {
+                    if (timetable_select_idx > 0) timetable_select_idx--;
+                } else if (ch == RIGHT_ARROW) {
+                    if (timetable_select_idx < total_subjects - 1) timetable_select_idx++;
+                }
             }
-            else { // 트리 커서
+            else {
                 Subject* current_parent = root;
                 if (col_idx == 1) current_parent = root->arr[row_indices[0]];
                 if (col_idx == 2) current_parent = root->arr[row_indices[0]]->arr[row_indices[1]];
@@ -449,23 +495,22 @@ void run_registration(int student_id) {
             }
         }
         else if (ch == ENTER) {
-            if (focus_area == 1) { // 버튼 클릭
-                if (btn_idx == 0) { edit_mode = !edit_mode; }
-                else if (btn_idx == 1) { 
+            if (focus_area == BUTTON) {
+                if (btn_idx == MODE) { edit_mode = !edit_mode; }
+                else if (btn_idx == SEM) { 
                     int new_sem = popup_select_semester(0, SEMESTER_NUM - 1, "현재 이수 학기를 선택하세요");
                     if (new_sem != -1) user.current_sem = new_sem;
                 }
-                else if (btn_idx == 2) { 
+                else if (btn_idx == SAVE) { 
                     save_user_data(&user); 
                     system("cls");
                     printf("\n저장 완료 (ID: %d). 프로그램을 종료합니다.\n", user.id);
                     break;
                 }
             }
-            else if (focus_area == 2) { // 시간표 항목 선택 -> 수정/삭제 팝업
+            else if (focus_area == EDIT) {
                 int action = popup_edit_menu();
-                if (action == 1 || action == 2) { // 이동 or 삭제
-                    // 선택된 인덱스(linear)를 (학기, 과목) 인덱스로 변환
+                if (action == 1 || action == 2) {
                     int current_idx = 0;
                     int target_sem = -1, target_sub = -1;
                     
@@ -480,14 +525,13 @@ void run_registration(int student_id) {
                     }
 
                     if (target_sem != -1) {
-                        if (action == 2) { // 삭제
+                        if (action == 2) {
                             delete_subject(&user, target_sem, target_sub);
-                            // 인덱스 조정 (범위 밖으로 나가지 않게)
                             if (timetable_select_idx >= total_subjects - 1) timetable_select_idx--;
                             if (timetable_select_idx < 0) timetable_select_idx = 0;
-                        } else { // 이동
+                        } else {
                             int start_s, end_s;
-                            char title[50];
+                            char title[STR_LENGTH];
                             if (edit_mode == 0) { 
                                 start_s = user.current_sem + 1; end_s = SEMESTER_NUM;
                                 strcpy(title, "이동할 학기 선택 (예정)");
@@ -506,13 +550,13 @@ void run_registration(int student_id) {
                     }
                 }
             }
-            else if (focus_area == 0 && col_idx == 2) { // 과목 추가
+            else if (focus_area == 0 && col_idx == 2) {
                 Subject* parent = root->arr[row_indices[0]]->arr[row_indices[1]];
                 Subject* target = parent->arr[row_indices[2]];
 
                 if (target->isFile == 1) {
                     int start_s, end_s;
-                    char title[50];
+                    char title[STR_LENGTH];
                     if (edit_mode == 0) { 
                         start_s = user.current_sem + 1; end_s = SEMESTER_NUM;
                         strcpy(title, "수강할 학기 선택 (예정)");

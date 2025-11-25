@@ -11,13 +11,14 @@ Subject* load_data_from_file(const char* filename) {
     parents[0] = root;
 
     char line[256];
-    int depth, isFile, credit; 
+    int depth, isFile, credit, sub_id; 
     char name_buffer[NAME_LENGTH];
 
     while (fgets(line, sizeof(line), fp)) {
-        if (sscanf(line, "%d|%d|%d|%[^\n]", &depth, &isFile, &credit, name_buffer) == 4) {
+        if (sscanf(line, "%d|%d|%d|%d|%[^\n]", &depth, &isFile, &credit, &sub_id, name_buffer) == 5) {
             trim_newline(name_buffer);
             Subject* new_node = create_node(name_buffer, isFile, credit);
+            new_node->id = sub_id;
             if (depth > 0 && depth < 10) {
                 add_child(parents[depth - 1], new_node);
                 parents[depth] = new_node;

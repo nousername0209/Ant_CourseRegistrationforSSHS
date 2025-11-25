@@ -1,7 +1,3 @@
-//
-// Created by ±Ë¡÷»Ø on 25. 11. 9.
-//
-
 #ifndef COURSE_INPUT_H
 #define COURSE_INPUT_H
 

@@ -79,37 +79,40 @@ void popup_show_message(const char* title, const char* msg) {
     // 팝업 닫기 (화면 복구는 draw_screen에서 처리됨)
 }
 
-void popup_show_difficulty_result(int sem, Subject *load, Subject (*synergy)[2], double diff) {
+void popup_show_difficulty_result(int sem, TimeTable *t) {
     int box_w = 50;
     int box_h = 12;
     int start_x = (CONSOLE_WIDTH - box_w) / 2;
     int start_y = 8;
 
-    // 배경
-    for(int i=0; i<box_h; i++) {
-        goto_ansi(start_x, start_y + i);
-        printf("%s%*s%s", UI_REVERSE, box_w, "", UI_RESET); 
-    }
+    // 배경 지우기
+    system("cls");
 
     goto_ansi(start_x + 2, start_y + 1);
     printf("%s %d학기 난이도 분석 결과 %s", UI_BOLD, sem, UI_RESET);
 
     goto_ansi(start_x + 2, start_y + 3);
-    printf("%s1. 최고 난이도 과목 (argmax_load)%s", UI_COLOR_YELLOW, UI_RESET);
-    goto_ansi(start_x + 5, start_y + 4);
-    printf("-> %s (%d학점)", load->name, load->credit);
-
+    if (t->argmax_load == NULL) {
+        printf("%s1. 최고 난이도 과목 (argmax_load)%s", UI_COLOR_YELLOW, UI_RESET);
+        goto_ansi(start_x + 5, start_y + 4);
+        printf("-> 과목이 없어 분석 불가");
+    } else {
+        goto_ansi(start_x + 2, start_y + 3);
+        printf("%s1. 최고 난이도 과목 (argmax_load)%s", UI_COLOR_YELLOW, UI_RESET);
+        goto_ansi(start_x + 5, start_y + 4);
+        printf("-> %s (%d학점)", t->argmax_load->name, t->argmax_load->credit);
+    }
     goto_ansi(start_x + 2, start_y + 6);
     printf("%s2. 최악의 조합 (argmax_synergy)%s", UI_COLOR_YELLOW, UI_RESET);
     goto_ansi(start_x + 5, start_y + 7);
-    if (strcmp((*synergy)[0].name, "N/A") == 0) {
+    if (strcmp((*t->argmax_synergy)[0].name, "N/A") == 0) {
         printf("-> 과목이 부족하여 분석 불가");
     } else {
-        printf("-> %s + %s", (*synergy)[0].name, (*synergy)[1].name);
+        printf("-> %s + %s", (*t->argmax_synergy)[0].name, (*t->argmax_synergy)[1].name);
     }
 
     goto_ansi(start_x + 2, start_y + 9);
-    printf("%s3. 총 난이도 (total_difficulty)%s: %.1f / 10.0", UI_COLOR_YELLOW, UI_RESET, diff);
+    printf("%s3. 총 난이도 (total_difficulty)%s: %.1f / 10.0", UI_COLOR_YELLOW, UI_RESET, t->difficulty);
 
     goto_ansi(start_x + 12, start_y + 11);
     printf("%s[ 확인 ]%s", UI_BOLD, UI_RESET);
@@ -338,9 +341,11 @@ int run_output(int student_id) {
                     } 
                     else {
                         if (btn_idx == 1) {
-                            
-                            calculate_difficulty(t);
-                            popup_show_difficulty_result(selected_sem, t->argmax_load, t->argmax_synergy, t->difficulty);
+                            StatusCode status = calculate_difficulty(t);
+                            popup_show_message("오류", "난이도 계산 중 오류가 발생했습니다.");
+                            printf("Error Code: %d\n", status);
+                            exit(1);
+                            continue;
                         } 
                         else { 
                             // [데이터 추가] 로직 (신규 팝업 호출)

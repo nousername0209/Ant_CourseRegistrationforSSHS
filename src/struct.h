@@ -1,6 +1,3 @@
-// modified by ?��민�?? on 2025.11.23. SubjectStats, SubjectInfo 구조�? 추�??
-
-
 #ifndef STRUCT_H
 #define STRUCT_H
 
@@ -30,7 +27,7 @@ static inline int getch(void) {
 }
 #endif
 
-// UI �??��
+// ANSI �̽������� �ڵ�
 #define UI_RESET "\x1B[0m"
 #define UI_REVERSE "\x1B[7m"
 #define UI_DIM "\x1B[2m"
@@ -58,8 +55,8 @@ typedef enum _Page {
 } Page;
 
 #define CONSOLE_WIDTH 80
-#define UI_WIDTH 50 // UI ?��?���? 차�???��?�� ????��?��?�� �?�? 길이 (?���? ?��?��)
-#define START_X ((CONSOLE_WIDTH - UI_WIDTH) / 2) // UI ?��?��?�� X 좌표
+#define UI_WIDTH 50 
+#define START_X ((CONSOLE_WIDTH - UI_WIDTH) / 2)
 #define START_Y 0
 
 static inline void goto_ansi(int x, int y) {
@@ -71,7 +68,7 @@ static inline void print_center(const char* title, int len, int y_pos) {
     printf("%s", title);
 }
 
-// ?��로그?�� �??��
+
 #define PATH_LENGTH 300
 #define NAME_LENGTH 100
 #define SEMESTER_NUM 6
@@ -81,15 +78,10 @@ static inline void print_center(const char* title, int len, int y_pos) {
 #define PW_LENGTH 30
 #define MAX_APPLY_NUM 50
 
-//?��?��과목?�� 최�?? 개수
 #define MAX_PREREQ 10
 
-//과목 ?���? ?��보의 최�?? 개수
 #define MAX_SUBJECT_STATS 100
 
-// 구조�?
-
-// ?��?�� 과목?�� �? ?��?��, ?���? �? ?��?��?��?�� ?���? ?��보�?? ?��??? 구조�?
 typedef struct {
     int year;
     int semester;
@@ -101,14 +93,11 @@ typedef struct {
     int id;
     char name[NAME_LENGTH];
 
-    //과목 ?��?��(?��주일 ?��?�� ?��?��)
     int credit; 
 
-    //?��?��과목 개수 �? ID 목록
     int prereq_count;
     int prereq_ids[MAX_PREREQ];
 
-    //과목?�� ?��?���?, ?��기별 ?��?�� ?���? ?���?
     int stats_count;
     SubjectStats stats[MAX_SUBJECT_STATS];
 } SubjectInfo;
@@ -160,8 +149,6 @@ typedef struct {
     SubjectZScore z_array[MAX_SUBJECT_NUM];
 } User;
 
-// 공용�?
-
 typedef union {
     Subject *subject;
     TimeTable *time_table;
@@ -169,7 +156,6 @@ typedef union {
     BoardPost *board_post;
 } DataPointer;
 
-// ?��거형
 typedef enum {
     MENU_STATE_MAIN,
     MENU_STATE_CALCULATOR,
@@ -190,7 +176,7 @@ typedef enum {
     ERROR_MEMORY_ALLOC
 } StatusCode;
 
-// 함수 선언 및 정의
+// �Լ� ���� �� ����
 Subject* create_node(const char* name, int isFile, int credit) {
     Subject* s = (Subject*)malloc(sizeof(Subject));
     if (s == NULL) return NULL;

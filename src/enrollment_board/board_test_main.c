@@ -184,7 +184,7 @@ static ApplyResult show_apply_screen(BoardPost *post, int user_id) {
         else if (ch == ESC) return result;
         else if (ch == ENTER) {
             if (selected == 0) {
-                StatusCode code = already_applied ? cancel_post(post, user_id) : apply_post(post, user_id);
+                StatusCodeEnum code = already_applied ? cancel_post(post, user_id) : apply_post(post, user_id);
                 printf("\x1B[2J\x1B[H");
                 if (code == SUCCESS) {
                     if (already_applied) {
@@ -212,7 +212,7 @@ static ApplyResult show_apply_screen(BoardPost *post, int user_id) {
 static int add_post(BoardPost *posts, int count) {
     if (count >= MAX_POSTS) return count;
 
-    StatusCode code = create_post(&posts[count]);
+    StatusCodeEnum code = create_post(&posts[count]);
     if (code == SUCCESS) {
         return count + 1;
     }

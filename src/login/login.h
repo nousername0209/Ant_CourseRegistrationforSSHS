@@ -7,11 +7,11 @@
 
 typedef enum _Select {ID_FIELD, LOGIN_BUTTON} Select;
 
-StatusCode draw_ui(Select select, const char* id_buffer);
-StatusCode show_login_screen(char *id_buffer, int max_len);
+StatusCodeEnum draw_ui(Select select, const char* id_buffer);
+StatusCodeEnum show_login_screen(char *id_buffer, int max_len);
 
 // to main:
-StatusCode login(int *user_id);
+StatusCodeEnum login(int *user_id);
 
 
 #endif //COURSE_INPUT_H

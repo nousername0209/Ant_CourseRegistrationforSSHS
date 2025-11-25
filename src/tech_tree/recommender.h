@@ -29,12 +29,12 @@ const SubjectStats *find_subject_stats(const SubjectInfo *subject_info, int year
  * @param semester        학기
  * @param mean_raw_score  해당 연도/학기의 원점수 평균
  * @param stdev_raw_score 해당 연도/학기의 원점수 표준편차
- * @return StatusCode
+ * @return StatusCodeEnum
  *         - SUCCESS: 추가 성공
  *         - ERROR_INVALID_INPUT: subject_info가 NULL일 때
  *         - ERROR_INDEX_OUT: MAX_SUBJECT_STATS를 초과했을 때 등
  */
-StatusCode add_subject_stats(SubjectInfo *subject_info, int year, int semester, double mean_raw_score, double stdev_raw_score);
+StatusCodeEnum add_subject_stats(SubjectInfo *subject_info, int year, int semester, double mean_raw_score, double stdev_raw_score);
 
 /**
  * @brief 학생이 특정 과목의 선수과목들을 모두 들었는지 검사한다.
@@ -61,7 +61,7 @@ int meets_prereq(const SubjectInfo *subject_info, const int taken_ids[], int tak
  *         - SUCCESS: 정상 계산
  *         - ERROR_INVALID_INPUT: subject_info가 NULL이거나 통계를 찾지 못했을 때 등
  */
-StatusCode get_z_score(const SubjectInfo *subject_info, int year, int semester, double raw_score, SubjectZScore *z_array, int z_index);
+StatusCodeEnum get_z_score(const SubjectInfo *subject_info, int year, int semester, double raw_score, SubjectZScore *z_array, int z_index);
 
 /**
  * @brief 학생의 z-score 배열을 입력받아 테크트리를 추천한다.
@@ -71,11 +71,11 @@ StatusCode get_z_score(const SubjectInfo *subject_info, int year, int semester, 
  * @param trees            테크트리 배열
  * @param tree_count       테크트리 개수
  * @param recommended_tree 추천 결과를 저장할 테크트리 포인터
- * @return StatusCode
+ * @return StatusCodeEnum
  *         - SUCCESS: 추천 성공
  *         - ERROR_INVALID_INPUT: 인자 이상 등
  */
-StatusCode recommend_techtree(const SubjectZScore *z_array, int z_count, const TechTree *trees, int tree_count, TechTree *recommended_tree);
+StatusCodeEnum recommend_techtree(const SubjectZScore *z_array, int z_count, const TechTree *trees, int tree_count, TechTree *recommended_tree);
 
 /**
  * @brief SubjectInfo 배열을 이진 파일로 저장한다.
@@ -87,12 +87,12 @@ StatusCode recommend_techtree(const SubjectZScore *z_array, int z_count, const T
  * @param subjects   저장할 SubjectInfo 배열 포인터
  * @param count      subjects 배열에 들어 있는 과목 개수
  * @param path       저장할 파일 경로 (예: "data/subject_infos.dat")
- * @return StatusCode
+ * @return StatusCodeEnum
  *         - SUCCESS: 저장 성공
  *         - ERROR_INVALID_INPUT: 포인터가 NULL이거나 count가 음수일 때
  *         - ERROR_FILE_NOT_FOUND: 파일을 열지 못한 경우(경로/권한 문제 등)
  */
-StatusCode save_subject_infos(const SubjectInfo *subjects, int count, const char *path);
+StatusCodeEnum save_subject_infos(const SubjectInfo *subjects, int count, const char *path);
 
 /**
  * @brief 이진 파일에서 SubjectInfo 배열을 로드한다.
@@ -105,11 +105,11 @@ StatusCode save_subject_infos(const SubjectInfo *subjects, int count, const char
  * @param max_count   subjects 배열이 수용 가능한 최대 과목 수
  * @param out_count   실제로 읽어온 과목 수를 돌려줄 정수 포인터
  * @param path        읽어 올 파일 경로 (예: "data/subject_infos.dat")
- * @return StatusCode
+ * @return StatusCodeEnum
  *         - SUCCESS: 로드 성공
  *         - ERROR_FILE_NOT_FOUND: 파일이 없거나 열기 실패
  *         - ERROR_INVALID_INPUT: 포인터 NULL, 파일 포맷 이상, max_count 초과 등
  */
-StatusCode load_subject_infos(SubjectInfo *subjects, int max_count, int *out_count, const char *path);
+StatusCodeEnum load_subject_infos(SubjectInfo *subjects, int max_count, int *out_count, const char *path);
 
 #endif

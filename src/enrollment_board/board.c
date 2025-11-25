@@ -25,16 +25,20 @@ static int adjust_value_with_arrows(const char *title, int initial, int min, int
 
     while (1) {
         clear_screen();
-        print_center("[°Ô½Ã±Û ÀÛ¼º]", 18, 2);
+        print_center("[ï¿½Ô½Ã±ï¿½ ï¿½Û¼ï¿½]", 18, 2);
 
         goto_ansi(START_X, START_Y + 5);
         printf("%s%s%s", UI_BOLD, title, UI_RESET);
 
         goto_ansi(START_X, START_Y + 7);
-        printf("%s<%s  %s%d¸í%s  %s>%s", UI_COLOR_CYAN, UI_RESET, UI_BOLD, value, UI_RESET, UI_COLOR_CYAN, UI_RESET);
+        printf("%s<%s  %s%dï¿½ï¿½%s  %s>%s", UI_COLOR_CYAN, UI_RESET, UI_BOLD, value, UI_RESET, UI_COLOR_CYAN, UI_RESET);
 
         goto_ansi(START_X, START_Y + 10);
+<<<<<<< HEAD
         printf("%s¡ç/¡æ%s ·Î Á¶Àý, Enter·Î È®Á¤ (ESC·Î Ãë¼Ò)", UI_DIM, UI_RESET);
+=======
+        printf("%sï¿½ï¿½/ï¿½ï¿½%s Å°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, Enterï¿½ï¿½ È®ï¿½ï¿½ (ESCï¿½ï¿½ ï¿½ï¿½ï¿½)", UI_DIM, UI_RESET);
+>>>>>>> c7717766bcbcd78097ff04dba3d6d0f349c8f616
 
         int ch = read_key();
         if (ch == LEFT_ARROW && value > min) value--;
@@ -50,7 +54,7 @@ static void pause_message(const char *msg) {
     read_key();
 }
 
-StatusCode create_post(BoardPost *result) {
+StatusCodeEnum create_post(BoardPost *result) {
     if (result == NULL) return ERROR_INVALID_INPUT;
 
     memset(result, 0, sizeof(BoardPost));
@@ -62,9 +66,9 @@ StatusCode create_post(BoardPost *result) {
     char buffer[256];
 
     clear_screen();
-    print_center("[°Ô½Ã±Û ÀÛ¼º]", 18, 2);
+    print_center("[ï¿½Ô½Ã±ï¿½ ï¿½Û¼ï¿½]", 18, 2);
     goto_ansi(START_X, START_Y + 4);
-    printf("°ú¸ñ ÀÌ¸§À» ÀÔ·ÂÇÏ¼¼¿ä: ");
+    printf("ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¸ï¿½ï¿½ï¿½ ï¿½Ô·ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½: ");
     if (fgets(buffer, sizeof(buffer), stdin) == NULL) return ERROR_INVALID_INPUT;
     trim_newline(buffer);
 
@@ -82,16 +86,24 @@ StatusCode create_post(BoardPost *result) {
     strncpy(subject->name, buffer, NAME_LENGTH - 1);
     subject->name[NAME_LENGTH - 1] = '\0';
 
+<<<<<<< HEAD
     int target = adjust_value_with_arrows("¸ðÁý ÀÎ¿øÀ» Á¤ÇÏ¼¼¿ä", 5, 1, ID_NUM);
+=======
+    int target = adjust_value_with_arrows("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Î¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½", 5, 1, ID_NUM);
+>>>>>>> c7717766bcbcd78097ff04dba3d6d0f349c8f616
     if (target < 0) {
         free(subject);
         return ERROR_INVALID_INPUT;
     }
 
     clear_screen();
-    print_center("[°Ô½Ã±Û ÀÛ¼º]", 18, 2);
+    print_center("[ï¿½Ô½Ã±ï¿½ ï¿½Û¼ï¿½]", 18, 2);
     goto_ansi(START_X, START_Y + 4);
+<<<<<<< HEAD
     printf("È«º¸ ¸Þ½ÃÁö¸¦ ÀÔ·ÂÇÏ¼¼¿ä: ");
+=======
+    printf("È«ï¿½ï¿½ ï¿½Þ¼ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Û¼ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½:  ");
+>>>>>>> c7717766bcbcd78097ff04dba3d6d0f349c8f616
     if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
         free(subject);
         return ERROR_INVALID_INPUT;
@@ -106,19 +118,30 @@ StatusCode create_post(BoardPost *result) {
     result->current_students = 0;
 
     clear_screen();
+<<<<<<< HEAD
     print_center("°Ô½Ã±ÛÀÌ ÀúÀåµÇ¾ú½À´Ï´Ù!", 24, 8);
+=======
+    print_center("ï¿½Ô½Ã±ï¿½ï¿½ï¿½ ï¿½ï¿½ÏµÇ¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½!", 24, 8);
+>>>>>>> c7717766bcbcd78097ff04dba3d6d0f349c8f616
     goto_ansi(START_X, START_Y + 10);
-    printf("°ú¸ñ: %s\n", subject->name);
+    printf("ï¿½ï¿½ï¿½ï¿½: %s\n", subject->name);
     goto_ansi(START_X, START_Y + 11);
+<<<<<<< HEAD
     printf("¸ðÁý ÀÎ¿ø: %d¸í\n", target);
     goto_ansi(START_X, START_Y + 12);
     printf("È«º¸ ¹®±¸: %s\n", result->promo_message);
     pause_message("°è¼ÓÇÏ·Á¸é ¾Æ¹« Å°³ª ´©¸£¼¼¿ä...");
+=======
+    printf("ï¿½ï¿½ï¿½ï¿½ ï¿½Î¿ï¿½: %dï¿½ï¿½\n", target);
+    goto_ansi(START_X, START_Y + 12);
+    printf("È«ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½: %s\n", result->promo_message);
+    pause_message("ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ ï¿½Æ¹ï¿½ Å°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½...");
+>>>>>>> c7717766bcbcd78097ff04dba3d6d0f349c8f616
 
     return SUCCESS;
 }
 
-StatusCode apply_post(BoardPost *post, int id) {
+StatusCodeEnum apply_post(BoardPost *post, int id) {
     if (post == NULL) return ERROR_INVALID_INPUT;
     if (id < 0 || id >= ID_NUM) return ERROR_INVALID_INPUT;
     if (post->target_students <= 0) return ERROR_INVALID_INPUT;
@@ -152,7 +175,7 @@ int is_user_applied(const BoardPost *post, int id) {
     return find_student_index(post, id) >= 0;
 }
 
-StatusCode cancel_post(BoardPost *post, int id) {
+StatusCodeEnum cancel_post(BoardPost *post, int id) {
     if (post == NULL) return ERROR_INVALID_INPUT;
     if (id < 0 || id >= ID_NUM) return ERROR_INVALID_INPUT;
     if (post->target_students <= 0) return ERROR_INVALID_INPUT;

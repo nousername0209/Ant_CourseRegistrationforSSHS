@@ -27,7 +27,7 @@ static inline int getch(void) {
 }
 #endif
 
-// ANSI ÀÌ½ºÄÉÀÌÇÁ ÄÚµå
+// ANSI ï¿½Ì½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Úµï¿½
 #define UI_RESET "\x1B[0m"
 #define UI_REVERSE "\x1B[7m"
 #define UI_DIM "\x1B[2m"
@@ -176,7 +176,7 @@ typedef enum {
     ERROR_MEMORY_ALLOC
 } StatusCode;
 
-// ÇÔ¼ö ¼±¾ð ¹× Á¤ÀÇ
+// ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 Subject* create_node(const char* name, int isFile, int credit) {
     Subject* s = (Subject*)malloc(sizeof(Subject));
     if (s == NULL) return NULL;

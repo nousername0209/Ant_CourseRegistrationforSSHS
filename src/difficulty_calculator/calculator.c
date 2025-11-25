@@ -1,5 +1,5 @@
 //
-// Created by ê¹?ì£¼í™˜ on 25. 11. 9.
+// Created by ï¿½?ì£¼í™˜ on 25. 11. 9.
 //
 
 #include "../struct.h" 
@@ -8,7 +8,7 @@
 
 /**
  * preprocess_load
- * dir_path?— ?žˆ?Š” ?°?´?„°?…‹?„ ë°”íƒ•?œ¼ë¡? Load(?‹¨?¼ ê³¼ëª© ?‚œ?´?„)ë¥? ë¡œë“œ?•œ?‹¤.
+ * dir_path?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ë°”íƒ•?ï¿½ï¿½ï¿½? Load(?ï¿½ï¿½?ï¿½ï¿½ ê³¼ëª© ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½)ï¿½? ë¡œë“œ?ï¿½ï¿½?ï¿½ï¿½.
  */
 StatusCode preprocess_load(double (*Load)[MAX_SUBJECT_NUM]) {
     char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
@@ -64,7 +64,7 @@ StatusCode preprocess_load(double (*Load)[MAX_SUBJECT_NUM]) {
 
 /**
  * preprocess_synergy
- * dir_path?— ?žˆ?Š” ?°?´?„°?…‹?„ ë°”íƒ•?œ¼ë¡? Synergy(ê³¼ëª© ê°? ?‹œ?„ˆì§?/êµì°¨ ?‚œ?´?„)ë¥? ë¡œë“œ?•œ?‹¤
+ * dir_path?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ë°”íƒ•?ï¿½ï¿½ï¿½? Synergy(ê³¼ëª© ï¿½? ?ï¿½ï¿½?ï¿½ï¿½ï¿½?/êµì°¨ ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½)ï¿½? ë¡œë“œ?ï¿½ï¿½?ï¿½ï¿½
  */
 StatusCode preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM]) {
     char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
@@ -132,8 +132,8 @@ StatusCode preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM
 
 /**
  * calculate_difficulty
- * ì£¼ì–´ì§? Load??? Synergyë¥? ë°”íƒ•?œ¼ë¡? TimeTable?˜ ?‚œ?´?„ ?š”?†Œë¥? ê³„ì‚°?•œ?‹¤.
- * ê°??ž¥ Loadê°? ?° ê³¼ëª©(argmax_load)ê³? Synergyê°? ê°??ž¥ ?†’??? ê³¼ëª© ?Œ(argmax_synergy)?„ ì°¾ëŠ”?‹¤.
+ * ì£¼ì–´ï¿½? Load??? Synergyï¿½? ë°”íƒ•?ï¿½ï¿½ï¿½? TimeTable?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½ï¿½? ê³„ì‚°?ï¿½ï¿½?ï¿½ï¿½.
+ * ï¿½??ï¿½ï¿½ Loadï¿½? ?ï¿½ï¿½ ê³¼ëª©(argmax_load)ï¿½? Synergyï¿½? ï¿½??ï¿½ï¿½ ?ï¿½ï¿½??? ê³¼ëª© ?ï¿½ï¿½(argmax_synergy)?ï¿½ï¿½ ì°¾ëŠ”?ï¿½ï¿½.
  */
 StatusCode calculate_difficulty(TimeTable* table) {
     if (table == NULL || table->n ==0) {
@@ -205,8 +205,8 @@ StatusCode calculate_difficulty(TimeTable* table) {
 
 /**
  * add_difficulty_db
- * ì§?? •?œ path?— difficulty ?°?´?„°ë² ì´?Š¤ë¥? ì¶”ê???•œ?‹¤.
- * ?•„?š”?•œ ? •ë³?(ID, ê°? ?“±)?Š” ?•¨?ˆ˜ ?‚´ë¶??—?„œ ?‚¬?š©?žë¡œë???„° ?ž…? ¥ë°›ëŠ”?‹¤.
+ * ï¿½??ï¿½ï¿½?ï¿½ï¿½ path?ï¿½ï¿½ difficulty ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ë² ì´?ï¿½ï¿½ï¿½? ì¶”ï¿½???ï¿½ï¿½?ï¿½ï¿½.
+ * ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½ï¿½?(ID, ï¿½? ?ï¿½ï¿½)?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½ï¿½??ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ë¡œï¿½???ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½ë°›ëŠ”?ï¿½ï¿½.
  **/
 // StatusCode add_difficulty_db(const TimeTable *table) {
 //     char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
@@ -227,7 +227,7 @@ StatusCode calculate_difficulty(TimeTable* table) {
 //     }
 //     fclose(fp);
 
-//     printf("?•´?‹¹ ?‹œê°„í‘œ?˜ ?‚œ?´?„ë¥? 0~10?˜ ? •?ˆ˜ë¡? ?ž…? ¥?•´ì£¼ì„¸?š” : ");
+//     printf("?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½ê°„í‘œ?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ï¿½? 0~10?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½ï¿½? ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ì£¼ì„¸?ï¿½ï¿½ : ");
 //     scanf("%d", &total_difficulty);
 
 //     sprintf(file_path, "%s/data/data%:03d.txt", dir_path, num_of_data);
@@ -236,7 +236,7 @@ StatusCode calculate_difficulty(TimeTable* table) {
 //     fprintf(fp, "%d %d\n", table->n, total_difficulty);
 //     for(int i=0;i<table->n;i++){
 //         int cur_difficulty;
-//         printf("ê³¼ëª© %s?˜ ?‚œ?´?„ë¥? 0~10?˜ ? •?ˆ˜ë¡? ?ž…? ¥?•´ì£¼ì„¸?š” : ", table->subjects[i]->name);
+//         printf("ê³¼ëª© %s?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ï¿½? 0~10?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½ï¿½? ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ì£¼ì„¸?ï¿½ï¿½ : ", table->subjects[i]->name);
 //         scanf("%d", &cur_difficulty);
 //         fprintf(fp, "%d %d\n", table->subjects[i]->id, cur_difficulty);
 //     }

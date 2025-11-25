@@ -74,13 +74,16 @@ static inline void print_center(const char* title, int len, int y_pos) {
 
 
 #define PATH_LENGTH 300
-#define NAME_LENGTH 100
 #define SEMESTER_NUM 6
 #define MAX_SUBJECT_NUM 50
 #define ID_NUM 50
 #define MESSAGE_LENGTH 210
 #define PW_LENGTH 30
 #define MAX_APPLY_NUM 50
+#define LINE_LENGTH 256
+#define STR_LENGTH 50
+#define PRE_INPUT1 0
+#define PRE_INPUT2 224
 
 #define MAX_PREREQ 10
 
@@ -95,7 +98,7 @@ typedef struct {
 
 typedef struct {
     int id;
-    char name[NAME_LENGTH];
+    char name[STR_LENGTH];
 
     int credit; 
 
@@ -113,7 +116,7 @@ typedef struct _subject{
     int credit;
     double mean_raw_score;
     double stdev_raw_score;
-    char name[NAME_LENGTH];
+    char name[STR_LENGTH];
     struct _subject *arr[MAX_SUBJECT_NUM];
 } Subject;
 
@@ -127,7 +130,7 @@ typedef struct {
 
 typedef struct {
     int id, n;
-    char name[NAME_LENGTH];
+    char name[STR_LENGTH];
     Subject *subject_arr[MAX_SUBJECT_NUM];
     int weight[MAX_SUBJECT_NUM];
 } TechTree;
@@ -255,7 +258,7 @@ static void load_user_data(User* user, int id, int *is_first) {
             }
         }
         else if (current_sem_idx != -1 && subjects_to_read > 0) {
-            char name[NAME_LENGTH];
+            char name[STR_LENGTH];
             int credit, sub_id;
             
             if (sscanf(line, "%[^|]|%d|%d", name, &credit, &sub_id) == 3) {

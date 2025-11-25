@@ -1,11 +1,33 @@
 #include "output.h"
 #include "../difficulty_calculator/calculator.h"
 
+/**
+ * @brief 난이도 입력 값이 유효한지 검사한다 (0~9 사이 정수)
+ * 
+ * @param buf 입력 문자열
+ * 
+ * @return int 유효하면 1, 아니면 0 반환
+ */
 int is_valid_difficulty_input(const char* buf) {
     int val = atoi(buf);
     return (val >= 0 && val <= 10);
 }
 
+/**
+ * @brief 난이도 입력 페이지를 그린다.
+ * 
+ * @param table 난이도 입력을 하는 시간표의 포인터
+ * @param semester 학기 번호
+ * @param total_difficulty_input 총 난이도 입력 값
+ * @param subject_difficulties 과목별 난이도 입력 값 배열
+ * @param current_idx 현재 선택된 입력 필드 인덱스 (-1: 총 난이도, 0~n-1: 과목 인덱스)
+ * @param box_w 팝업 박스 너비
+ * @param box_h 팝업 박스 높이
+ * @param start_x 팝업 시작 X 좌표
+ * @param start_y 팝업 시작 Y 좌표
+ * 
+ * @return void
+ */
 void draw_input_difficulty_popup(TimeTable* table, int semester, int total_difficulty_input, int subject_difficulties[], int current_idx, int box_w, int box_h, int start_x, int start_y) {
     system("cls");
     int cursor_y;
@@ -13,7 +35,6 @@ void draw_input_difficulty_popup(TimeTable* table, int semester, int total_diffi
     goto_ansi(start_x + 2, start_y + 1);
     printf("%s[ %d학기 난이도 데이터 추가 ]%s (0~10점 입력, 숫자를 입력하세요)", UI_BOLD, semester, UI_RESET);
     
-    // 1. 총 난이도 입력 필드
     cursor_y = start_y + 3;
     goto_ansi(start_x + 2, cursor_y);
     if (current_idx == -1) printf("%s", UI_COLOR_CYAN); // 현재 선택 강조
@@ -45,8 +66,8 @@ void draw_input_difficulty_popup(TimeTable* table, int semester, int total_diffi
     }
 
     // 3. 버튼 영역
-    cursor_y = start_y + box_h - 2;
-    goto_ansi(start_x + (box_w / 2) - 15, cursor_y);
+    cursor_y = start_y + 20;
+    goto_ansi(start_x + 10, cursor_y);
     printf("%s[ ↑/↓: 이동 | 숫자: 입력 | ENTER: 저장 | ESC: 취소 ]%s", UI_BOLD, UI_RESET);
 }
 
@@ -126,8 +147,6 @@ void popup_show_difficulty_result(int sem, TimeTable *t) {
     }
 }
 
-// --- [신규 UI] 난이도 정보 입력 팝업 및 파일 저장 ---
-// 요청하신 난이도 입력 로직과 파일 저장 로직을 통합합니다.
 StatusCodeEnum popup_input_difficulty(TimeTable* table, int student_id, int semester) {
     if (table == NULL) return ERROR_INVALID_INPUT;
 
@@ -141,11 +160,11 @@ StatusCodeEnum popup_input_difficulty(TimeTable* table, int student_id, int seme
 
     
     char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
-    char file_path[PATH_LENGTH + 40];
+    char file_path[PATH_LENGTH];
     int num_of_data;
     int total_difficulty = -1;
     int subject_difficulties[MAX_SUBJECT_NUM];
-    char input_buffer[10];
+    char input_buffer[STR_LENGTH];
 
     FILE *fp = NULL;
     sprintf(file_path, "%s/num_of_data.dat", dir_path);
@@ -175,7 +194,7 @@ StatusCodeEnum popup_input_difficulty(TimeTable* table, int student_id, int seme
 
         if (ch == ESC) return SUCCESS; // 취소
 
-        if (ch == 224 || ch == 0) {
+        if (ch == PRE_INPUT1 || ch == PRE_INPUT2) {
             ch = _getch();
             if (ch == UP_ARROW) {
                 if (current_input_idx > -1) current_input_idx--;
@@ -250,8 +269,6 @@ StatusCodeEnum popup_input_difficulty(TimeTable* table, int student_id, int seme
                 } else {
                     subject_difficulties[current_input_idx] = input_val;
                 }
-            } else {
-                 // 0~10 범위 밖 입력에 대한 처리 (필요시)
             }
         }
     }
@@ -355,8 +372,6 @@ int run_output(int student_id) {
             } 
             else if (btn_idx == 1 || btn_idx == 2) { 
                 // [난이도 계산] 또는 [데이터 추가]
-                
-                // 1. 학기 선택 (course_reg.c에 있는 함수 재사용)
                 int selected_sem = popup_select_semester(1, SEMESTER_NUM, "작업할 학기 선택");
                 
                 if (selected_sem != -1) {

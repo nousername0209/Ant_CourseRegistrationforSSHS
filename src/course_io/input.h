@@ -6,10 +6,6 @@
 #define COL_WIDTH 25
 #define COL_Y 4
 #define TREE_DEPTH 3
-#define LINE_LENGTH 256
-#define STR_LENGTH 50
-#define PRE_INPUT1 0
-#define PRE_INPUT2 224
 #define BUTTON_NUM 3
 
 typedef enum {

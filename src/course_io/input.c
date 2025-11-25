@@ -15,7 +15,7 @@ Subject* load_data_from_file() {
 
     char line[LINE_LENGTH];
     int depth, isFile, credit, sub_id; 
-    char name_buffer[NAME_LENGTH];
+    char name_buffer[STR_LENGTH];
 
     while (fgets(line, sizeof(line), fp)) {
         if (sscanf(line, "%d|%d|%d|%d|%[^\n]", &depth, &isFile, &credit, &sub_id, name_buffer) == 5) {
@@ -550,7 +550,7 @@ void run_registration(int student_id) {
                     }
                 }
             }
-            else if (focus_area == 0 && col_idx == 2) {
+            else if (focus_area == TREE && col_idx == 2) {
                 Subject* parent = root->arr[row_indices[0]]->arr[row_indices[1]];
                 Subject* target = parent->arr[row_indices[2]];
 

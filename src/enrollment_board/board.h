@@ -8,9 +8,11 @@
 #include "../struct.h"
 
 StatusCodeEnum create_post(BoardPost *result);
-StatusCodeEnum apply_post(BoardPost *post, int id);
-StatusCodeEnum cancel_post(BoardPost *post, int id);
-int is_user_applied(const BoardPost *post, int id);
-int board_main(int user_id);
 
-#endif // ENROLLMENT_BOARD_H
+StatusCodeEnum apply_post(BoardPost *post, int id);
+
+StatusCodeEnum cancel_post(BoardPost *post, int id);
+
+int is_user_applied(const BoardPost *post, int id);
+
+#endif //ENROLLMENT_BOARD_H

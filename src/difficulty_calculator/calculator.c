@@ -1,5 +1,5 @@
 //
-// Created by �??주환 on 25. 11. 9.
+// Created by �??주환 on 25. 11. 9.
 //
 
 #include "../struct.h" 
@@ -8,9 +8,9 @@
 
 /**
  * preprocess_load
- * dir_path?�� ?��?�� ?��?��?��?��?�� 바탕?���?? Load(?��?�� 과목 ?��?��?��)�?? 로드?��?��.
+ * dir_path?�� ?��?�� ?��?��?��?��?�� 바탕?���?? Load(?��?�� 과목 ?��?��?��)�?? 로드?��?��.
  */
-StatusCode preprocess_load(double (*Load)[MAX_SUBJECT_NUM]) {
+StatusCodeEnum preprocess_load(double (*Load)[MAX_SUBJECT_NUM]) {
     char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
     char file_path[PATH_LENGTH + 20];
     char data_path[PATH_LENGTH + 40];
@@ -64,9 +64,9 @@ StatusCode preprocess_load(double (*Load)[MAX_SUBJECT_NUM]) {
 
 /**
  * preprocess_synergy
- * dir_path?�� ?��?�� ?��?��?��?��?�� 바탕?���?? Synergy(과목 �?? ?��?���??/교차 ?��?��?��)�?? 로드?��?��
+ * dir_path?�� ?��?�� ?��?��?��?��?�� 바탕?���?? Synergy(과목 �?? ?��?���??/교차 ?��?��?��)�?? 로드?��?��
  */
-StatusCode preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM]) {
+StatusCodeEnum preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM]) {
     char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
     char file_path[PATH_LENGTH + 20];
     char data_path[PATH_LENGTH + 40];
@@ -148,10 +148,10 @@ StatusCode preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM
 
 /**
  * calculate_difficulty
- * 주어�?? Load??? Synergy�?? 바탕?���?? TimeTable?�� ?��?��?�� ?��?���?? 계산?��?��.
- * �???�� Load�?? ?�� 과목(argmax_load)�?? Synergy�?? �???�� ?��??? 과목 ?��(argmax_synergy)?�� 찾는?��.
+ * 주어�?? Load??? Synergy�?? 바탕?���?? TimeTable?�� ?��?��?�� ?��?���?? 계산?��?��.
+ * �???�� Load�?? ?�� 과목(argmax_load)�?? Synergy�?? �???�� ?��??? 과목 ?��(argmax_synergy)?�� 찾는?��.
  */
-StatusCode calculate_difficulty(TimeTable* table) {
+StatusCodeEnum calculate_difficulty(TimeTable* table) {
     if (table == NULL || table->n ==0) {
         return ERROR_INVALID_INPUT;
     }
@@ -221,10 +221,10 @@ StatusCode calculate_difficulty(TimeTable* table) {
 
 /**
  * add_difficulty_db
- * �???��?�� path?�� difficulty ?��?��?��베이?���?? 추�???��?��.
- * ?��?��?�� ?���??(ID, �?? ?��)?�� ?��?�� ?���???��?�� ?��?��?��로�???�� ?��?��받는?��.
+ * �???��?�� path?�� difficulty ?��?��?��베이?���?? 추�???��?��.
+ * ?��?��?�� ?���??(ID, �?? ?��)?�� ?��?�� ?���???��?�� ?��?��?��로�???�� ?��?��받는?��.
  **/
-// StatusCode add_difficulty_db(const TimeTable *table) {
+// StatusCodeEnum add_difficulty_db(const TimeTable *table) {
 //     char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
 //     char file_path[PATH_LENGTH + 20];
 //     int num_of_data;
@@ -243,7 +243,7 @@ StatusCode calculate_difficulty(TimeTable* table) {
 //     }
 //     fclose(fp);
 
-//     printf("?��?�� ?��간표?�� ?��?��?���?? 0~10?�� ?��?���?? ?��?��?��주세?�� : ");
+//     printf("?��?�� ?��간표?�� ?��?��?���?? 0~10?�� ?��?���?? ?��?��?��주세?�� : ");
 //     scanf("%d", &total_difficulty);
 
 //     sprintf(file_path, "%s/data/data%:03d.txt", dir_path, num_of_data);
@@ -252,7 +252,7 @@ StatusCode calculate_difficulty(TimeTable* table) {
 //     fprintf(fp, "%d %d\n", table->n, total_difficulty);
 //     for(int i=0;i<table->n;i++){
 //         int cur_difficulty;
-//         printf("과목 %s?�� ?��?��?���?? 0~10?�� ?��?���?? ?��?��?��주세?�� : ", table->subjects[i]->name);
+//         printf("과목 %s?�� ?��?��?���?? 0~10?�� ?��?���?? ?��?��?��주세?�� : ", table->subjects[i]->name);
 //         scanf("%d", &cur_difficulty);
 //         fprintf(fp, "%d %d\n", table->subjects[i]->id, cur_difficulty);
 //     }

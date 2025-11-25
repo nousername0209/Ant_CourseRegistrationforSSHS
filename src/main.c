@@ -4,7 +4,7 @@ int main() {
     system("mode con cols=80 lines=30");
     
     int user_id;
-    Page page = LOGIN_PAGE;
+    PageEnum page = LOGIN_PAGE;
 
     while (1) {
         int flag = 0;

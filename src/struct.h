@@ -47,7 +47,7 @@ typedef enum _Key {
     ENTER = '\r',
     BACKSPACE = '\b',
     ESC = 27
-} Key;
+} KeyEnum;
 
 typedef enum _Page {
     HOME_PAGE,
@@ -55,7 +55,7 @@ typedef enum _Page {
     INPUT_PAGE,
     OUTPUT_PAGE,
     ESC_PAGE
-} Page;
+} PageEnum;
 
 #define CONSOLE_WIDTH 80
 #define UI_WIDTH 50 
@@ -117,26 +117,26 @@ typedef struct _subject{
 } Subject;
 
 typedef struct {
-int n;
-Subject *subjects[MAX_SUBJECT_NUM];
-double difficulty;
-Subject *argmax_load;
-Subject (*argmax_synergy)[2];
+    int n;
+    Subject *subjects[MAX_SUBJECT_NUM];
+    double difficulty;
+    Subject *argmax_load;
+    Subject (*argmax_synergy)[2];
 } TimeTable;
 
 typedef struct {
-int id, n;
-char name[NAME_LENGTH];
-Subject *subject_arr[MAX_SUBJECT_NUM];
-int weight[MAX_SUBJECT_NUM];
+    int id, n;
+    char name[NAME_LENGTH];
+    Subject *subject_arr[MAX_SUBJECT_NUM];
+    int weight[MAX_SUBJECT_NUM];
 } TechTree;
 
 typedef struct {
-int id;
-Subject *subject;
-int current_students, target_students;
-int students_id[ID_NUM];
-char promo_message[MESSAGE_LENGTH];
+    int id;
+    Subject *subject;
+    int current_students, target_students;
+    int students_id[ID_NUM];
+    char promo_message[MESSAGE_LENGTH];
 } BoardPost;
 
 typedef struct {
@@ -165,7 +165,7 @@ typedef enum {
     MENU_STATE_TECH_TREE,
     MENU_STATE_BOARD,
     MENU_STATE_EXIT
-} MenuState;
+} MenuStateEnum;
 
 #ifdef ERROR_FILE_NOT_FOUND
 #undef ERROR_FILE_NOT_FOUND
@@ -177,7 +177,7 @@ typedef enum {
     ERROR_INVALID_INPUT,
     ERROR_INDEX_OUT,
     ERROR_MEMORY_ALLOC
-} StatusCode;
+} StatusCodeEnum;
 
 static Subject* create_node(const char* name, int isFile, int credit) {
     Subject* s = (Subject*)malloc(sizeof(Subject));

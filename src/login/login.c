@@ -1,7 +1,7 @@
 #include "login.h"
 #include "windows.h"
 
-StatusCode draw_ui(Select select, const char* id_buffer) {
+StatusCodeEnum draw_ui(Select select, const char* id_buffer) {
     system("cls");
     
     print_center("=== LOGIN ===", 13, 10);
@@ -25,14 +25,14 @@ StatusCode draw_ui(Select select, const char* id_buffer) {
     return SUCCESS;
 }
 
-StatusCode show_login_screen(char *id_buffer, int max_len) {
+StatusCodeEnum show_login_screen(char *id_buffer, int max_len) {
     Select current = ID_FIELD;
     int id_index = 0;
     id_buffer[0] = '\0';
     
     Key ch;
     while (1) {
-        StatusCode draw_ui_s = draw_ui(current, id_buffer);
+        StatusCodeEnum draw_ui_s = draw_ui(current, id_buffer);
 
         ch = _getch(); 
 
@@ -71,10 +71,10 @@ StatusCode show_login_screen(char *id_buffer, int max_len) {
     return SUCCESS;
 }
 
-StatusCode login(int *user_id) {
+StatusCodeEnum login(int *user_id) {
     system("cls");
     char id_str[ID_LENGTH];
-    StatusCode s_show_login_screen = show_login_screen(id_str, ID_LENGTH);
+    StatusCodeEnum s_show_login_screen = show_login_screen(id_str, ID_LENGTH);
     *user_id = atoi(id_str);
     return SUCCESS;
 }

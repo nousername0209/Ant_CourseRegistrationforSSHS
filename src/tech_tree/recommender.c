@@ -40,12 +40,12 @@ const SubjectStats *find_subject_stats(const SubjectInfo *subject_info, int year
  * @param semester        학기
  * @param mean_raw_score  해당 연도/학기의 원점수 평균
  * @param stdev_raw_score 해당 연도/학기의 원점수 표준편차
- * @return StatusCode
+ * @return StatusCodeEnum
  *         - SUCCESS: 추가 성공
  *         - ERROR_INVALID_INPUT: subject_info가 NULL일 때
  *         - ERROR_INDEX_OUT: MAX_SUBJECT_STATS를 초과했을 때 등
  */
-StatusCode add_subject_stats(SubjectInfo *subject_info, int year, int semester, double mean_raw_score, double stdev_raw_score)
+StatusCodeEnum add_subject_stats(SubjectInfo *subject_info, int year, int semester, double mean_raw_score, double stdev_raw_score)
 {
     if (subject_info == NULL) {
         return ERROR_INVALID_INPUT;
@@ -112,12 +112,12 @@ int meets_prereq(const SubjectInfo *subject_info, const int taken_ids[], int tak
  * @param raw_score      학생의 원점수
  * @param z_array        (과목, z_score) 정보를 저장하는 배열
  * @param z_index        z_array에 쓸 인덱스 (0 <= z_index < 배열 크기)
- * @return StatusCode
+ * @return StatusCodeEnum
  *         - SUCCESS: 정상 계산
  *         - ERROR_INVALID_INPUT: subject_info나 z_array가 NULL, 통계를 찾지 못했을 때 등
  *         - ERROR_INDEX_OUT: z_index가 배열 범위를 벗어났을 때
  */
-StatusCode get_z_score(const SubjectInfo *subject_info,
+StatusCodeEnum get_z_score(const SubjectInfo *subject_info,
                        int year, int semester,
                        double raw_score,
                        SubjectZScore *z_array, int z_index)
@@ -200,11 +200,11 @@ static double find_z_by_id(const SubjectZScore *z_array, int z_count, int subjec
  * @param trees            테크트리 배열
  * @param tree_count       테크트리 개수
  * @param recommended_tree 추천 결과를 저장할 테크트리 포인터
- * @return StatusCode
+ * @return StatusCodeEnum
  *         - SUCCESS: 추천 성공
  *         - ERROR_INVALID_INPUT: 인자 이상 등
  */
-StatusCode recommend_techtree(const SubjectZScore *z_array,
+StatusCodeEnum recommend_techtree(const SubjectZScore *z_array,
                               int z_count,
                               const TechTree *trees,
                               int tree_count,
@@ -269,12 +269,12 @@ StatusCode recommend_techtree(const SubjectZScore *z_array,
  * @param subjects   저장할 SubjectInfo 배열 포인터
  * @param count      subjects 배열에 들어 있는 과목 개수
  * @param path       저장할 파일 경로 (예: "data/subject_infos.dat")
- * @return StatusCode
+ * @return StatusCodeEnum
  *         - SUCCESS: 저장 성공
  *         - ERROR_INVALID_INPUT: 포인터가 NULL이거나 count가 음수일 때
  *         - ERROR_FILE_NOT_FOUND: 파일을 열지 못한 경우(경로/권한 문제 등)
  */
-StatusCode save_subject_infos(const SubjectInfo *subjects, int count, const char *path)
+StatusCodeEnum save_subject_infos(const SubjectInfo *subjects, int count, const char *path)
 {
     if (subjects == NULL || path == NULL) {
         return ERROR_INVALID_INPUT;
@@ -318,12 +318,12 @@ StatusCode save_subject_infos(const SubjectInfo *subjects, int count, const char
  * @param max_count   subjects 배열이 수용 가능한 최대 과목 수
  * @param out_count   실제로 읽어온 과목 수를 돌려줄 정수 포인터
  * @param path        읽어 올 파일 경로 (예: "data/subject_infos.dat")
- * @return StatusCode
+ * @return StatusCodeEnum
  *         - SUCCESS: 로드 성공
  *         - ERROR_FILE_NOT_FOUND: 파일이 없거나 열기 실패
  *         - ERROR_INVALID_INPUT: 포인터 NULL, 파일 포맷 이상, max_count 초과 등
  */
-StatusCode load_subject_infos(SubjectInfo *subjects, int max_count, int *out_count, const char *path)
+StatusCodeEnum load_subject_infos(SubjectInfo *subjects, int max_count, int *out_count, const char *path)
 {
     if (subjects == NULL || out_count == NULL || path == NULL) {
         return ERROR_INVALID_INPUT;

@@ -9,15 +9,26 @@
 #define MAX_POSTS 20
 #define VISIBLE_ROWS 12
 
+/**
+ * @brief post_id를 관리하는 함수이다. 이전에 호출됐었다면 그 때 나왔던 값 +1을, 처음 호출됐다면 0을 반환한다.
+ * @return 관리하고 있는 id를 반환한다.
+ */
 static int generate_post_id(void) {
     static int next_id = 0;
     return next_id++;
 }
 
+/**
+ * @brief 현재 화면에 출력된 결과를 모두 지운다.
+ */
 static void clear_screen(void) {
     printf("\x1B[2J\x1B[H");
 }
 
+/**
+ * @brief 재귀적 방법을 이용해 키를 입력받는다. 디폴트 값(0, 224)이라면 계속 입력을 받는다.
+ * @return 키보드 입력값(화살표, 엔터 등)을 반환한다.
+ */
 static int read_key(void) {
 #ifdef _WIN32
     int ch = _getch();
@@ -29,6 +40,15 @@ static int read_key(void) {
     return ch;
 }
 
+/**
+ * @brief 게시글을 작성할 때 목표 인원수를 지정하게 하는 함수이다.
+ * @param title 작성할 게시글의 제목이다.
+ * @param initial 작성할 게시글의 목표 인원수의 기본값이다. 기본적으로 6명으로 입력된다.
+ * @param min 목표 인원수의 최솟값이다. 기본적으로 1명이다.
+ * @param max 목표 인원수의 최댓값이다. 기본적으로 50명이다.
+ * @return 목표 인원을 int로 반환한다.
+ *       - 게시글 작성을 취소할 경우 -1을 반환한다.
+ */
 static int adjust_value_with_arrows(const char *title, int initial, int min, int max) {
     int value = initial;
 
@@ -53,12 +73,23 @@ static int adjust_value_with_arrows(const char *title, int initial, int min, int
     }
 }
 
+/**
+ * @brief 입력받은 문자열을 출력한다.
+ * @param msg 출력할 문자열이다.
+ */
 static void pause_message(const char *msg) {
     goto_ansi(START_X, START_Y + 16);
     printf("%s%s%s", UI_DIM, msg, UI_RESET);
     read_key();
 }
 
+/**
+ * @brief 적절한 정보를 입력ㅂ다아 주어진 주소값에 게시글을 만들어 저장한다.
+ * @param result 게시글을 저장할 주소값이다.
+ * @return 결과를 StatusCodeEnum으로 반환한다.
+ *       - SUCCESS: 정상 작동
+ *       - ERROR_INVALID_INPUT: calloc 실패 혹은 각종 다양한 Invalid input
+ */
 StatusCodeEnum create_post(BoardPost *result) {
     if (result == NULL) return ERROR_INVALID_INPUT;
 
@@ -127,6 +158,12 @@ StatusCodeEnum create_post(BoardPost *result) {
     return SUCCESS;
 }
 
+/**
+ * @brief 게시글에 지원하는(게시글의 과목에 참가 신청을 하는) 함수이다.
+ * @param post 지원할 게시글이다.
+ * @param id 지원하는 사람의 id이다. 중복을 확인해서 한 명이 여러번 신청하는 것을 방지한다.
+ * @return 실행 결과를 StatusCodeEnum으로 반환한다.
+ */
 StatusCodeEnum apply_post(BoardPost *post, int id) {
     if (post == NULL) return ERROR_INVALID_INPUT;
     if (id < 0 || id >= ID_NUM) return ERROR_INVALID_INPUT;
@@ -147,8 +184,15 @@ StatusCodeEnum apply_post(BoardPost *post, int id) {
     return SUCCESS;
 }
 
+/**
+ * @brief 각 게시글에서 사람이 지원했는지, 지원했다면 몇번째로 지원했는지 확인한다.
+ * @param post 확인할 게시글이다.
+ * @param id 확인할 사람의 id이다.
+ * @return 해당 사람이 지원했다면 몇번째로 지원했었는지를 반환한다.(0-based index)
+ *       - 만약 해당 사람이 지원하지 않았거나, post가 잘못 입력되었다면 -1을 반환한다.
+ */
 static int find_student_index(const BoardPost *post, int id) {
-    if (post == NULL || id < 0 || id >= ID_NUM) return -1;
+    if (post == NULL || id < 0) return -1;
 
     for (int i = 0; i < post->current_students; i++) {
         if (post->students_id[i] == id) return i;
@@ -157,10 +201,22 @@ static int find_student_index(const BoardPost *post, int id) {
     return -1;
 }
 
+/**
+ * @brief 각 게시글에서 사람이 지원했는지 여부를 확인한다.
+ * @param post 확인할 계시글이다.
+ * @param id 확인할 사람의 id이다.
+ * @return 지원했다면 1, 지원하지 않았다면 0을 반환한다.
+ */
 int is_user_applied(const BoardPost *post, int id) {
     return find_student_index(post, id) >= 0;
 }
 
+/**
+ * @brief 각 게시글에서 특정 사람의 지원을 취소하는 함수이다.
+ * @param post 확인할 계시글이다.
+ * @param id 확인할 사람의 id이다.
+ * @return 함수의 처리 여부를 StatusCodeEnum으로 반환한다.
+ */
 StatusCodeEnum cancel_post(BoardPost *post, int id) {
     if (post == NULL) return ERROR_INVALID_INPUT;
     if (id < 0 || id >= ID_NUM) return ERROR_INVALID_INPUT;
@@ -181,6 +237,9 @@ StatusCodeEnum cancel_post(BoardPost *post, int id) {
 
 
 #ifdef _WIN32
+    /**
+     * @brief cmd에서 정상적인 출력이 가능케 하도록 하는 함수이다.(화면 전체 지우기, 인코딩 지정 등)
+     */
     void enable_virtual_terminal_processing() {
         HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
         DWORD dwMode = 0;
@@ -196,6 +255,10 @@ StatusCodeEnum cancel_post(BoardPost *post, int id) {
     }
 #endif
 
+/**
+ * @brief 게시글을 삭제하는 함수이다.
+ * @param post 삭제할 게시글이다.
+ */
 static void clear_board_post(BoardPost *post) {
     if (post != NULL && post->subject != NULL) {
         free(post->subject);

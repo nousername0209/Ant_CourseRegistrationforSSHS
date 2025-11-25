@@ -166,7 +166,7 @@ StatusCodeEnum create_post(BoardPost *result) {
  */
 StatusCodeEnum apply_post(BoardPost *post, int id) {
     if (post == NULL) return ERROR_INVALID_INPUT;
-    if (id < 0 || id >= ID_NUM) return ERROR_INVALID_INPUT;
+    if (id < 0) return ERROR_INVALID_INPUT;
     if (post->target_students <= 0) return ERROR_INVALID_INPUT;
     if (post->current_students >= post->target_students) return ERROR_INDEX_OUT;
 
@@ -219,7 +219,7 @@ int is_user_applied(const BoardPost *post, int id) {
  */
 StatusCodeEnum cancel_post(BoardPost *post, int id) {
     if (post == NULL) return ERROR_INVALID_INPUT;
-    if (id < 0 || id >= ID_NUM) return ERROR_INVALID_INPUT;
+    if (id < 0) return ERROR_INVALID_INPUT;
     if (post->target_students <= 0) return ERROR_INVALID_INPUT;
 
     int index = find_student_index(post, id);

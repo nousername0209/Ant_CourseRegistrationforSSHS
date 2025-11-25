@@ -266,7 +266,11 @@ static void clear_board_post(BoardPost *post) {
     }
 }
 
-
+/**
+ * @brief UI를 표시하는 함수이다.
+ * @param selected_index 선택된 인덱스이다.
+ * @param post_count 현재 있는 게시글 개수이다.
+ */
 static void render_buttons(int selected_index, int post_count) {
     int create_idx = post_count;
     int planned_idx = post_count + 1;
@@ -296,6 +300,13 @@ static void render_buttons(int selected_index, int post_count) {
     }
 }
 
+
+/**
+ * @brief 문자열을 max_len 길이에 맞춰 자르고 '...'을 붙이는 함수이다.
+ * @param dest 자른 문자열이다.
+ * @param src 원래 문자열이다.
+ * @param max_len 최대로 표시할 문자열이다.
+ */
 // 문자열을 max_len 길이(바이트 기준)에 맞춰 자르고 '...'을 붙이는 함수
 static void get_truncated_text(char *dest, const char *src, int max_len) {
     int src_len = (int)strlen(src);
@@ -330,6 +341,13 @@ static void get_truncated_text(char *dest, const char *src, int max_len) {
     strcat(dest, "...");
 }
 
+
+/**
+ * @brief 게시글의 행을 렌더하는 함수이다.
+ * @param post 현재 게시글이다.
+ * @param row 게시글의 열이다.
+ * @param is_selected 선택 여부이다.
+ */
 static void render_post_row(const BoardPost *post, int row, int is_selected) {
     goto_ansi(START_X, START_Y + 5 + row);
     if (is_selected) printf("%s", UI_REVERSE);
@@ -354,6 +372,14 @@ static void render_post_row(const BoardPost *post, int row, int is_selected) {
     if (is_selected) printf("%s", UI_RESET);
 }
 
+
+/**
+ * @brief 보드를 화면에 띄우는 함수이다.
+ * @param posts 전체 게시글들이다.
+ * @param post_count 현재 있는 게시글 개수이다.
+ * @param selected_index 현재 선택되어 있는 게시글의 인덱스이다.
+ * @param scroll_offset 스크롤과 내가 있는 곳의 변위차이다.
+ */
 static void render_board(const BoardPost *posts, int post_count, int selected_index, int scroll_offset) {
     printf("\x1B[2J\x1B[H");
     print_center("[수강신청 게시판]", 10, 2);
@@ -387,50 +413,13 @@ static void render_board(const BoardPost *posts, int post_count, int selected_in
     printf("%s상/하 이동, 좌/우 메뉴 이동, Enter 확인%s", UI_DIM, UI_RESET);
 }
 
-static char* choose_user_id(void) {
-    // int value = 0;
 
-    // while (1) {
-    //     printf("\x1B[2J\x1B[H");
-    //     print_center("사용자 ID를 선택하세요", 24, 4);
-    //     goto_ansi(START_X, START_Y + 7);
-    //     printf("%s<%s  %s%d%s  %s>%s", UI_COLOR_CYAN, UI_RESET, UI_BOLD, value, UI_RESET, UI_COLOR_CYAN, UI_RESET);
-    //     goto_ansi(START_X, START_Y + 10);
-    //     printf("%s좌/우 이동, Enter 확인%s", UI_DIM, UI_RESET);
-
-    //     int ch = read_key();
-    //     if (ch == LEFT_ARROW && value > 0) value--;
-    //     else if (ch == RIGHT_ARROW && value < ID_NUM - 1) value++;
-    //     else if (ch == ENTER) return value;
-    // }
-    char *id_buffer = (char *)malloc(21);
-    SelectEnum select = ID_FIELD; // 초기화 추가 (원문에는 없었으나 로직상 필요)
-    
-    // (이 함수 내부의 UI 로직은 원본 코드에서 일부 누락된 것으로 보이나,
-    //  깨진 텍스트 복구 요청에 집중하여 영문 텍스트는 그대로 둡니다)
-    system("cls");
-    
-    print_center("=== LOGIN ===", 13, 10);
-    
-    print_center("User ID: ", 33, 12);
-    if (select == ID_FIELD) {
-        printf("%s> [%-20s]%s", UI_REVERSE, id_buffer, UI_RESET);
-        goto_ansi(START_X + (UI_WIDTH - 33) / 2 + (int)strlen(id_buffer), 12);
-    } else {
-        printf("  [%-20s]", id_buffer);
-    }
-
-    goto_ansi(START_X + (UI_WIDTH - 16)/2, 15);
-    if (select == LOGIN_BUTTON) {
-        printf("%s[ >> LOGIN << ]%s", UI_REVERSE, UI_RESET);
-    } else {
-        printf("[    LOGIN    ]");
-    }
-    fflush(stdout);
-
-    return id_buffer;
-}
-
+/**
+ * @brief 신청화면을 보여주는 함수이다.
+ * @param post 신청화면에 보여줄 게시글이다.
+ * @param user_id 현재 로그인 중인 사용자의 아이디이다.
+ * @return 신청창의 종료를 알린다.
+ */
 static ApplyResultEnum show_apply_screen(BoardPost *post, int user_id) {
     int selected = 0; // 0: 확인, 1: 취소
     int already_applied = is_user_applied(post, user_id);
@@ -491,6 +480,13 @@ static ApplyResultEnum show_apply_screen(BoardPost *post, int user_id) {
     }
 }
 
+
+/**
+ * @brief 게시글을 추가하는 함수이다.
+ * @param posts 현재 존재하는 게시글들이다.
+ * @param count 현재 존재하는 게시글 수이다.
+ * @return 최종적 게시글 수를 리턴한다.
+ */
 static int add_post(BoardPost *posts, int count) {
     if (count >= MAX_POSTS) return count;
 
@@ -503,6 +499,14 @@ static int add_post(BoardPost *posts, int count) {
     return count;
 }
 
+
+/**
+ * @brief 게시글을 왼쪽으로 쉬프트 해주는 함수이다.
+ * @param posts 현재 존재하는 게시글들이다.
+ * @param count 현재 존재하는 게시글 수이다.
+ * @param start_index 시작 인덱스이다.
+ * @param free_first start_index 위치의 요소를 먼저 정리할지 여부를 나타내는 조건이다.
+ */
 static void shift_left(BoardPost *posts, int *count, int start_index, int free_first) {
     if (free_first) {
         clear_board_post(&posts[start_index]);
@@ -519,12 +523,23 @@ static void shift_left(BoardPost *posts, int *count, int start_index, int free_f
     (*count)--;
 }
 
+/**
+ * @brief 모집이 완료된 과목으로 전환시키는 함수이다.
+ * @param planned 현재 모집이 완료된 과목이다.
+ * @param planned_count 현재 모집이 완료된 과목의 개수이다.
+ * @param post 현재 게시글들이다.
+ */
 static void move_to_planned(BoardPost *planned, int *planned_count, BoardPost *post) {
     if (*planned_count >= MAX_POSTS) return;
     planned[*planned_count] = *post;
     (*planned_count)++;
 }
 
+/**
+ * @brief 모집이 완료된 과목을 보여주는 함수이다.
+ * @param planned 현재 모집이 완료된 과목이다.
+ * @param planned_count 현재 모집이 완료된 과목의 개수이다.
+ */
 static void show_planned_courses(const BoardPost *planned, int planned_count) {
     while (1) {
         printf("\x1B[2J\x1B[H");
@@ -551,6 +566,12 @@ static void show_planned_courses(const BoardPost *planned, int planned_count) {
     }
 }
 
+
+/**
+ * @brief 모집이 완료된 과목으로 전환시키는 함수이다.
+ * @param  user_id 사용중인 유저의 아이디이다.
+ * @return 0을 반환한다.
+ */
 int board_main(int user_id) {
 #ifdef _WIN32
     enable_virtual_terminal_processing();

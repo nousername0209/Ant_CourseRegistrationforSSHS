@@ -388,7 +388,7 @@ void run_registration(int student_id) {
         edit_mode = 1;
     }
 
-    Key ch;
+    KeyEnum ch;
     while (1) {
         draw_screen(&user, root, col_idx, row_indices, focus_area, btn_idx, edit_mode, timetable_select_idx);
         
@@ -544,7 +544,7 @@ void run_registration(int student_id) {
     }
 }
 
-StatusCode input(int id) {
+StatusCodeEnum input(int id) {
     run_registration(id);
     return SUCCESS;
 }

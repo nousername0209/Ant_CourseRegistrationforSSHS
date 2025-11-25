@@ -34,11 +34,7 @@ static int adjust_value_with_arrows(const char *title, int initial, int min, int
         printf("%s<%s  %s%dï¿½ï¿½%s  %s>%s", UI_COLOR_CYAN, UI_RESET, UI_BOLD, value, UI_RESET, UI_COLOR_CYAN, UI_RESET);
 
         goto_ansi(START_X, START_Y + 10);
-<<<<<<< HEAD
         printf("%s¡ç/¡æ%s ·Î Á¶Àý, Enter·Î È®Á¤ (ESC·Î Ãë¼Ò)", UI_DIM, UI_RESET);
-=======
-        printf("%sï¿½ï¿½/ï¿½ï¿½%s Å°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, Enterï¿½ï¿½ È®ï¿½ï¿½ (ESCï¿½ï¿½ ï¿½ï¿½ï¿½)", UI_DIM, UI_RESET);
->>>>>>> c7717766bcbcd78097ff04dba3d6d0f349c8f616
 
         int ch = read_key();
         if (ch == LEFT_ARROW && value > min) value--;
@@ -86,11 +82,7 @@ StatusCodeEnum create_post(BoardPost *result) {
     strncpy(subject->name, buffer, NAME_LENGTH - 1);
     subject->name[NAME_LENGTH - 1] = '\0';
 
-<<<<<<< HEAD
     int target = adjust_value_with_arrows("¸ðÁý ÀÎ¿øÀ» Á¤ÇÏ¼¼¿ä", 5, 1, ID_NUM);
-=======
-    int target = adjust_value_with_arrows("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Î¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½", 5, 1, ID_NUM);
->>>>>>> c7717766bcbcd78097ff04dba3d6d0f349c8f616
     if (target < 0) {
         free(subject);
         return ERROR_INVALID_INPUT;
@@ -99,11 +91,7 @@ StatusCodeEnum create_post(BoardPost *result) {
     clear_screen();
     print_center("[ï¿½Ô½Ã±ï¿½ ï¿½Û¼ï¿½]", 18, 2);
     goto_ansi(START_X, START_Y + 4);
-<<<<<<< HEAD
     printf("È«º¸ ¸Þ½ÃÁö¸¦ ÀÔ·ÂÇÏ¼¼¿ä: ");
-=======
-    printf("È«ï¿½ï¿½ ï¿½Þ¼ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Û¼ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½:  ");
->>>>>>> c7717766bcbcd78097ff04dba3d6d0f349c8f616
     if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
         free(subject);
         return ERROR_INVALID_INPUT;
@@ -118,25 +106,14 @@ StatusCodeEnum create_post(BoardPost *result) {
     result->current_students = 0;
 
     clear_screen();
-<<<<<<< HEAD
     print_center("°Ô½Ã±ÛÀÌ ÀúÀåµÇ¾ú½À´Ï´Ù!", 24, 8);
-=======
-    print_center("ï¿½Ô½Ã±ï¿½ï¿½ï¿½ ï¿½ï¿½ÏµÇ¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½!", 24, 8);
->>>>>>> c7717766bcbcd78097ff04dba3d6d0f349c8f616
     goto_ansi(START_X, START_Y + 10);
     printf("ï¿½ï¿½ï¿½ï¿½: %s\n", subject->name);
     goto_ansi(START_X, START_Y + 11);
-<<<<<<< HEAD
     printf("¸ðÁý ÀÎ¿ø: %d¸í\n", target);
     goto_ansi(START_X, START_Y + 12);
     printf("È«º¸ ¹®±¸: %s\n", result->promo_message);
     pause_message("°è¼ÓÇÏ·Á¸é ¾Æ¹« Å°³ª ´©¸£¼¼¿ä...");
-=======
-    printf("ï¿½ï¿½ï¿½ï¿½ ï¿½Î¿ï¿½: %dï¿½ï¿½\n", target);
-    goto_ansi(START_X, START_Y + 12);
-    printf("È«ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½: %s\n", result->promo_message);
-    pause_message("ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ ï¿½Æ¹ï¿½ Å°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½...");
->>>>>>> c7717766bcbcd78097ff04dba3d6d0f349c8f616
 
     return SUCCESS;
 }
@@ -192,3 +169,363 @@ StatusCodeEnum cancel_post(BoardPost *post, int id) {
 
     return SUCCESS;
 }
+
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#ifdef _WIN32
+#include <windows.h>
+#endif
+#include "board.h"
+
+#define MAX_POSTS 20
+#define VISIBLE_ROWS 12
+
+typedef enum {
+    APPLY_NO_CHANGE,
+    APPLY_APPLIED,
+    APPLY_CANCELLED,
+    APPLY_FILLED
+} ApplyResult;
+
+#ifdef _WIN32
+    void enable_virtual_terminal_processing() {
+        HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+        DWORD dwMode = 0;
+        
+        // 1. ÀÎÄÚµùÀ» UTF-8·Î ¼³Á¤ÇÏ¿© ÇÑ±Û ±úÁü ¹æÁö
+        SetConsoleOutputCP(949);
+
+        // 2. Virtual Terminal Processing ¸ðµå È°¼ºÈ­ (ANSI ÄÚµå ÇØ¼®)
+        if (hOut != INVALID_HANDLE_VALUE && GetConsoleMode(hOut, &dwMode)) {
+            dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+            SetConsoleMode(hOut, dwMode);
+    }
+}
+#endif
+
+static void clear_board_post(BoardPost *post) {
+    if (post != NULL && post->subject != NULL) {
+        free(post->subject);
+        post->subject = NULL;
+    }
+}
+
+
+static void render_buttons(int selected_index, int post_count) {
+    int create_idx = post_count;
+    int planned_idx = post_count + 1;
+    int exit_idx = post_count + 2;
+
+    goto_ansi(3, 22);
+    if (selected_index == create_idx) {
+        printf("%s[+] °Ô½Ã±Û »ý¼º%s", UI_REVERSE, UI_RESET);
+    } else {
+        printf("[+] °Ô½Ã±Û »ý¼º");
+    }
+
+    int planned_x = (CONSOLE_WIDTH / 2) - (int)strlen("°³¼³ ¿¹Á¤ °ú¸ñ") / 2 - 3;
+    goto_ansi(planned_x, 22);
+    if (selected_index == planned_idx) {
+        printf("%s[°³¼³ ¿¹Á¤ °ú¸ñ]%s", UI_REVERSE, UI_RESET);
+    } else {
+        printf("[°³¼³ ¿¹Á¤ °ú¸ñ]");
+    }
+
+    int exit_x = CONSOLE_WIDTH - (int)strlen("Á¾·á") - 6;
+    goto_ansi(exit_x, 22);
+    if (selected_index == exit_idx) {
+        printf("%s[Á¾·á]%s", UI_REVERSE, UI_RESET);
+    } else {
+        printf("[Á¾·á]");
+    }
+}
+
+static void render_post_row(const BoardPost *post, int row, int is_selected) {
+    goto_ansi(START_X, START_Y + 5 + row);
+    if (is_selected) printf("%s", UI_REVERSE);
+
+    printf("#%02d | %s | %d/%d¸í | %s",
+           post->id,
+           (post->subject && strlen(post->subject->name) > 0) ? post->subject->name : "(Á¦¸ñ ¾øÀ½)",
+           post->current_students,
+           post->target_students,
+           post->promo_message);
+
+    if (is_selected) printf("%s", UI_RESET);
+}
+
+static void render_board(const BoardPost *posts, int post_count, int selected_index, int scroll_offset) {
+    printf("\x1B[2J\x1B[H");
+    print_center("[°Ô½ÃÆÇ]", 12, 2);
+
+    goto_ansi(START_X, START_Y + 4);
+    printf("%sID | °ú¸ñ | ÇöÀç/¸ðÁý | È«º¸¹®±¸%s", UI_DIM, UI_RESET);
+
+    if (post_count == 0) {
+        goto_ansi(START_X, START_Y + 6);
+        printf("°Ô½Ã±ÛÀÌ ¾ø½À´Ï´Ù. ¿ÞÂÊ ÇÏ´Ü¿¡¼­ »õ °Ô½Ã±ÛÀ» »ý¼ºÇÏ¼¼¿ä.");
+    } else {
+        int end = scroll_offset + VISIBLE_ROWS;
+        if (end > post_count) end = post_count;
+        for (int i = scroll_offset; i < end; i++) {
+            render_post_row(&posts[i], i - scroll_offset, selected_index == i);
+        }
+
+        if (scroll_offset > 0) {
+            goto_ansi(CONSOLE_WIDTH - 8, START_Y + 5);
+            printf("%s¡ã%s", UI_DIM, UI_RESET);
+        }
+        if (scroll_offset + VISIBLE_ROWS < post_count) {
+            goto_ansi(CONSOLE_WIDTH - 8, START_Y + 5 + VISIBLE_ROWS - 1);
+            printf("%s¡å%s", UI_DIM, UI_RESET);
+        }
+    }
+
+    render_buttons(selected_index, post_count);
+    goto_ansi(START_X, START_Y + 18);
+    printf("%s¡è/¡é ¼±ÅÃ, ¡ç/¡æ ¹öÆ° ÀÌµ¿, Enter È®Á¤%s", UI_DIM, UI_RESET);
+}
+
+static char* choose_user_id(void) {
+    // int value = 0;
+
+    // while (1) {
+    //     printf("\x1B[2J\x1B[H");
+    //     print_center("»ç¿ëÀÚ ID¸¦ ¼±ÅÃÇÏ¼¼¿ä", 24, 4);
+    //     goto_ansi(START_X, START_Y + 7);
+    //     printf("%s<%s  %s%d%s  %s>%s", UI_COLOR_CYAN, UI_RESET, UI_BOLD, value, UI_RESET, UI_COLOR_CYAN, UI_RESET);
+    //     goto_ansi(START_X, START_Y + 10);
+    //     printf("%s¡ç/¡æ Á¶Àý, Enter È®Á¤%s", UI_DIM, UI_RESET);
+
+    //     int ch = read_key();
+    //     if (ch == LEFT_ARROW && value > 0) value--;
+    //     else if (ch == RIGHT_ARROW && value < ID_NUM - 1) value++;
+    //     else if (ch == ENTER) return value;
+    // }
+    char *id_buffer = (char *)malloc(21);
+    SelectEnum select;
+    system("cls");
+    
+    print_center("=== LOGIN ===", 13, 10);
+    
+    print_center("User ID: ", 33, 12);
+    if (select == ID_FIELD) {
+        printf("%s> [%-20s]%s", UI_REVERSE, id_buffer, UI_RESET);
+        goto_ansi(START_X + (UI_WIDTH - 33) / 2 + (int)strlen(id_buffer), 12);
+    } else {
+        printf("  [%-20s]", id_buffer);
+    }
+
+    goto_ansi(START_X + (UI_WIDTH - 16)/2, 15);
+    if (select == LOGIN_BUTTON) {
+        printf("%s[ >> LOGIN << ]%s", UI_REVERSE, UI_RESET);
+    } else {
+        printf("[    LOGIN    ]");
+    }
+    fflush(stdout);
+
+    return id_buffer;
+}
+
+static ApplyResult show_apply_screen(BoardPost *post, int user_id) {
+    int selected = 0; // 0: È®ÀÎ, 1: Ãë¼Ò
+    int already_applied = is_user_applied(post, user_id);
+    ApplyResult result = APPLY_NO_CHANGE;
+
+    while (1) {
+        printf("\x1B[2J\x1B[H");
+        print_center("[½ÅÃ» È®ÀÎ]", 14, 2);
+
+        goto_ansi(START_X, START_Y + 5);
+        printf("°ú¸ñ: %s", post->subject ? post->subject->name : "(¾Ë ¼ö ¾øÀ½)");
+        goto_ansi(START_X, START_Y + 6);
+        printf("¸ðÁý %d¸í / ÇöÀç %d¸í", post->target_students, post->current_students);
+        goto_ansi(START_X, START_Y + 7);
+        printf("½ÅÃ»ÀÚ ID: %d", user_id);
+        goto_ansi(START_X, START_Y + 10);
+        if (already_applied) {
+            printf("½ÅÃ»À» Ãë¼ÒÇÏ½Ã°Ú½À´Ï±î?");
+        } else {
+            printf("½ÅÃ»ÇÏ½Ã°Ú½À´Ï±î?");
+        }
+
+        goto_ansi(START_X, START_Y + 13);
+        if (selected == 0) printf("%s[È®ÀÎ]%s  [Ãë¼Ò]", UI_REVERSE, UI_RESET);
+        else printf("[È®ÀÎ]  %s[Ãë¼Ò]%s", UI_REVERSE, UI_RESET);
+
+        goto_ansi(START_X, START_Y + 16);
+        printf("%s¡ç/¡æ ÀÌµ¿, Enter ¼±ÅÃ%s", UI_DIM, UI_RESET);
+
+        int ch = read_key();
+        if (ch == LEFT_ARROW) selected = 0;
+        else if (ch == RIGHT_ARROW) selected = 1;
+        else if (ch == ESC) return result;
+        else if (ch == ENTER) {
+            if (selected == 0) {
+                StatusCodeEnum code = already_applied ? cancel_post(post, user_id) : apply_post(post, user_id);
+                printf("\x1B[2J\x1B[H");
+                if (code == SUCCESS) {
+                    if (already_applied) {
+                        print_center("½ÅÃ»ÀÌ Ãë¼ÒµÇ¾ú½À´Ï´Ù!", 24, 6);
+                        result = APPLY_CANCELLED;
+                    } else {
+                        print_center("½ÅÃ»ÀÌ ¿Ï·áµÇ¾ú½À´Ï´Ù!", 24, 6);
+                        result = APPLY_APPLIED;
+                        if (post->current_students >= post->target_students) {
+                            result = APPLY_FILLED;
+                        }
+                    }
+                } else {
+                    print_center("Ã³¸®¿¡ ½ÇÆÐÇß½À´Ï´Ù.", 22, 6);
+                }
+                goto_ansi(START_X, START_Y + 8);
+                printf("°á°ú ÄÚµå: %d", code);
+                pause_message("°è¼ÓÇÏ·Á¸é ¾Æ¹« Å°³ª ´©¸£¼¼¿ä...");
+            }
+            return result;
+        }
+    }
+}
+
+static int add_post(BoardPost *posts, int count) {
+    if (count >= MAX_POSTS) return count;
+
+    StatusCodeEnum code = create_post(&posts[count]);
+    if (code == SUCCESS) {
+        return count + 1;
+    }
+
+    clear_board_post(&posts[count]);
+    return count;
+}
+
+static void shift_left(BoardPost *posts, int *count, int start_index, int free_first) {
+    if (free_first) {
+        clear_board_post(&posts[start_index]);
+    }
+
+    for (int i = start_index; i < *count - 1; i++) {
+        posts[i] = posts[i + 1];
+    }
+
+    if (*count > 0) {
+        posts[*count - 1] = (BoardPost){0};
+    }
+
+    (*count)--;
+}
+
+static void move_to_planned(BoardPost *planned, int *planned_count, BoardPost *post) {
+    if (*planned_count >= MAX_POSTS) return;
+    planned[*planned_count] = *post;
+    (*planned_count)++;
+}
+
+static void show_planned_courses(const BoardPost *planned, int planned_count) {
+    while (1) {
+        printf("\x1B[2J\x1B[H");
+        print_center("[°³¼³ ¿¹Á¤ °ú¸ñ]", 20, 2);
+
+        if (planned_count == 0) {
+            goto_ansi(START_X, START_Y + 5);
+            printf("¾ÆÁ÷ °³¼³ ¿¹Á¤ÀÎ °ú¸ñÀÌ ¾ø½À´Ï´Ù.");
+        } else {
+            goto_ansi(START_X, START_Y + 4);
+            printf("%sID | °ú¸ñ | È«º¸¹®±¸%s", UI_DIM, UI_RESET);
+            for (int i = 0; i < planned_count && i < VISIBLE_ROWS; i++) {
+                goto_ansi(START_X, START_Y + 6 + i);
+                const BoardPost *p = &planned[i];
+                printf("#%02d | %s | %s", p->id, p->subject ? p->subject->name : "(Á¦¸ñ ¾øÀ½)", p->promo_message);
+            }
+        }
+
+        goto_ansi(START_X, START_Y + 18);
+        printf("%s[È®ÀÎ]%s", UI_REVERSE, UI_RESET);
+
+        int ch = read_key();
+        if (ch == ENTER || ch == ESC) return;
+    }
+}
+
+int board_main(int user_id) {
+#ifdef _WIN32
+    enable_virtual_terminal_processing();
+#endif
+
+    BoardPost posts[MAX_POSTS] = {0};
+    BoardPost planned[MAX_POSTS] = {0};
+    int post_count = 0;
+    int planned_count = 0;
+    int selected_index = 0;
+    int scroll_offset = 0;
+
+    while (1) {
+        int total_items = post_count + 3; // posts + create + planned + exit
+        if (selected_index >= total_items) selected_index = total_items - 1;
+
+        if (selected_index < scroll_offset) scroll_offset = selected_index;
+        if (selected_index >= scroll_offset + VISIBLE_ROWS && selected_index < post_count) {
+            scroll_offset = selected_index - VISIBLE_ROWS + 1;
+        }
+        if (scroll_offset < 0) scroll_offset = 0;
+
+        render_board(posts, post_count, selected_index, scroll_offset);
+
+        int ch = read_key();
+        if (ch == UP_ARROW) {
+            if (selected_index > 0) selected_index--;
+        } else if (ch == DOWN_ARROW) {
+            if (selected_index < total_items - 1) selected_index++;
+        } else if (ch == LEFT_ARROW) {
+            int create_idx = post_count;
+            int planned_idx = post_count + 1;
+            int exit_idx = post_count + 2;
+            if (selected_index == planned_idx) selected_index = create_idx;
+            else if (selected_index == exit_idx) selected_index = planned_idx;
+        } else if (ch == RIGHT_ARROW) {
+            int create_idx = post_count;
+            int planned_idx = post_count + 1;
+            int exit_idx = post_count + 2;
+            if (selected_index == create_idx) selected_index = planned_idx;
+            else if (selected_index == planned_idx) selected_index = exit_idx;
+        } else if (ch == ENTER) {
+            int create_idx = post_count;
+            int planned_idx = post_count + 1;
+            int exit_idx = post_count + 2;
+
+            if (selected_index < post_count) {
+                ApplyResult result = show_apply_screen(&posts[selected_index], user_id);
+                if (result == APPLY_FILLED) {
+                    move_to_planned(planned, &planned_count, &posts[selected_index]);
+                    shift_left(posts, &post_count, selected_index, 0);
+                    if (selected_index >= post_count && post_count > 0) selected_index = post_count - 1;
+                }
+            } else if (selected_index == create_idx) {
+                post_count = add_post(posts, post_count);
+                if (post_count > 0) selected_index = post_count - 1;
+            } else if (selected_index == planned_idx) {
+                show_planned_courses(planned, planned_count);
+            } else if (selected_index == exit_idx) {
+                for (int i = 0; i < post_count; i++) clear_board_post(&posts[i]);
+                for (int i = 0; i < planned_count; i++) clear_board_post(&planned[i]);
+                return 0;
+            }
+        }
+    }
+}
+
+#ifdef _WIN32
+// ÀÏºÎ MinGW ¼³Á¤¿¡¼­ GUI ¼­ºê½Ã½ºÅÛÀ» ±âº»°ªÀ¸·Î »ç¿ëÇÒ ¶§ WinMainÀÌ ÇÊ¿äÇÏ¹Ç·Î
+// ÄÜ¼Ö ÇÁ·Î±×·¥ ¿£Æ®¸®¸¦ main¿¡ À§ÀÓÇÑ´Ù.
+// int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+//     (void)hInstance;
+//     (void)hPrevInstance;
+//     (void)lpCmdLine;
+//     (void)nCmdShow;
+//     return main();
+// }
+#endif

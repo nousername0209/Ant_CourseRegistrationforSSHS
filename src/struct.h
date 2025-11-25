@@ -54,7 +54,8 @@ typedef enum _Page {
     LOGIN_PAGE,
     INPUT_PAGE,
     OUTPUT_PAGE,
-    ESC_PAGE
+    ESC_PAGE,
+    BOARD_PAGE
 } PageEnum;
 
 #define CONSOLE_WIDTH 80
@@ -178,6 +179,8 @@ typedef enum {
     ERROR_INDEX_OUT,
     ERROR_MEMORY_ALLOC
 } StatusCodeEnum;
+
+typedef enum _Select {ID_FIELD, LOGIN_BUTTON} SelectEnum;
 
 static Subject* create_node(const char* name, int isFile, int credit) {
     Subject* s = (Subject*)malloc(sizeof(Subject));

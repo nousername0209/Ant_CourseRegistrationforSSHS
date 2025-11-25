@@ -105,9 +105,12 @@ void popup_show_difficulty_result(int sem, TimeTable *t) {
     goto_ansi(start_x + 2, start_y + 6);
     printf("%s2. 최악의 조합 (argmax_synergy)%s", UI_COLOR_YELLOW, UI_RESET);
     goto_ansi(start_x + 5, start_y + 7);
-    if (strcmp((*t->argmax_synergy)[0].name, "N/A") == 0) {
+    if (((*t->argmax_synergy)[0].id) == ((*t->argmax_synergy)[1].id)) {
         printf("-> 과목이 부족하여 분석 불가");
     } else {
+        if(DEBUG_MODE){
+            printf("%d %d\n", t->argmax_synergy[0]->id, (*t->argmax_synergy)[1].id);
+        }
         printf("-> %s + %s", (*t->argmax_synergy)[0].name, (*t->argmax_synergy)[1].name);
     }
 
@@ -217,6 +220,19 @@ StatusCode popup_input_difficulty(TimeTable* table, int student_id, int semester
             double Load[MAX_SUBJECT_NUM], Synergy[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM];
             preprocess_load(&Load);
             preprocess_synergy(&Synergy);
+            if (DEBUG_MODE){
+                printf("Load result: \n");
+                for(int i=0;i<MAX_SUBJECT_NUM;i++){
+                    printf("%lf ", Load[i]);
+                }
+                printf("\nSynergy result: \n");
+                for(int i=0;i<MAX_SUBJECT_NUM;i++){
+                    for(int j=0;j<MAX_SUBJECT_NUM;j++){
+                        printf("%lf ", Synergy[i][j]);
+                    }
+                    printf("\n");
+                }
+            }
 
             // 성공 메시지 팝업 후 종료
             popup_show_message("완료", "난이도 정보가 성공적으로 저장되었습니다.");

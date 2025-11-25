@@ -36,6 +36,9 @@ static inline int getch(void) {
 #define UI_COLOR_YELLOW "\x1B[33m"
 #define UI_COLOR_GREEN "\x1B[32m"
 
+
+#define DEBUG_MODE 0
+
 typedef enum _Key {
     LEFT_ARROW = 75,
     RIGHT_ARROW = 77,
@@ -177,7 +180,7 @@ typedef enum {
 } StatusCode;
 
 // �Լ� ���� �� ����
-Subject* create_node(const char* name, int isFile, int credit) {
+ Subject* create_node(const char* name, int isFile, int credit) {
     Subject* s = (Subject*)malloc(sizeof(Subject));
     if (s == NULL) return NULL;
     strcpy(s->name, name);

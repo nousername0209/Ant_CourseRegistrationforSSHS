@@ -1,14 +1,14 @@
 //
-// Created by ê¹€ì£¼í™˜ on 25. 11. 9.
+// Created by ê¹?ì£¼í™˜ on 25. 11. 9.
 //
 
 #include "../struct.h" 
-#include "../login/login.h"
+// #include "../login/login.h"
 #include "calculator.h"
 
 /**
  * preprocess_load
- * dir_pathì— ìžˆëŠ” ë°ì´í„°ì…‹ì„ ë°”íƒ•ìœ¼ë¡œ Load(ë‹¨ì¼ ê³¼ëª© ë‚œì´ë„)ë¥¼ ë¡œë“œí•œë‹¤.
+ * dir_path?— ?žˆ?Š” ?°?´?„°?…‹?„ ë°”íƒ•?œ¼ë¡? Load(?‹¨?¼ ê³¼ëª© ?‚œ?´?„)ë¥? ë¡œë“œ?•œ?‹¤.
  */
 StatusCode preprocess_load(double (*Load)[MAX_SUBJECT_NUM]) {
     char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
@@ -64,7 +64,7 @@ StatusCode preprocess_load(double (*Load)[MAX_SUBJECT_NUM]) {
 
 /**
  * preprocess_synergy
- * dir_pathì— ìžˆëŠ” ë°ì´í„°ì…‹ì„ ë°”íƒ•ìœ¼ë¡œ Synergy(ê³¼ëª© ê°„ ì‹œë„ˆì§€/êµì°¨ ë‚œì´ë„)ë¥¼ ë¡œë“œí•œë‹¤
+ * dir_path?— ?žˆ?Š” ?°?´?„°?…‹?„ ë°”íƒ•?œ¼ë¡? Synergy(ê³¼ëª© ê°? ?‹œ?„ˆì§?/êµì°¨ ?‚œ?´?„)ë¥? ë¡œë“œ?•œ?‹¤
  */
 StatusCode preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM]) {
     char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
@@ -132,8 +132,8 @@ StatusCode preprocess_synergy(double (*Synergy)[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM
 
 /**
  * calculate_difficulty
- * ì£¼ì–´ì§„ Loadì™€ Synergyë¥¼ ë°”íƒ•ìœ¼ë¡œ TimeTableì˜ ë‚œì´ë„ ìš”ì†Œë¥¼ ê³„ì‚°í•œë‹¤.
- * ê°€ìž¥ Loadê°€ í° ê³¼ëª©(argmax_load)ê³¼ Synergyê°€ ê°€ìž¥ ë†’ì€ ê³¼ëª© ìŒ(argmax_synergy)ì„ ì°¾ëŠ”ë‹¤.
+ * ì£¼ì–´ì§? Load??? Synergyë¥? ë°”íƒ•?œ¼ë¡? TimeTable?˜ ?‚œ?´?„ ?š”?†Œë¥? ê³„ì‚°?•œ?‹¤.
+ * ê°??ž¥ Loadê°? ?° ê³¼ëª©(argmax_load)ê³? Synergyê°? ê°??ž¥ ?†’??? ê³¼ëª© ?Œ(argmax_synergy)?„ ì°¾ëŠ”?‹¤.
  */
 StatusCode calculate_difficulty(TimeTable* table) {
     if (table == NULL || table->n ==0) {
@@ -148,6 +148,8 @@ StatusCode calculate_difficulty(TimeTable* table) {
     double Load[MAX_SUBJECT_NUM];
     double Synergy[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM];
     table->difficulty = 0;
+    table->argmax_load = (Subject *)malloc(sizeof(Subject));
+    table->argmax_synergy = (Subject (*)[2])malloc(sizeof(Subject)*2);
 
     sprintf(data_path, "%s/data", dir_path);
     
@@ -167,7 +169,7 @@ StatusCode calculate_difficulty(TimeTable* table) {
     fread(Synergy, sizeof(double), MAX_SUBJECT_NUM*MAX_SUBJECT_NUM, fp);
     fclose(fp);
 
-    *(table->argmax_load) = *(table->subjects[0]);
+    table->argmax_load = table->subjects[0];
     for (int i = 0; i < table->n; i++) {
         Subject *cur_subject = table->subjects[i];
         if(cur_subject == NULL ||
@@ -202,67 +204,67 @@ StatusCode calculate_difficulty(TimeTable* table) {
 
 /**
  * add_difficulty_db
- * ì§€ì •ëœ pathì— difficulty ë°ì´í„°ë² ì´ìŠ¤ë¥¼ ì¶”ê°€í•œë‹¤.
- * í•„ìš”í•œ ì •ë³´(ID, ê°’ ë“±)ëŠ” í•¨ìˆ˜ ë‚´ë¶€ì—ì„œ ì‚¬ìš©ìžë¡œë¶€í„° ìž…ë ¥ë°›ëŠ”ë‹¤.
- */
-StatusCode add_difficulty_db(const TimeTable *table) {
-    char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
-    char file_path[PATH_LENGTH + 20];
-    int num_of_data;
-    int total_difficulty;
+ * ì§?? •?œ path?— difficulty ?°?´?„°ë² ì´?Š¤ë¥? ì¶”ê???•œ?‹¤.
+ * ?•„?š”?•œ ? •ë³?(ID, ê°? ?“±)?Š” ?•¨?ˆ˜ ?‚´ë¶??—?„œ ?‚¬?š©?žë¡œë???„° ?ž…? ¥ë°›ëŠ”?‹¤.
+ **/
+// StatusCode add_difficulty_db(const TimeTable *table) {
+//     char dir_path[PATH_LENGTH] = "./dataset/difficulty_calculator";
+//     char file_path[PATH_LENGTH + 20];
+//     int num_of_data;
+//     int total_difficulty;
     
-    FILE *fp = NULL;
-    sprintf(file_path, "%s/num_of_data.dat", dir_path);
-    fp = fopen(file_path, "rb");
-    if(fp == NULL){
-        num_of_data = 0;
-        fp = fopen(file_path, "wb");
-        fwrite(&num_of_data, sizeof(int), 1, fp);
-    }
-    else{
-        fread(&num_of_data, sizeof(int), 1, fp);
-    }
-    fclose(fp);
+//     FILE *fp = NULL;
+//     sprintf(file_path, "%s/num_of_data.dat", dir_path);
+//     fp = fopen(file_path, "rb");
+//     if(fp == NULL){
+//         num_of_data = 0;
+//         fp = fopen(file_path, "wb");
+//         fwrite(&num_of_data, sizeof(int), 1, fp);
+//     }
+//     else{
+//         fread(&num_of_data, sizeof(int), 1, fp);
+//     }
+//     fclose(fp);
 
-    printf("í•´ë‹¹ ì‹œê°„í‘œì˜ ë‚œì´ë„ë¥¼ 0~10ì˜ ì •ìˆ˜ë¡œ ìž…ë ¥í•´ì£¼ì„¸ìš” : ");
-    scanf("%d", &total_difficulty);
+//     printf("?•´?‹¹ ?‹œê°„í‘œ?˜ ?‚œ?´?„ë¥? 0~10?˜ ? •?ˆ˜ë¡? ?ž…? ¥?•´ì£¼ì„¸?š” : ");
+//     scanf("%d", &total_difficulty);
 
-    sprintf(file_path, "%s/data/data%:03d.txt", dir_path, num_of_data);
-    fp = fopen(file_path, "w");
+//     sprintf(file_path, "%s/data/data%:03d.txt", dir_path, num_of_data);
+//     fp = fopen(file_path, "w");
 
-    fprintf(fp, "%d %d\n", table->n, total_difficulty);
-    for(int i=0;i<table->n;i++){
-        int cur_difficulty;
-        printf("ê³¼ëª© %sì˜ ë‚œì´ë„ë¥¼ 0~10ì˜ ì •ìˆ˜ë¡œ ìž…ë ¥í•´ì£¼ì„¸ìš” : ", table->subjects[i]->name);
-        scanf("%d", &cur_difficulty);
-        fprintf(fp, "%d %d\n", table->subjects[i]->id, cur_difficulty);
-    }
-    fclose(fp);
+//     fprintf(fp, "%d %d\n", table->n, total_difficulty);
+//     for(int i=0;i<table->n;i++){
+//         int cur_difficulty;
+//         printf("ê³¼ëª© %s?˜ ?‚œ?´?„ë¥? 0~10?˜ ? •?ˆ˜ë¡? ?ž…? ¥?•´ì£¼ì„¸?š” : ", table->subjects[i]->name);
+//         scanf("%d", &cur_difficulty);
+//         fprintf(fp, "%d %d\n", table->subjects[i]->id, cur_difficulty);
+//     }
+//     fclose(fp);
 
-    // sprintf(file_path, "%s/data/data%:03d.txt", dir_path, num_of_data);
-    // fp = fopen(file_path, "w");
+//     // sprintf(file_path, "%s/data/data%:03d.txt", dir_path, num_of_data);
+//     // fp = fopen(file_path, "w");
 
-    // int num_of_subject;
-    // scanf("%d %d", &num_of_subject, &total_difficulty);
-    // fprintf(fp, "%d %d\n", num_of_subject, total_difficulty);
-    // for(int i=0;i<num_of_subject;i++){
-    //     int subject, cur_difficulty;
-    //     scanf("%d %d", &subject, &cur_difficulty);
-    //     fprintf(fp, "%d %d\n", subject, cur_difficulty);
-    // }
-    // fclose(fp);
+//     // int num_of_subject;
+//     // scanf("%d %d", &num_of_subject, &total_difficulty);
+//     // fprintf(fp, "%d %d\n", num_of_subject, total_difficulty);
+//     // for(int i=0;i<num_of_subject;i++){
+//     //     int subject, cur_difficulty;
+//     //     scanf("%d %d", &subject, &cur_difficulty);
+//     //     fprintf(fp, "%d %d\n", subject, cur_difficulty);
+//     // }
+//     // fclose(fp);
 
-    num_of_data++;
+//     num_of_data++;
 
-    sprintf(file_path, "%s/num_of_data.dat", dir_path);
-    fp = fopen(file_path, "wb");
-    fwrite(&num_of_data, sizeof(int), 1, fp);
-    fclose(fp);
+//     sprintf(file_path, "%s/num_of_data.dat", dir_path);
+//     fp = fopen(file_path, "wb");
+//     fwrite(&num_of_data, sizeof(int), 1, fp);
+//     fclose(fp);
     
 
-    double Load[MAX_SUBJECT_NUM], Synergy[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM];
-    preprocess_load(&Load);
-    preprocess_synergy(&Synergy);
+//     double Load[MAX_SUBJECT_NUM], Synergy[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM];
+//     preprocess_load(&Load);
+//     preprocess_synergy(&Synergy);
 
-    return SUCCESS;
-}
+//     return SUCCESS;
+// }

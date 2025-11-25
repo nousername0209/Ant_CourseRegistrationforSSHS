@@ -119,8 +119,8 @@ StatusCodeEnum create_post(BoardPost *result) {
     subject->credit = 0;
     subject->mean_raw_score = 0.0;
     subject->stdev_raw_score = 0.0;
-    strncpy(subject->name, buffer, NAME_LENGTH - 1);
-    subject->name[NAME_LENGTH - 1] = '\0';
+    strncpy(subject->name, buffer, STR_LENGTH - 1);
+    subject->name[STR_LENGTH - 1] = '\0';
 
     int target = adjust_value_with_arrows("수강 인원을 설정하세요", 5, 1, ID_NUM);
     if (target < 0) {

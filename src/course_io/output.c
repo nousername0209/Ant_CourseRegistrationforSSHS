@@ -1,119 +1,112 @@
 #include "output.h"
 #include "../difficulty_calculator/calculator.h"
 
-int is_valid_difficulty_input(const char *buf) {
+int is_valid_difficulty_input(const char* buf) {
     int val = atoi(buf);
     return (val >= 0 && val <= 10);
 }
 
-void draw_input_difficulty_popup(TimeTable *table, int semester, int total_difficulty_input,
-                                 int subject_difficulties[], int current_idx, int box_w, int box_h,
-                                 int start_x, int start_y) {
+void draw_input_difficulty_popup(TimeTable* table, int semester, int total_difficulty_input, int subject_difficulties[], int current_idx, int box_w, int box_h, int start_x, int start_y) {
     system("cls");
     int cursor_y;
 
     goto_ansi(start_x + 2, start_y + 1);
-    printf("%s[ %dĞ± Ìµ  ß° ]%s (0~10 Ô·, Ú¸ Ô·Ï¼)", UI_BOLD, semester,
-           UI_RESET);
-
-    if (current_idx == -1)
-        printf("%s", UI_COLOR_CYAN); //   
-
-        printf("___");
-        if (current_idx == i)
-            printf("%s", UI_COLOR_CYAN); //   
-
-            printf("%d", subject_difficulties[i]);
-            printf("___");
-void popup_show_message(const char *title, const char *msg) {
-    for (int i = 0; i < box_h; i++) {
-        printf("%s%*s%s", UI_REVERSE, box_w, "", UI_RESET);
-
-    while (1) {
-        if (ch == ENTER || ch == ESC)
-            break;
-
-        if (DEBUG_MODE) {
-    printf("%s3.  Ìµ (total_difficulty)%s: %.1f / 10.0", UI_COLOR_YELLOW, UI_RESET,
-           t->difficulty);
-    while (1) {
-        if (ch == ENTER || ch == ESC)
-            break;
-StatusCodeEnum popup_input_difficulty(TimeTable *table, int student_id, int semester) {
-    if (table == NULL)
-        return ERROR_INVALID_INPUT;
-    if (box_h > 25)
-        box_h = 25; // Ö´  
-
-    if (fp == NULL) {
+    printf("%s[ %dÇĞ±â ³­ÀÌµµ µ¥ÀÌÅÍ Ãß°¡ ]%s (0~10Á¡ ÀÔ·Â, ¼ıÀÚ¸¦ ÀÔ·ÂÇÏ¼¼¿ä)", UI_BOLD, semester, UI_RESET);
+    
+    // 1. ÃÑ ³­ÀÌµµ ÀÔ·Â ÇÊµå
+    cursor_y = start_y + 3;
+    goto_ansi(start_x + 2, cursor_y);
+    if (current_idx == -1) printf("%s", UI_COLOR_CYAN); // ÇöÀç ¼±ÅÃ °­Á¶
+    printf("ÃÑ ½Ã°£Ç¥ ³­ÀÌµµ: ");
+    
+    goto_ansi(start_x + 30, cursor_y);
+    if (total_difficulty_input != -1) {
+        printf("%d", total_difficulty_input);
     } else {
-    fclose(fp);
-    for (int i = 0; i < table->n; i++)
-        subject_difficulties[i] = 0;
-        draw_input_difficulty_popup(table, semester, total_difficulty, subject_difficulties,
-        if (ch == ESC)
-            return SUCCESS; // 
+         printf("___");
+    }
+    printf("%s", UI_RESET);
 
-                if (current_input_idx > -1)
-                    current_input_idx--;
-                if (current_input_idx < table->n - 1)
-                    current_input_idx++;
-                popup_show_message("", " Ìµ Ô· Ö¼.");
-                continue;
-            for (int i = 0; i < table->n; i++) {
-                popup_show_message("", "  Ìµ Ô· Ö¼.");
-                continue;
+    // 2. °ú¸ñº° ³­ÀÌµµ ÀÔ·Â ÇÊµå
+    for (int i = 0; i < table->n; i++) {
+        cursor_y = start_y + 5 + i * 2;
+        goto_ansi(start_x + 2, cursor_y);
+        if (current_idx == i) printf("%s", UI_COLOR_CYAN); // ÇöÀç ¼±ÅÃ °­Á¶
 
-            //    
-                fprintf(fp, "%d %d\n", table->subjects[i]->id, subject_difficulties[i]);
-
-            if (DEBUG_MODE) {
-                for (int i = 0; i < MAX_SUBJECT_NUM; i++) {
-                for (int i = 0; i < MAX_SUBJECT_NUM; i++) {
-                    for (int j = 0; j < MAX_SUBJECT_NUM; j++) {
-                // 0~10   Ô·Â¿  Ã³ (Ê¿)
+        printf("°ú¸ñ %s ³­ÀÌµµ: ", table->subjects[i]->name);
+        
+        goto_ansi(start_x + 30, cursor_y);
+        if (subject_difficulties[i] > 0) {
+             printf("%d", subject_difficulties[i]);
+        } else {
+             printf("___");
+        }
+        printf("%s", UI_RESET);
     }
 
-void draw_output_view(User *user, int btn_idx) {
-    printf("   Ã°Ç¥ È®                                                 %sID: %5d%s\n",
-           UI_BOLD, user->id, UI_RESET);
-    int box_w = 26;
+    // 3. ¹öÆ° ¿µ¿ª
+    cursor_y = start_y + box_h - 2;
+    goto_ansi(start_x + (box_w / 2) - 15, cursor_y);
+    printf("%s[ ¡è/¡é: ÀÌµ¿ | ¼ıÀÚ: ÀÔ·Â | ENTER: ÀúÀå | ESC: Ãë¼Ò ]%s", UI_BOLD, UI_RESET);
+}
 
-        int box_y = start_table_row + (row * 8);
-        if ((sem + 1) <= user->current_sem)
-        else
-        TimeTable *t = user->table[sem];
-                if (i >= 6) {
+void popup_show_message(const char* title, const char* msg) {
+    int box_w = 40;
+    int box_h = 7;
+    int start_x = (CONSOLE_WIDTH - box_w) / 2;
+    int start_y = 10;
 
-    const char *labels[4] = {"Ã°Ç¥ ", "Ìµ ", " ß°", "  È¨  "};
+    // ¹è°æ Áö¿ì±â ¹× ¹Ú½º
+    for(int i=0; i<box_h; i++) {
+        goto_ansi(start_x, start_y + i);
+        printf("%s%*s%s", UI_REVERSE, box_w, "", UI_RESET); 
+    }
 
+    goto_ansi(start_x + 2, start_y + 2);
+    printf("%s[%s]%s", UI_BOLD, title, UI_RESET);
+    
+    goto_ansi(start_x + 2, start_y + 3);
+    printf("%s%s%s", UI_REVERSE, msg, UI_RESET);
 
-                if (btn_idx > 0)
-                    btn_idx--;
-            } else if (ch == RIGHT_ARROW) {
-                if (btn_idx < 3)
-                    btn_idx++;
-        } else if (ch == ENTER) {
-            } else if (btn_idx == 1 || btn_idx == 2) {
+    goto_ansi(start_x + 2, start_y + 5);
+    printf("%s[ ¿£ÅÍ Å°¸¦ ´­·¯ È®ÀÎ ]%s", UI_DIM, UI_RESET);
 
+    while(1) {
+        int ch = _getch();
+        if (ch == ENTER || ch == ESC) break;
+    }
+    
+    // ÆË¾÷ ´İ±â (È­¸é º¹±¸´Â draw_screen¿¡¼­ Ã³¸®µÊ)
+}
 
-                    TimeTable *t = user.table[selected_sem - 1];
+void popup_show_difficulty_result(int sem, TimeTable *t) {
+    int box_w = 50;
+    int box_h = 12;
+    int start_x = (CONSOLE_WIDTH - box_w) / 2;
+    int start_y = 8;
 
-                    } else {
-                            } else
-                                popup_show_difficulty_result(selected_sem, t);
-                        } else {
-                            StatusCodeEnum status =
-                                popup_input_difficulty(t, student_id, selected_sem);
-            } else {              // btn_idx == 3
-                return HOME_PAGE; // È¨
-        } else if (ch == ESC) {
+    // ¹è°æ Áö¿ì±â
+    system("cls");
+
+    goto_ansi(start_x + 2, start_y + 1);
+    printf("%s %dÇĞ±â ³­ÀÌµµ ºĞ¼® °á°ú %s", UI_BOLD, sem, UI_RESET);
+
+    goto_ansi(start_x + 2, start_y + 3);
+    if (t->argmax_load == NULL) {
+        printf("%s1. ÃÖ°í ³­ÀÌµµ °ú¸ñ (argmax_load)%s", UI_COLOR_YELLOW, UI_RESET);
+        goto_ansi(start_x + 5, start_y + 4);
+        printf("-> °ú¸ñÀÌ ¾ø¾î ºĞ¼® ºÒ°¡");
+    } else {
+        goto_ansi(start_x + 2, start_y + 3);
+        printf("%s1. ÃÖ°í ³­ÀÌµµ °ú¸ñ (argmax_load)%s", UI_COLOR_YELLOW, UI_RESET);
+        goto_ansi(start_x + 5, start_y + 4);
+        printf("-> %s (%dÇĞÁ¡)", t->argmax_load->name, t->argmax_load->credit);
     }
     goto_ansi(start_x + 2, start_y + 6);
-    printf("%s2. ìµœì•…ì˜ ì¡°í•© (argmax_synergy)%s", UI_COLOR_YELLOW, UI_RESET);
+    printf("%s2. ÃÖ¾ÇÀÇ Á¶ÇÕ (argmax_synergy)%s", UI_COLOR_YELLOW, UI_RESET);
     goto_ansi(start_x + 5, start_y + 7);
     if (((*t->argmax_synergy)[0].id) == ((*t->argmax_synergy)[1].id)) {
-        printf("-> ê³¼ëª©ì´ ë¶€ì¡±í•˜ì—¬ ë¶„ì„ ë¶ˆê°€");
+        printf("-> °ú¸ñÀÌ ºÎÁ·ÇÏ¿© ºĞ¼® ºÒ°¡");
     } else {
         if(DEBUG_MODE){
             printf("%d %d\n", t->argmax_synergy[0]->id, (*t->argmax_synergy)[1].id);
@@ -122,10 +115,10 @@ void draw_output_view(User *user, int btn_idx) {
     }
 
     goto_ansi(start_x + 2, start_y + 9);
-    printf("%s3. ì´ ë‚œì´ë„ (total_difficulty)%s: %.1f / 10.0", UI_COLOR_YELLOW, UI_RESET, t->difficulty);
+    printf("%s3. ÃÑ ³­ÀÌµµ (total_difficulty)%s: %.1f / 10.0", UI_COLOR_YELLOW, UI_RESET, t->difficulty);
 
     goto_ansi(start_x + 12, start_y + 11);
-    printf("%s[ í™•ì¸ ]%s", UI_BOLD, UI_RESET);
+    printf("%s[ È®ÀÎ ]%s", UI_BOLD, UI_RESET);
 
     while(1) {
         int ch = _getch();
@@ -133,15 +126,15 @@ void draw_output_view(User *user, int btn_idx) {
     }
 }
 
-// --- [ì‹ ê·œ UI] ë‚œì´ë„ ì •ë³´ ì…ë ¥ íŒì—… ë° íŒŒì¼ ì €ì¥ ---
-// ìš”ì²­í•˜ì‹  ë‚œì´ë„ ì…ë ¥ ë¡œì§ê³¼ íŒŒì¼ ì €ì¥ ë¡œì§ì„ í†µí•©í•©ë‹ˆë‹¤.
+// --- [½Å±Ô UI] ³­ÀÌµµ Á¤º¸ ÀÔ·Â ÆË¾÷ ¹× ÆÄÀÏ ÀúÀå ---
+// ¿äÃ»ÇÏ½Å ³­ÀÌµµ ÀÔ·Â ·ÎÁ÷°ú ÆÄÀÏ ÀúÀå ·ÎÁ÷À» ÅëÇÕÇÕ´Ï´Ù.
 StatusCodeEnum popup_input_difficulty(TimeTable* table, int student_id, int semester) {
     if (table == NULL) return ERROR_INVALID_INPUT;
 
-    // íŒì—… ì„¤ì •
+    // ÆË¾÷ ¼³Á¤
     int box_w = 70;
-    int box_h = 7 + table->n * 2; // ì´ ë‚œì´ë„ ì…ë ¥ 2ì¤„ + ê³¼ëª©ë³„ ì…ë ¥ 2*nì¤„
-    if (box_h > 25) box_h = 25; // ìµœëŒ€ ë†’ì´ ì œí•œ
+    int box_h = 7 + table->n * 2; // ÃÑ ³­ÀÌµµ ÀÔ·Â 2ÁÙ + °ú¸ñº° ÀÔ·Â 2*nÁÙ
+    if (box_h > 25) box_h = 25; // ÃÖ´ë ³ôÀÌ Á¦ÇÑ
     
     int start_x = (CONSOLE_WIDTH - box_w) / 2;
     int start_y = 3;
@@ -167,20 +160,20 @@ StatusCodeEnum popup_input_difficulty(TimeTable* table, int student_id, int seme
     }
     fclose(fp); 
 
-    // ì´ˆê¸°ê°’ ì„¤ì •
-    int current_input_idx = -1; // -1: ì´ ë‚œì´ë„, 0~n-1: ê³¼ëª©ë³„ ë‚œì´ë„
+    // ÃÊ±â°ª ¼³Á¤
+    int current_input_idx = -1; // -1: ÃÑ ³­ÀÌµµ, 0~n-1: °ú¸ñº° ³­ÀÌµµ
     for (int i = 0; i < table->n; i++) subject_difficulties[i] = 0;
 
-    // ì…ë ¥ í•„ë“œ ìˆœíšŒ
+    // ÀÔ·Â ÇÊµå ¼øÈ¸
     while (1) {
-        // draw_popup ëŒ€ì‹  ì™¸ë¶€ í•¨ìˆ˜ í˜¸ì¶œ
+        // draw_popup ´ë½Å ¿ÜºÎ ÇÔ¼ö È£Ãâ
         draw_input_difficulty_popup(table, semester, total_difficulty, subject_difficulties, 
                                     current_input_idx, box_w, box_h, start_x, start_y);
 
-        // ì…ë ¥ ëŒ€ê¸°
+        // ÀÔ·Â ´ë±â
         int ch = _getch();
 
-        if (ch == ESC) return SUCCESS; // ì·¨ì†Œ
+        if (ch == ESC) return SUCCESS; // Ãë¼Ò
 
         if (ch == 224 || ch == 0) {
             ch = _getch();
@@ -190,9 +183,9 @@ StatusCodeEnum popup_input_difficulty(TimeTable* table, int student_id, int seme
                 if (current_input_idx < table->n - 1) current_input_idx++;
             }
         } else if (ch == ENTER) {
-            // ëª¨ë“  í•„ë“œ ì…ë ¥ í™•ì¸
+            // ¸ğµç ÇÊµå ÀÔ·Â È®ÀÎ
             if (total_difficulty == -1) {
-                 popup_show_message("ì˜¤ë¥˜", "ì´ ë‚œì´ë„ë¥¼ ì…ë ¥í•´ ì£¼ì„¸ìš”.");
+                 popup_show_message("¿À·ù", "ÃÑ ³­ÀÌµµ¸¦ ÀÔ·ÂÇØ ÁÖ¼¼¿ä.");
                  continue;
             }
             int all_subjects_entered = 1;
@@ -203,11 +196,11 @@ StatusCodeEnum popup_input_difficulty(TimeTable* table, int student_id, int seme
                 }
             }
             if (!all_subjects_entered) {
-                 popup_show_message("ì˜¤ë¥˜", "ëª¨ë“  ê³¼ëª©ì˜ ë‚œì´ë„ë¥¼ ì…ë ¥í•´ ì£¼ì„¸ìš”.");
+                 popup_show_message("¿À·ù", "¸ğµç °ú¸ñÀÇ ³­ÀÌµµ¸¦ ÀÔ·ÂÇØ ÁÖ¼¼¿ä.");
                  continue;
             }
             
-            // íŒŒì¼ ì €ì¥ ë¡œì§ ì‹¤í–‰  
+            // ÆÄÀÏ ÀúÀå ·ÎÁ÷ ½ÇÇà  
             sprintf(file_path, "%s/data/data%03d.txt", dir_path, num_of_data);
             fp = fopen(file_path, "w");
 
@@ -241,15 +234,15 @@ StatusCodeEnum popup_input_difficulty(TimeTable* table, int student_id, int seme
                 }
             }
 
-            // ì„±ê³µ ë©”ì‹œì§€ íŒì—… í›„ ì¢…ë£Œ
-            popup_show_message("ì™„ë£Œ", "ë‚œì´ë„ ì •ë³´ê°€ ì„±ê³µì ìœ¼ë¡œ ì €ì¥ë˜ì—ˆìŠµë‹ˆë‹¤.");
+            // ¼º°ø ¸Ş½ÃÁö ÆË¾÷ ÈÄ Á¾·á
+            popup_show_message("¿Ï·á", "³­ÀÌµµ Á¤º¸°¡ ¼º°øÀûÀ¸·Î ÀúÀåµÇ¾ú½À´Ï´Ù.");
             return SUCCESS;
         } else if (ch >= '0' && ch <= '9') {
-            // ìˆ«ì ì…ë ¥ ì²˜ë¦¬ (ë‹¨ì¼ ìˆ«ì ì…ë ¥ë§Œ ê°€ëŠ¥í•˜ë‹¤ê³  ê°€ì •)
+            // ¼ıÀÚ ÀÔ·Â Ã³¸® (´ÜÀÏ ¼ıÀÚ ÀÔ·Â¸¸ °¡´ÉÇÏ´Ù°í °¡Á¤)
             input_buffer[0] = (char)ch;
             input_buffer[1] = '\0';
 
-            // is_valid_input ëŒ€ì‹  ì™¸ë¶€ í•¨ìˆ˜ í˜¸ì¶œ
+            // is_valid_input ´ë½Å ¿ÜºÎ ÇÔ¼ö È£Ãâ
             if (is_valid_difficulty_input(input_buffer)) {
                 int input_val = atoi(input_buffer);
                 if (current_input_idx == -1) {
@@ -258,27 +251,27 @@ StatusCodeEnum popup_input_difficulty(TimeTable* table, int student_id, int seme
                     subject_difficulties[current_input_idx] = input_val;
                 }
             } else {
-                 // 0~10 ë²”ìœ„ ë°– ì…ë ¥ì— ëŒ€í•œ ì²˜ë¦¬ (í•„ìš”ì‹œ)
+                 // 0~10 ¹üÀ§ ¹Û ÀÔ·Â¿¡ ´ëÇÑ Ã³¸® (ÇÊ¿ä½Ã)
             }
         }
     }
 }
 
 
-// ì¶œë ¥ í™”ë©´ ê·¸ë¦¬ê¸°
+// Ãâ·Â È­¸é ±×¸®±â
 void draw_output_view(User* user, int btn_idx) {
     system("cls");
 
-    // 1. í—¤ë”
+    // 1. Çì´õ
     printf("================================================================================\n");
-    printf("  ë‚´ ì‹œê°„í‘œ í™•ì¸                                                 %sID: %5d%s\n", 
+    printf("  ³» ½Ã°£Ç¥ È®ÀÎ                                                 %sID: %5d%s\n", 
             UI_BOLD, user->id, UI_RESET);
     printf("================================================================================\n");
 
     int start_table_row = 4;
     int box_w = 26; 
 
-    // 2. í•™ê¸°ë³„ ì‹œê°„í‘œ ì¶œë ¥
+    // 2. ÇĞ±âº° ½Ã°£Ç¥ Ãâ·Â
     for (int sem = 0; sem < SEMESTER_NUM; sem++) {
         int col = sem % 3;
         int row = sem / 3;
@@ -287,21 +280,21 @@ void draw_output_view(User* user, int btn_idx) {
 
         goto_ansi(box_x, box_y);
         if ((sem + 1) <= user->current_sem) 
-            printf("%s[%d í•™ê¸° (ì™„ë£Œ)]%s", UI_DIM, sem + 1, UI_RESET);
+            printf("%s[%d ÇĞ±â (¿Ï·á)]%s", UI_DIM, sem + 1, UI_RESET);
         else 
-            printf("%s[%d í•™ê¸° (ì˜ˆì •)]%s", UI_COLOR_CYAN, sem + 1, UI_RESET);
+            printf("%s[%d ÇĞ±â (¿¹Á¤)]%s", UI_COLOR_CYAN, sem + 1, UI_RESET);
 
         TimeTable* t = user->table[sem];
         int sem_credits = 0;
 
         if (t == NULL || t->n == 0) {
             goto_ansi(box_x, box_y + 1);
-            printf("%s(ë¹„ì–´ìˆìŒ)%s", UI_DIM, UI_RESET);
+            printf("%s(ºñ¾îÀÖÀ½)%s", UI_DIM, UI_RESET);
         } else {
             for (int i = 0; i < t->n; i++) {
                 if (i >= 6) { 
                     goto_ansi(box_x, box_y + 1 + i);
-                    printf("...ì™¸ %dê±´", t->n - i);
+                    printf("...¿Ü %d°Ç", t->n - i);
                     break;
                 }
                 goto_ansi(box_x, box_y + 1 + i);
@@ -310,16 +303,16 @@ void draw_output_view(User* user, int btn_idx) {
             }
         }
         goto_ansi(box_x + 16, box_y);
-        printf("(%dí•™ì )", sem_credits);
+        printf("(%dÇĞÁ¡)", sem_credits);
     }
 
-    // 3. í•˜ë‹¨ ë²„íŠ¼ ì˜ì—­ (4ê°œ ë²„íŠ¼)
+    // 3. ÇÏ´Ü ¹öÆ° ¿µ¿ª (4°³ ¹öÆ°)
     int btn_y = 23;
     int btn_spacing = 18;
     int btn_start_x = (CONSOLE_WIDTH - (btn_spacing * 4)) / 2 + 2;
     
-    // ë²„íŠ¼ ë¼ë²¨
-    const char* labels[4] = { "ì‹œê°„í‘œ ìˆ˜ì •", "ë‚œì´ë„ ê³„ì‚°", "ë°ì´í„° ì¶”ê°€", "  í™ˆìœ¼ë¡œ  " };
+    // ¹öÆ° ¶óº§
+    const char* labels[4] = { "½Ã°£Ç¥ ¼öÁ¤", "³­ÀÌµµ °è»ê", "µ¥ÀÌÅÍ Ãß°¡", "  È¨À¸·Î  " };
 
     for (int i = 0; i < 4; i++) {
         goto_ansi(btn_start_x + (i * btn_spacing), btn_y);
@@ -331,14 +324,14 @@ void draw_output_view(User* user, int btn_idx) {
     }
 }
 
-// Output ëª¨ë“œ ì‹¤í–‰ í•¨ìˆ˜
+// Output ¸ğµå ½ÇÇà ÇÔ¼ö
 int run_output(int student_id) {
     User user;
     int is_first;
     
     load_user_data(&user, student_id, &is_first);
 
-    int btn_idx = 0; // 0:ìˆ˜ì •, 1:ê³„ì‚°, 2:ì¶”ê°€, 3:í™ˆ
+    int btn_idx = 0; // 0:¼öÁ¤, 1:°è»ê, 2:Ãß°¡, 3:È¨
     int ch;
 
     while (1) {
@@ -358,42 +351,42 @@ int run_output(int student_id) {
         }
         else if (ch == ENTER) {
             if (btn_idx == 0) {
-                return INPUT_PAGE; // ì‹œê°„í‘œ ìˆ˜ì •
+                return INPUT_PAGE; // ½Ã°£Ç¥ ¼öÁ¤
             } 
             else if (btn_idx == 1 || btn_idx == 2) { 
-                // [ë‚œì´ë„ ê³„ì‚°] ë˜ëŠ” [ë°ì´í„° ì¶”ê°€]
+                // [³­ÀÌµµ °è»ê] ¶Ç´Â [µ¥ÀÌÅÍ Ãß°¡]
                 
-                // 1. í•™ê¸° ì„ íƒ (course_reg.cì— ìˆëŠ” í•¨ìˆ˜ ì¬ì‚¬ìš©)
-                int selected_sem = popup_select_semester(1, SEMESTER_NUM, "ì‘ì—…í•  í•™ê¸° ì„ íƒ");
+                // 1. ÇĞ±â ¼±ÅÃ (course_reg.c¿¡ ÀÖ´Â ÇÔ¼ö Àç»ç¿ë)
+                int selected_sem = popup_select_semester(1, SEMESTER_NUM, "ÀÛ¾÷ÇÒ ÇĞ±â ¼±ÅÃ");
                 
                 if (selected_sem != -1) {
                     TimeTable* t = user.table[selected_sem - 1];
                     
-                    // ë°ì´í„°ê°€ ì—†ëŠ” ê²½ìš° ì²˜ë¦¬
+                    // µ¥ÀÌÅÍ°¡ ¾ø´Â °æ¿ì Ã³¸®
                     if (t == NULL || t->n == 0) {
-                        popup_show_message("ì˜¤ë¥˜", "ì„ íƒí•œ í•™ê¸°ì— ë“±ë¡ëœ ê³¼ëª©ì´ ì—†ìŠµë‹ˆë‹¤.");
+                        popup_show_message("¿À·ù", "¼±ÅÃÇÑ ÇĞ±â¿¡ µî·ÏµÈ °ú¸ñÀÌ ¾ø½À´Ï´Ù.");
                     } 
                     else {
                         if (btn_idx == 1) {
                             StatusCodeEnum status = calculate_difficulty(t);
                             if (status != SUCCESS) {
-                                popup_show_message("ì˜¤ë¥˜", "ë‚œì´ë„ ê³„ì‚° ì¤‘ ì˜¤ë¥˜ê°€ ë°œìƒí–ˆìŠµë‹ˆë‹¤.");
+                                popup_show_message("¿À·ù", "³­ÀÌµµ °è»ê Áß ¿À·ù°¡ ¹ß»ıÇß½À´Ï´Ù.");
                             }
                             else popup_show_difficulty_result(selected_sem, t);
                         } 
                         else { 
-                            // [ë°ì´í„° ì¶”ê°€] ë¡œì§ (ì‹ ê·œ íŒì—… í˜¸ì¶œ)
+                            // [µ¥ÀÌÅÍ Ãß°¡] ·ÎÁ÷ (½Å±Ô ÆË¾÷ È£Ãâ)
                             StatusCodeEnum status = popup_input_difficulty(t, student_id, selected_sem);
                             if (status == ERROR_FILE_NOT_FOUND) {
-                                popup_show_message("ì˜¤ë¥˜", "íŒŒì¼ ì €ì¥ ê²½ë¡œì— ì ‘ê·¼í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+                                popup_show_message("¿À·ù", "ÆÄÀÏ ÀúÀå °æ·Î¿¡ Á¢±ÙÇÒ ¼ö ¾ø½À´Ï´Ù.");
                             }
-                            // Note: popup_input_difficulty ë‚´ë¶€ì—ì„œ ì„±ê³µ ë©”ì‹œì§€ë¥¼ ë„ì›€
+                            // Note: popup_input_difficulty ³»ºÎ¿¡¼­ ¼º°ø ¸Ş½ÃÁö¸¦ ¶ç¿ò
                         }
                     }
                 }
             } 
             else { // btn_idx == 3
-                return HOME_PAGE;  // í™ˆìœ¼ë¡œ
+                return HOME_PAGE;  // È¨À¸·Î
             }
         }
         else if (ch == ESC) {

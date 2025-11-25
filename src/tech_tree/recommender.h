@@ -2,15 +2,14 @@
 // Created by 김주환 on 25. 11. 9.
 //
 // modified by 장민준 on 2025.11.23. find_subject_stats, add_subject_stats, has_prereq 함수 추가
-// modified by 장민준 on 2025.11.24.
+// modified by 장민준 on 2025.11.24. 
 
 #ifndef RECOMMENDER_H
 #define RECOMMENDER_H
 #include "../struct.h"
 
 /**
- * @brief SubjectInfo 안에서 특정 year/semester에 해당하는 원점수 평균/표준편차 통계(SubjectStats)를
- * 찾는다.
+ * @brief SubjectInfo 안에서 특정 year/semester에 해당하는 원점수 평균/표준편차 통계(SubjectStats)를 찾는다.
  *
  * @param subject_info  통계를 찾을 과목 SubjectInfo 구조체 포인터
  * @param year          찾고자 하는 연도 (예: 2025)
@@ -20,6 +19,7 @@
  *         - 없으면 NULL
  */
 const SubjectStats *find_subject_stats(const SubjectInfo *subject_info, int year, int semester);
+
 
 /**
  * @brief SubjectInfo에 새로운 통계(SubjectStats)를 하나 추가한다.
@@ -34,8 +34,7 @@ const SubjectStats *find_subject_stats(const SubjectInfo *subject_info, int year
  *         - ERROR_INVALID_INPUT: subject_info가 NULL일 때
  *         - ERROR_INDEX_OUT: MAX_SUBJECT_STATS를 초과했을 때 등
  */
-StatusCodeEnum add_subject_stats(SubjectInfo *subject_info, int year, int semester,
-                                 double mean_raw_score, double stdev_raw_score);
+StatusCodeEnum add_subject_stats(SubjectInfo *subject_info, int year, int semester, double mean_raw_score, double stdev_raw_score);
 
 /**
  * @brief 학생이 특정 과목의 선수과목들을 모두 들었는지 검사한다.
@@ -62,8 +61,7 @@ int meets_prereq(const SubjectInfo *subject_info, const int taken_ids[], int tak
  *         - SUCCESS: 정상 계산
  *         - ERROR_INVALID_INPUT: subject_info가 NULL이거나 통계를 찾지 못했을 때 등
  */
-StatusCodeEnum get_z_score(const SubjectInfo *subject_info, int year, int semester,
-                           double raw_score, SubjectZScore *z_array, int z_index);
+StatusCodeEnum get_z_score(const SubjectInfo *subject_info, int year, int semester, double raw_score, SubjectZScore *z_array, int z_index);
 
 /**
  * @brief 학생의 z-score 배열을 입력받아 테크트리를 추천한다.
@@ -77,8 +75,7 @@ StatusCodeEnum get_z_score(const SubjectInfo *subject_info, int year, int semest
  *         - SUCCESS: 추천 성공
  *         - ERROR_INVALID_INPUT: 인자 이상 등
  */
-StatusCodeEnum recommend_techtree(const SubjectZScore *z_array, int z_count, const TechTree *trees,
-                                  int tree_count, TechTree *recommended_tree);
+StatusCodeEnum recommend_techtree(const SubjectZScore *z_array, int z_count, const TechTree *trees, int tree_count, TechTree *recommended_tree);
 
 /**
  * @brief SubjectInfo 배열을 이진 파일로 저장한다.
@@ -113,7 +110,6 @@ StatusCodeEnum save_subject_infos(const SubjectInfo *subjects, int count, const 
  *         - ERROR_FILE_NOT_FOUND: 파일이 없거나 열기 실패
  *         - ERROR_INVALID_INPUT: 포인터 NULL, 파일 포맷 이상, max_count 초과 등
  */
-StatusCodeEnum load_subject_infos(SubjectInfo *subjects, int max_count, int *out_count,
-                                  const char *path);
+StatusCodeEnum load_subject_infos(SubjectInfo *subjects, int max_count, int *out_count, const char *path);
 
 #endif

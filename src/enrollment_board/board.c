@@ -34,7 +34,7 @@ static int adjust_value_with_arrows(const char *title, int initial, int min, int
         printf("%s<%s  %s%d명%s  %s>%s", UI_COLOR_CYAN, UI_RESET, UI_BOLD, value, UI_RESET, UI_COLOR_CYAN, UI_RESET);
 
         goto_ansi(START_X, START_Y + 10);
-        printf("%s좌/우%s 키로 조절, Enter로 확인 (ESC로 취소)", UI_DIM, UI_RESET);
+        printf("%s←/→%s 로 조절, Enter로 확정 (ESC로 취소)", UI_DIM, UI_RESET);
 
         int ch = read_key();
         if (ch == LEFT_ARROW && value > min) value--;
@@ -82,7 +82,7 @@ StatusCode create_post(BoardPost *result) {
     strncpy(subject->name, buffer, NAME_LENGTH - 1);
     subject->name[NAME_LENGTH - 1] = '\0';
 
-    int target = adjust_value_with_arrows("현재 수강 인원을 설정하세요", 5, 1, ID_NUM);
+    int target = adjust_value_with_arrows("모집 인원을 정하세요", 5, 1, ID_NUM);
     if (target < 0) {
         free(subject);
         return ERROR_INVALID_INPUT;
@@ -91,7 +91,7 @@ StatusCode create_post(BoardPost *result) {
     clear_screen();
     print_center("[게시글 작성]", 18, 2);
     goto_ansi(START_X, START_Y + 4);
-    printf("홍보 메세지를 작성하세요:  ");
+    printf("홍보 메시지를 입력하세요: ");
     if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
         free(subject);
         return ERROR_INVALID_INPUT;
@@ -106,13 +106,13 @@ StatusCode create_post(BoardPost *result) {
     result->current_students = 0;
 
     clear_screen();
-    print_center("게시글이 등록되었습니다!", 24, 8);
+    print_center("게시글이 저장되었습니다!", 24, 8);
     goto_ansi(START_X, START_Y + 10);
     printf("과목: %s\n", subject->name);
     goto_ansi(START_X, START_Y + 11);
-    printf("수강 인원: %d명\n", target);
+    printf("모집 인원: %d명\n", target);
     goto_ansi(START_X, START_Y + 12);
-    printf("홍보 메시지: %s\n", result->promo_message);
+    printf("홍보 문구: %s\n", result->promo_message);
     pause_message("계속하려면 아무 키나 누르세요...");
 
     return SUCCESS;

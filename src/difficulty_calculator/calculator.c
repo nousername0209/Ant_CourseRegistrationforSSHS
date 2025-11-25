@@ -198,6 +198,7 @@ StatusCode calculate_difficulty(TimeTable* table) {
                 table->difficulty += Synergy[table->subjects[i]->id][table->subjects[j]->id];
             }
         }
+        table->difficulty /= table->n;
     }
     return SUCCESS;
 }

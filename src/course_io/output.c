@@ -197,15 +197,26 @@ StatusCode popup_input_difficulty(TimeTable* table, int student_id, int semester
                  continue;
             }
             
-            // 파일 저장 로직 실행
-            sprintf(file_path, "%s/data/data%:03d.txt", dir_path, num_of_data);
+            // 파일 저장 로직 실행  
+            sprintf(file_path, "%s/data/data%03d.txt", dir_path, num_of_data);
             fp = fopen(file_path, "w");
 
             fprintf(fp, "%d %d\n", table->n, total_difficulty);
             for (int i = 0; i < table->n; i++) {
-                fprintf(fp, "%d %d\n", table->subjects[i]->id, subject_difficulties[i]);
+                fprintf(fp, "%d %d\n", table->subjects[i]-> id, subject_difficulties[i]);
             }
             fclose(fp);
+
+            num_of_data++;
+
+            sprintf(file_path, "%s/num_of_data.dat", dir_path);
+            fp = fopen(file_path, "wb");
+            fwrite(&num_of_data, sizeof(int), 1, fp);
+            fclose(fp);
+            
+            double Load[MAX_SUBJECT_NUM], Synergy[MAX_SUBJECT_NUM][MAX_SUBJECT_NUM];
+            preprocess_load(&Load);
+            preprocess_synergy(&Synergy);
 
             // 성공 메시지 팝업 후 종료
             popup_show_message("완료", "난이도 정보가 성공적으로 저장되었습니다.");
@@ -342,10 +353,10 @@ int run_output(int student_id) {
                     else {
                         if (btn_idx == 1) {
                             StatusCode status = calculate_difficulty(t);
-                            popup_show_message("오류", "난이도 계산 중 오류가 발생했습니다.");
-                            printf("Error Code: %d\n", status);
-                            exit(1);
-                            continue;
+                            if (status != SUCCESS) {
+                                popup_show_message("오류", "난이도 계산 중 오류가 발생했습니다.");
+                            }
+                            else popup_show_difficulty_result(selected_sem, t);
                         } 
                         else { 
                             // [데이터 추가] 로직 (신규 팝업 호출)

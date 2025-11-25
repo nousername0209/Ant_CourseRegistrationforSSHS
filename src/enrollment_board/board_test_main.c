@@ -131,22 +131,45 @@ static void render_board(const BoardPost *posts, int post_count, int selected_in
     printf("%s↑/↓ 선택, ←/→ 버튼 이동, Enter 확정%s", UI_DIM, UI_RESET);
 }
 
-static int choose_user_id(void) {
-    int value = 0;
+static char* choose_user_id(void) {
+    // int value = 0;
 
-    while (1) {
-        printf("\x1B[2J\x1B[H");
-        print_center("사용자 ID를 선택하세요", 24, 4);
-        goto_ansi(START_X, START_Y + 7);
-        printf("%s<%s  %s%d%s  %s>%s", UI_COLOR_CYAN, UI_RESET, UI_BOLD, value, UI_RESET, UI_COLOR_CYAN, UI_RESET);
-        goto_ansi(START_X, START_Y + 10);
-        printf("%s←/→ 조절, Enter 확정%s", UI_DIM, UI_RESET);
+    // while (1) {
+    //     printf("\x1B[2J\x1B[H");
+    //     print_center("사용자 ID를 선택하세요", 24, 4);
+    //     goto_ansi(START_X, START_Y + 7);
+    //     printf("%s<%s  %s%d%s  %s>%s", UI_COLOR_CYAN, UI_RESET, UI_BOLD, value, UI_RESET, UI_COLOR_CYAN, UI_RESET);
+    //     goto_ansi(START_X, START_Y + 10);
+    //     printf("%s←/→ 조절, Enter 확정%s", UI_DIM, UI_RESET);
 
-        int ch = read_key();
-        if (ch == LEFT_ARROW && value > 0) value--;
-        else if (ch == RIGHT_ARROW && value < ID_NUM - 1) value++;
-        else if (ch == ENTER) return value;
+    //     int ch = read_key();
+    //     if (ch == LEFT_ARROW && value > 0) value--;
+    //     else if (ch == RIGHT_ARROW && value < ID_NUM - 1) value++;
+    //     else if (ch == ENTER) return value;
+    // }
+    char *id_buffer = (char *)malloc(21);
+    SelectEnum select;
+    system("cls");
+    
+    print_center("=== LOGIN ===", 13, 10);
+    
+    print_center("User ID: ", 33, 12);
+    if (select == ID_FIELD) {
+        printf("%s> [%-20s]%s", UI_REVERSE, id_buffer, UI_RESET);
+        goto_ansi(START_X + (UI_WIDTH - 33) / 2 + (int)strlen(id_buffer), 12);
+    } else {
+        printf("  [%-20s]", id_buffer);
     }
+
+    goto_ansi(START_X + (UI_WIDTH - 16)/2, 15);
+    if (select == LOGIN_BUTTON) {
+        printf("%s[ >> LOGIN << ]%s", UI_REVERSE, UI_RESET);
+    } else {
+        printf("[    LOGIN    ]");
+    }
+    fflush(stdout);
+
+    return id_buffer;
 }
 
 static ApplyResult show_apply_screen(BoardPost *post, int user_id) {
@@ -269,7 +292,7 @@ static void show_planned_courses(const BoardPost *planned, int planned_count) {
     }
 }
 
-int main(void) {
+int board_main(int user_id) {
 #ifdef _WIN32
     enable_virtual_terminal_processing();
 #endif
@@ -280,7 +303,6 @@ int main(void) {
     int planned_count = 0;
     int selected_index = 0;
     int scroll_offset = 0;
-    int user_id = choose_user_id();
 
     while (1) {
         int total_items = post_count + 3; // posts + create + planned + exit
@@ -340,11 +362,11 @@ int main(void) {
 #ifdef _WIN32
 // 일부 MinGW 설정에서 GUI 서브시스템을 기본값으로 사용할 때 WinMain이 필요하므로
 // 콘솔 프로그램 엔트리를 main에 위임한다.
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-    (void)hInstance;
-    (void)hPrevInstance;
-    (void)lpCmdLine;
-    (void)nCmdShow;
-    return main();
-}
+// int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+//     (void)hInstance;
+//     (void)hPrevInstance;
+//     (void)lpCmdLine;
+//     (void)nCmdShow;
+//     return main();
+// }
 #endif

@@ -6,5 +6,6 @@
 #include "difficulty_calculator/calculator.c"
 #include "login/login.c"
 #include "tech_tree/recommender.c"
+#include "enrollment_board/board.c"
 
 #endif //MAIN_H

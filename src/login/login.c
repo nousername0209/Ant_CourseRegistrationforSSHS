@@ -1,7 +1,7 @@
 #include "login.h"
 #include "windows.h"
 
-StatusCodeEnum draw_ui(Select select, const char* id_buffer) {
+StatusCodeEnum draw_ui(SelectEnum select, const char* id_buffer) {
     system("cls");
     
     print_center("=== LOGIN ===", 13, 10);
@@ -26,11 +26,11 @@ StatusCodeEnum draw_ui(Select select, const char* id_buffer) {
 }
 
 StatusCodeEnum show_login_screen(char *id_buffer, int max_len) {
-    Select current = ID_FIELD;
+    SelectEnum current = ID_FIELD;
     int id_index = 0;
     id_buffer[0] = '\0';
     
-    Key ch;
+    KeyEnum ch;
     while (1) {
         StatusCodeEnum draw_ui_s = draw_ui(current, id_buffer);
 

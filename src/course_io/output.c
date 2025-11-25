@@ -128,7 +128,7 @@ void popup_show_difficulty_result(int sem, TimeTable *t) {
 
 // --- [신규 UI] 난이도 정보 입력 팝업 및 파일 저장 ---
 // 요청하신 난이도 입력 로직과 파일 저장 로직을 통합합니다.
-StatusCode popup_input_difficulty(TimeTable* table, int student_id, int semester) {
+StatusCodeEnum popup_input_difficulty(TimeTable* table, int student_id, int semester) {
     if (table == NULL) return ERROR_INVALID_INPUT;
 
     // 팝업 설정
@@ -368,7 +368,7 @@ int run_output(int student_id) {
                     } 
                     else {
                         if (btn_idx == 1) {
-                            StatusCode status = calculate_difficulty(t);
+                            StatusCodeEnum status = calculate_difficulty(t);
                             if (status != SUCCESS) {
                                 popup_show_message("오류", "난이도 계산 중 오류가 발생했습니다.");
                             }
@@ -376,7 +376,7 @@ int run_output(int student_id) {
                         } 
                         else { 
                             // [데이터 추가] 로직 (신규 팝업 호출)
-                            StatusCode status = popup_input_difficulty(t, student_id, selected_sem);
+                            StatusCodeEnum status = popup_input_difficulty(t, student_id, selected_sem);
                             if (status == ERROR_FILE_NOT_FOUND) {
                                 popup_show_message("오류", "파일 저장 경로에 접근할 수 없습니다.");
                             }

@@ -5,9 +5,7 @@
 
 #include "../struct.h"
 
-typedef enum _Select {ID_FIELD, LOGIN_BUTTON} Select;
-
-StatusCodeEnum draw_ui(Select select, const char* id_buffer);
+StatusCodeEnum draw_ui(SelectEnum select, const char* id_buffer);
 StatusCodeEnum show_login_screen(char *id_buffer, int max_len);
 
 // to main:

@@ -31,6 +31,6 @@ void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3],
 void run_registration(int student_id);
 
 // to main:
-StatusCode input(int id);
+StatusCodeEnum input(int id);
 
 #endif //COURSE_INPUT_H

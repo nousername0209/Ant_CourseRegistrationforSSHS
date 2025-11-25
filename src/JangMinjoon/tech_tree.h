@@ -1,7 +1,7 @@
 #ifndef TECH_TREE_H
 #define TECH_TREE_H
 
-#include "struct.h"
+#include "../struct.h"
 
 /* ==========================================================
  *  과목, 과목 통계, 테크트리 정보를 담을 텍스트 파일 형식 
@@ -92,14 +92,8 @@ const SubjectStats *find_subject_stats(const SubjectInfo *subject,
  * @param subjects      과목 정보를 저장할 배열
  * @param max_subjects  subjects 배열의 최대 크기
  * @param out_count     실제로 읽어온 과목 수를 돌려줄 포인터
- * @return StatusCode
- *         - STATUS_OK                 : 성공
- *         - STATUS_ERROR_FILE         : 파일 열기 실패
- *         - STATUS_ERROR_PARSE        : 파일 형식 파싱 실패
- *         - STATUS_ERROR_CAPACITY     : max_subjects를 초과하는 데이터
- *         - STATUS_ERROR_INVALID_INPUT: 잘못된 인자
  */
-StatusCode load_subjects_from_text(const char *path,
+StatusCodeEnum load_subjects_from_text(const char *path,
                                    SubjectInfo *subjects,
                                    int max_subjects,
                                    int *out_count);
@@ -113,14 +107,8 @@ StatusCode load_subjects_from_text(const char *path,
  * @param path          텍스트 파일 경로
  * @param subjects      미리 로드된 과목 배열
  * @param subject_count subjects 배열에 들어있는 과목 수
- * @return StatusCode
- *         - STATUS_OK                 : 성공
- *         - STATUS_ERROR_FILE         : 파일 열기 실패
- *         - STATUS_ERROR_PARSE        : 파일 형식 파싱 실패
- *         - STATUS_ERROR_CAPACITY     : 한 과목의 통계 용량 초과
- *         - STATUS_ERROR_INVALID_INPUT: 잘못된 인자
  */
-StatusCode load_subject_stats_from_text(const char *path,
+StatusCodeEnum load_subject_stats_from_text(const char *path,
                                         SubjectInfo *subjects,
                                         int subject_count);
 
@@ -137,14 +125,8 @@ StatusCode load_subject_stats_from_text(const char *path,
  * @param trees      테크트리 정보를 저장할 배열
  * @param max_trees  trees 배열의 최대 크기
  * @param out_count  실제로 읽어온 테크트리 수를 돌려줄 포인터
- * @return StatusCode
- *         - STATUS_OK                 : 성공
- *         - STATUS_ERROR_FILE         : 파일 열기 실패
- *         - STATUS_ERROR_PARSE        : 파일 형식 파싱 실패
- *         - STATUS_ERROR_CAPACITY     : 용량 초과
- *         - STATUS_ERROR_INVALID_INPUT: 잘못된 인자
  */
-StatusCode load_techtrees_from_text(const char *path,
+StatusCodeEnum load_techtrees_from_text(const char *path,
                                     TechTree *trees,
                                     int max_trees,
                                     int *out_count);
@@ -161,12 +143,8 @@ StatusCode load_techtrees_from_text(const char *path,
  * @param raw_score          학생의 원점수
  * @param out_z              계산된 z-score를 돌려줄 포인터
  * @param out_percentile_top 상위 퍼센트(Top x%)를 돌려줄 포인터
- * @return StatusCode
- *         - STATUS_OK                 : 계산 성공
- *         - STATUS_ERROR_INVALID_INPUT: 잘못된 인자 또는 stdev <= 0
- *         - STATUS_ERROR_NOT_FOUND    : 해당 연도/학기 통계 없음
  */
-StatusCode compute_z_and_percentile(const SubjectInfo *subject,
+StatusCodeEnum compute_z_and_percentile(const SubjectInfo *subject,
                                     int year,
                                     int semester,
                                     double raw_score,
@@ -189,13 +167,8 @@ StatusCode compute_z_and_percentile(const SubjectInfo *subject,
  * @param raw_score     원점수
  * @param subjects      과목 배열 (통계 포함)
  * @param subject_count 과목 개수
- * @return StatusCode
- *         - STATUS_OK                 : 성공적으로 추가
- *         - STATUS_ERROR_INVALID_INPUT: 잘못된 인자
- *         - STATUS_ERROR_CAPACITY     : scores 배열 용량 초과
- *         - STATUS_ERROR_NOT_FOUND    : 과목 또는 통계 정보 없음
  */
-StatusCode add_student_score(StudentScore *scores,
+StatusCodeEnum add_student_score(StudentScore *scores,
                              int max_scores,
                              int *inout_count,
                              int user_id,
@@ -227,12 +200,8 @@ StatusCode add_student_score(StudentScore *scores,
  * @param out_scores    각 테크트리 점수를 담을 배열 (크기 >= max_out, NULL 가능)
  * @param max_out       out_indices / out_scores에 담을 수 있는 최대 개수
  * @param out_returned  실제로 반환된 테크트리 개수를 돌려줄 포인터
- * @return StatusCode
- *         - STATUS_OK                 : 순위 계산 성공
- *         - STATUS_ERROR_INVALID_INPUT: 잘못된 인자
- *         - STATUS_ERROR_NOT_FOUND    : 해당 학생에 대해 점수를 계산할 수 있는 테크트리가 없음
  */
-StatusCode rank_techtrees(const TechTree *trees,
+StatusCodeEnum rank_techtrees(const TechTree *trees,
                           int tree_count,
                           const StudentScore *scores,
                           int score_count,

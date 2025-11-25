@@ -55,22 +55,22 @@ const SubjectStats *find_subject_stats(const SubjectInfo *subject,
     return NULL;
 }
 
-StatusCode load_subjects_from_text(const char *path,
+StatusCodeEnum load_subjects_from_text(const char *path,
                                    SubjectInfo *subjects,
                                    int max_subjects,
                                    int *out_count)
 {
     if (path == NULL || subjects == NULL || out_count == NULL) {
-        return STATUS_ERROR_INVALID_INPUT;
+        return ERROR_INVALID_INPUT;
     }
     if (max_subjects <= 0) {
-        return STATUS_ERROR_INVALID_INPUT;
+        return ERROR_INVALID_INPUT;
     }
 
     FILE *fp = fopen(path, "r");
     if (fp == NULL) {
         *out_count = 0;
-        return STATUS_ERROR_FILE;
+        return ERROR_FILE_NOT_FOUND;
     }
 
     int count = 0;
@@ -92,7 +92,7 @@ StatusCode load_subjects_from_text(const char *path,
         if (count >= max_subjects) {
             fclose(fp);
             *out_count = 0;
-            return STATUS_ERROR_CAPACITY;
+            return ERROR_INDEX_OUT;
         }
 
         SubjectInfo *s = &subjects[count];
@@ -109,23 +109,23 @@ StatusCode load_subjects_from_text(const char *path,
 
     fclose(fp);
     *out_count = count;
-    return STATUS_OK;
+    return SUCCESS;
 }
 
-StatusCode load_subject_stats_from_text(const char *path,
+StatusCodeEnum load_subject_stats_from_text(const char *path,
                                         SubjectInfo *subjects,
                                         int subject_count)
 {
     if (path == NULL || subjects == NULL) {
-        return STATUS_ERROR_INVALID_INPUT;
+        return ERROR_INVALID_INPUT;
     }
     if (subject_count < 0) {
-        return STATUS_ERROR_INVALID_INPUT;
+        return ERROR_INVALID_INPUT;
     }
 
     FILE *fp = fopen(path, "r");
     if (fp == NULL) {
-        return STATUS_ERROR_FILE;
+        return ERROR_FILE_NOT_FOUND;
     }
 
     while (!feof(fp)) {
@@ -151,12 +151,12 @@ StatusCode load_subject_stats_from_text(const char *path,
                                                  subject_id);
         if (subj == NULL) {
             fclose(fp);
-            return STATUS_ERROR_NOT_FOUND;
+            return ERROR_FILE_NOT_FOUND;
         }
 
         if (stdev <= 0.0) {
             fclose(fp);
-            return STATUS_ERROR_INVALID_INPUT;
+            return ERROR_INVALID_INPUT;
         }
 
         /* 같은 (year, semester)가 있으면 덮어쓰고, 없으면 새로 추가 */
@@ -175,7 +175,7 @@ StatusCode load_subject_stats_from_text(const char *path,
         } else {
             if (subj->stats_count >= MAX_SUBJECT_STATS) {
                 fclose(fp);
-                return STATUS_ERROR_CAPACITY;
+                return ERROR_INDEX_OUT;
             }
             st = &subj->stats[subj->stats_count];
             subj->stats_count++;
@@ -188,25 +188,25 @@ StatusCode load_subject_stats_from_text(const char *path,
     }
 
     fclose(fp);
-    return STATUS_OK;
+    return SUCCESS;
 }
 
-StatusCode load_techtrees_from_text(const char *path,
+StatusCodeEnum load_techtrees_from_text(const char *path,
                                     TechTree *trees,
                                     int max_trees,
                                     int *out_count)
 {
     if (path == NULL || trees == NULL || out_count == NULL) {
-        return STATUS_ERROR_INVALID_INPUT;
+        return ERROR_INVALID_INPUT;
     }
     if (max_trees <= 0) {
-        return STATUS_ERROR_INVALID_INPUT;
+        return ERROR_INVALID_INPUT;
     }
 
     FILE *fp = fopen(path, "r");
     if (fp == NULL) {
         *out_count = 0;
-        return STATUS_ERROR_FILE;
+        return ERROR_FILE_NOT_FOUND;
     }
 
     int tree_index = 0;
@@ -230,7 +230,7 @@ StatusCode load_techtrees_from_text(const char *path,
         if (tree_index >= max_trees) {
             fclose(fp);
             *out_count = 0;
-            return STATUS_ERROR_CAPACITY;
+            return ERROR_INDEX_OUT;
         }
 
         if (subject_count < 0 || subject_count > MAX_TREE_SUBJECTS) {
@@ -261,7 +261,7 @@ StatusCode load_techtrees_from_text(const char *path,
             if (tree->subject_count >= MAX_TREE_SUBJECTS) {
                 fclose(fp);
                 *out_count = 0;
-                return STATUS_ERROR_CAPACITY;
+                return ERROR_INDEX_OUT;
             }
 
             TreeSubject *node = &tree->subjects[tree->subject_count];
@@ -275,10 +275,10 @@ StatusCode load_techtrees_from_text(const char *path,
 
     fclose(fp);
     *out_count = tree_index;
-    return STATUS_OK;
+    return SUCCESS;
 }
 
-StatusCode compute_z_and_percentile(const SubjectInfo *subject,
+StatusCodeEnum compute_z_and_percentile(const SubjectInfo *subject,
                                     int year,
                                     int semester,
                                     double raw_score,
@@ -286,15 +286,15 @@ StatusCode compute_z_and_percentile(const SubjectInfo *subject,
                                     double *out_percentile_top)
 {
     if (subject == NULL || out_z == NULL || out_percentile_top == NULL) {
-        return STATUS_ERROR_INVALID_INPUT;
+        return ERROR_INVALID_INPUT;
     }
 
     const SubjectStats *st = find_subject_stats(subject, year, semester);
     if (st == NULL) {
-        return STATUS_ERROR_NOT_FOUND;
+        return ERROR_FILE_NOT_FOUND;
     }
     if (st->stdev <= 0.0) {
-        return STATUS_ERROR_INVALID_INPUT;
+        return ERROR_INVALID_INPUT;
     }
 
     /* (원점수 - 평균) / 표준편차 */
@@ -308,10 +308,10 @@ StatusCode compute_z_and_percentile(const SubjectInfo *subject,
 
     *out_z = z;
     *out_percentile_top = top_percent;
-    return STATUS_OK;
+    return SUCCESS;
 }
 
-StatusCode add_student_score(StudentScore *scores,
+StatusCodeEnum add_student_score(StudentScore *scores,
                              int max_scores,
                              int *inout_count,
                              int user_id,
@@ -323,31 +323,31 @@ StatusCode add_student_score(StudentScore *scores,
                              int subject_count)
 {
     if (scores == NULL || inout_count == NULL || subjects == NULL) {
-        return STATUS_ERROR_INVALID_INPUT;
+        return ERROR_INVALID_INPUT;
     }
     if (max_scores <= 0 || subject_count < 0) {
-        return STATUS_ERROR_INVALID_INPUT;
+        return ERROR_INVALID_INPUT;
     }
 
     if (*inout_count >= max_scores) {
-        return STATUS_ERROR_CAPACITY;
+        return ERROR_INDEX_OUT;
     }
 
     const SubjectInfo *subject =
         find_subject_by_id(subjects, subject_count, subject_id);
     if (subject == NULL) {
-        return STATUS_ERROR_NOT_FOUND;
+        return ERROR_FILE_NOT_FOUND;
     }
 
     double z;
     double p_top;
-    StatusCode st = compute_z_and_percentile(subject,
+    StatusCodeEnum st = compute_z_and_percentile(subject,
                                              year,
                                              semester,
                                              raw_score,
                                              &z,
                                              &p_top);
-    if (st != STATUS_OK) {
+    if (st != SUCCESS) {
         return st;
     }
 
@@ -361,7 +361,7 @@ StatusCode add_student_score(StudentScore *scores,
     score->percentile_top = p_top;
 
     (*inout_count)++;
-    return STATUS_OK;
+    return SUCCESS;
 }
 
 /* 특정 학생이 특정 과목에서 기록한 성적들 중
@@ -391,7 +391,7 @@ static double find_best_percentile_for_subject(const StudentScore *scores,
     return best;
 }
 
-StatusCode rank_techtrees(const TechTree *trees,
+StatusCodeEnum rank_techtrees(const TechTree *trees,
                           int tree_count,
                           const StudentScore *scores,
                           int score_count,
@@ -402,10 +402,10 @@ StatusCode rank_techtrees(const TechTree *trees,
                           int *out_returned)
 {
     if (trees == NULL || scores == NULL || out_indices == NULL || out_returned == NULL) {
-        return STATUS_ERROR_INVALID_INPUT;
+        return ERROR_INVALID_INPUT;
     }
     if (tree_count <= 0 || score_count < 0 || max_out <= 0) {
-        return STATUS_ERROR_INVALID_INPUT;
+        return ERROR_INVALID_INPUT;
     }
 
     /* 임시로 점수와 인덱스를 담을 버퍼 (최대 MAX_TECH_TREES개) */
@@ -455,7 +455,7 @@ StatusCode rank_techtrees(const TechTree *trees,
 
     if (used_count == 0) {
         *out_returned = 0;
-        return STATUS_ERROR_NOT_FOUND;
+        return ERROR_FILE_NOT_FOUND;
     }
 
     /* 점수 기준 내림차순 정렬 (간단한 선택 정렬) */
@@ -487,5 +487,5 @@ StatusCode rank_techtrees(const TechTree *trees,
     }
 
     *out_returned = out_n;
-    return STATUS_OK;
+    return SUCCESS;
 }

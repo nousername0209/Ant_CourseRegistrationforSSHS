@@ -173,6 +173,13 @@ typedef enum {
 #endif
 
 typedef enum {
+    APPLY_NO_CHANGE,
+    APPLY_APPLIED,
+    APPLY_CANCELLED,
+    APPLY_FILLED
+} ApplyResultEnum;
+
+typedef enum {
     SUCCESS,
     ERROR_FILE_NOT_FOUND,
     ERROR_INVALID_INPUT,

@@ -1,4 +1,13 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 #include "board.h"
+
+#define MAX_POSTS 20
+#define VISIBLE_ROWS 12
 
 static int generate_post_id(void) {
     static int next_id = 0;
@@ -34,7 +43,7 @@ static int adjust_value_with_arrows(const char *title, int initial, int min, int
         printf("%s<%s  %s%dï¿½ï¿½%s  %s>%s", UI_COLOR_CYAN, UI_RESET, UI_BOLD, value, UI_RESET, UI_COLOR_CYAN, UI_RESET);
 
         goto_ansi(START_X, START_Y + 10);
-        printf("%s¡ç/¡æ%s ·Î Á¶Àý, Enter·Î È®Á¤ (ESC·Î Ãë¼Ò)", UI_DIM, UI_RESET);
+        printf("%sï¿½ï¿½/ï¿½ï¿½%s ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, Enterï¿½ï¿½ È®ï¿½ï¿½ (ESCï¿½ï¿½ ï¿½ï¿½ï¿?)", UI_DIM, UI_RESET);
 
         int ch = read_key();
         if (ch == LEFT_ARROW && value > min) value--;
@@ -82,7 +91,7 @@ StatusCodeEnum create_post(BoardPost *result) {
     strncpy(subject->name, buffer, NAME_LENGTH - 1);
     subject->name[NAME_LENGTH - 1] = '\0';
 
-    int target = adjust_value_with_arrows("¸ðÁý ÀÎ¿øÀ» Á¤ÇÏ¼¼¿ä", 5, 1, ID_NUM);
+    int target = adjust_value_with_arrows("ï¿½ï¿½ï¿½ï¿½ ï¿½Î¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½", 5, 1, ID_NUM);
     if (target < 0) {
         free(subject);
         return ERROR_INVALID_INPUT;
@@ -91,7 +100,7 @@ StatusCodeEnum create_post(BoardPost *result) {
     clear_screen();
     print_center("[ï¿½Ô½Ã±ï¿½ ï¿½Û¼ï¿½]", 18, 2);
     goto_ansi(START_X, START_Y + 4);
-    printf("È«º¸ ¸Þ½ÃÁö¸¦ ÀÔ·ÂÇÏ¼¼¿ä: ");
+    printf("È«ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ô·ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½: ");
     if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
         free(subject);
         return ERROR_INVALID_INPUT;
@@ -106,14 +115,14 @@ StatusCodeEnum create_post(BoardPost *result) {
     result->current_students = 0;
 
     clear_screen();
-    print_center("°Ô½Ã±ÛÀÌ ÀúÀåµÇ¾ú½À´Ï´Ù!", 24, 8);
+    print_center("ï¿½Ô½Ã±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿?!", 24, 8);
     goto_ansi(START_X, START_Y + 10);
     printf("ï¿½ï¿½ï¿½ï¿½: %s\n", subject->name);
     goto_ansi(START_X, START_Y + 11);
-    printf("¸ðÁý ÀÎ¿ø: %d¸í\n", target);
+    printf("ï¿½ï¿½ï¿½ï¿½ ï¿½Î¿ï¿½: %dï¿½ï¿½\n", target);
     goto_ansi(START_X, START_Y + 12);
-    printf("È«º¸ ¹®±¸: %s\n", result->promo_message);
-    pause_message("°è¼ÓÇÏ·Á¸é ¾Æ¹« Å°³ª ´©¸£¼¼¿ä...");
+    printf("È«ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: %s\n", result->promo_message);
+    pause_message("ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿? ï¿½Æ¹ï¿½ Å°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½...");
 
     return SUCCESS;
 }
@@ -171,35 +180,15 @@ StatusCodeEnum cancel_post(BoardPost *post, int id) {
 }
 
 
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#ifdef _WIN32
-#include <windows.h>
-#endif
-#include "board.h"
-
-#define MAX_POSTS 20
-#define VISIBLE_ROWS 12
-
-typedef enum {
-    APPLY_NO_CHANGE,
-    APPLY_APPLIED,
-    APPLY_CANCELLED,
-    APPLY_FILLED
-} ApplyResult;
-
 #ifdef _WIN32
     void enable_virtual_terminal_processing() {
         HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
         DWORD dwMode = 0;
         
-        // 1. ÀÎÄÚµùÀ» UTF-8·Î ¼³Á¤ÇÏ¿© ÇÑ±Û ±úÁü ¹æÁö
+        // 1. ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ UTF-8ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½Ñ±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         SetConsoleOutputCP(949);
 
-        // 2. Virtual Terminal Processing ¸ðµå È°¼ºÈ­ (ANSI ÄÚµå ÇØ¼®)
+        // 2. Virtual Terminal Processing ï¿½ï¿½ï¿? È°ï¿½ï¿½È­ (ANSI ï¿½Úµï¿½ ï¿½Ø¼ï¿½)
         if (hOut != INVALID_HANDLE_VALUE && GetConsoleMode(hOut, &dwMode)) {
             dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
             SetConsoleMode(hOut, dwMode);
@@ -222,25 +211,25 @@ static void render_buttons(int selected_index, int post_count) {
 
     goto_ansi(3, 22);
     if (selected_index == create_idx) {
-        printf("%s[+] °Ô½Ã±Û »ý¼º%s", UI_REVERSE, UI_RESET);
+        printf("%s[+] ï¿½Ô½Ã±ï¿½ ï¿½ï¿½ï¿½ï¿½%s", UI_REVERSE, UI_RESET);
     } else {
-        printf("[+] °Ô½Ã±Û »ý¼º");
+        printf("[+] ï¿½Ô½Ã±ï¿½ ï¿½ï¿½ï¿½ï¿½");
     }
 
-    int planned_x = (CONSOLE_WIDTH / 2) - (int)strlen("°³¼³ ¿¹Á¤ °ú¸ñ") / 2 - 3;
+    int planned_x = (CONSOLE_WIDTH / 2) - (int)strlen("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½") / 2 - 3;
     goto_ansi(planned_x, 22);
     if (selected_index == planned_idx) {
-        printf("%s[°³¼³ ¿¹Á¤ °ú¸ñ]%s", UI_REVERSE, UI_RESET);
+        printf("%s[ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½]%s", UI_REVERSE, UI_RESET);
     } else {
-        printf("[°³¼³ ¿¹Á¤ °ú¸ñ]");
+        printf("[ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½]");
     }
 
-    int exit_x = CONSOLE_WIDTH - (int)strlen("Á¾·á") - 6;
+    int exit_x = CONSOLE_WIDTH - (int)strlen("ï¿½ï¿½ï¿½ï¿½") - 6;
     goto_ansi(exit_x, 22);
     if (selected_index == exit_idx) {
-        printf("%s[Á¾·á]%s", UI_REVERSE, UI_RESET);
+        printf("%s[ï¿½ï¿½ï¿½ï¿½]%s", UI_REVERSE, UI_RESET);
     } else {
-        printf("[Á¾·á]");
+        printf("[ï¿½ï¿½ï¿½ï¿½]");
     }
 }
 
@@ -248,9 +237,9 @@ static void render_post_row(const BoardPost *post, int row, int is_selected) {
     goto_ansi(START_X, START_Y + 5 + row);
     if (is_selected) printf("%s", UI_REVERSE);
 
-    printf("#%02d | %s | %d/%d¸í | %s",
+    printf("#%02d | %s | %d/%dï¿½ï¿½ | %s",
            post->id,
-           (post->subject && strlen(post->subject->name) > 0) ? post->subject->name : "(Á¦¸ñ ¾øÀ½)",
+           (post->subject && strlen(post->subject->name) > 0) ? post->subject->name : "(ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)",
            post->current_students,
            post->target_students,
            post->promo_message);
@@ -260,14 +249,14 @@ static void render_post_row(const BoardPost *post, int row, int is_selected) {
 
 static void render_board(const BoardPost *posts, int post_count, int selected_index, int scroll_offset) {
     printf("\x1B[2J\x1B[H");
-    print_center("[°Ô½ÃÆÇ]", 12, 2);
+    print_center("[ï¿½Ô½ï¿½ï¿½ï¿½]", 12, 2);
 
     goto_ansi(START_X, START_Y + 4);
-    printf("%sID | °ú¸ñ | ÇöÀç/¸ðÁý | È«º¸¹®±¸%s", UI_DIM, UI_RESET);
+    printf("%sID | ï¿½ï¿½ï¿½ï¿½ | ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ | È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½%s", UI_DIM, UI_RESET);
 
     if (post_count == 0) {
         goto_ansi(START_X, START_Y + 6);
-        printf("°Ô½Ã±ÛÀÌ ¾ø½À´Ï´Ù. ¿ÞÂÊ ÇÏ´Ü¿¡¼­ »õ °Ô½Ã±ÛÀ» »ý¼ºÇÏ¼¼¿ä.");
+        printf("ï¿½Ô½Ã±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½. ï¿½ï¿½ï¿½ï¿½ ï¿½Ï´Ü¿ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ô½Ã±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½.");
     } else {
         int end = scroll_offset + VISIBLE_ROWS;
         if (end > post_count) end = post_count;
@@ -277,17 +266,17 @@ static void render_board(const BoardPost *posts, int post_count, int selected_in
 
         if (scroll_offset > 0) {
             goto_ansi(CONSOLE_WIDTH - 8, START_Y + 5);
-            printf("%s¡ã%s", UI_DIM, UI_RESET);
+            printf("%sï¿½ï¿½%s", UI_DIM, UI_RESET);
         }
         if (scroll_offset + VISIBLE_ROWS < post_count) {
             goto_ansi(CONSOLE_WIDTH - 8, START_Y + 5 + VISIBLE_ROWS - 1);
-            printf("%s¡å%s", UI_DIM, UI_RESET);
+            printf("%sï¿½ï¿½%s", UI_DIM, UI_RESET);
         }
     }
 
     render_buttons(selected_index, post_count);
     goto_ansi(START_X, START_Y + 18);
-    printf("%s¡è/¡é ¼±ÅÃ, ¡ç/¡æ ¹öÆ° ÀÌµ¿, Enter È®Á¤%s", UI_DIM, UI_RESET);
+    printf("%sï¿½ï¿½/ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½/ï¿½ï¿½ ï¿½ï¿½Æ° ï¿½Ìµï¿½, Enter È®ï¿½ï¿½%s", UI_DIM, UI_RESET);
 }
 
 static char* choose_user_id(void) {
@@ -295,11 +284,11 @@ static char* choose_user_id(void) {
 
     // while (1) {
     //     printf("\x1B[2J\x1B[H");
-    //     print_center("»ç¿ëÀÚ ID¸¦ ¼±ÅÃÇÏ¼¼¿ä", 24, 4);
+    //     print_center("ï¿½ï¿½ï¿½ï¿½ï¿? IDï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½", 24, 4);
     //     goto_ansi(START_X, START_Y + 7);
     //     printf("%s<%s  %s%d%s  %s>%s", UI_COLOR_CYAN, UI_RESET, UI_BOLD, value, UI_RESET, UI_COLOR_CYAN, UI_RESET);
     //     goto_ansi(START_X, START_Y + 10);
-    //     printf("%s¡ç/¡æ Á¶Àý, Enter È®Á¤%s", UI_DIM, UI_RESET);
+    //     printf("%sï¿½ï¿½/ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, Enter È®ï¿½ï¿½%s", UI_DIM, UI_RESET);
 
     //     int ch = read_key();
     //     if (ch == LEFT_ARROW && value > 0) value--;
@@ -331,34 +320,34 @@ static char* choose_user_id(void) {
     return id_buffer;
 }
 
-static ApplyResult show_apply_screen(BoardPost *post, int user_id) {
-    int selected = 0; // 0: È®ÀÎ, 1: Ãë¼Ò
+static ApplyResultEnum show_apply_screen(BoardPost *post, int user_id) {
+    int selected = 0; // 0: È®ï¿½ï¿½, 1: ï¿½ï¿½ï¿?
     int already_applied = is_user_applied(post, user_id);
-    ApplyResult result = APPLY_NO_CHANGE;
+    ApplyResultEnum result = APPLY_NO_CHANGE;
 
     while (1) {
         printf("\x1B[2J\x1B[H");
-        print_center("[½ÅÃ» È®ÀÎ]", 14, 2);
+        print_center("[ï¿½ï¿½Ã» È®ï¿½ï¿½]", 14, 2);
 
         goto_ansi(START_X, START_Y + 5);
-        printf("°ú¸ñ: %s", post->subject ? post->subject->name : "(¾Ë ¼ö ¾øÀ½)");
+        printf("ï¿½ï¿½ï¿½ï¿½: %s", post->subject ? post->subject->name : "(ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)");
         goto_ansi(START_X, START_Y + 6);
-        printf("¸ðÁý %d¸í / ÇöÀç %d¸í", post->target_students, post->current_students);
+        printf("ï¿½ï¿½ï¿½ï¿½ %dï¿½ï¿½ / ï¿½ï¿½ï¿½ï¿½ %dï¿½ï¿½", post->target_students, post->current_students);
         goto_ansi(START_X, START_Y + 7);
-        printf("½ÅÃ»ÀÚ ID: %d", user_id);
+        printf("ï¿½ï¿½Ã»ï¿½ï¿½ ID: %d", user_id);
         goto_ansi(START_X, START_Y + 10);
         if (already_applied) {
-            printf("½ÅÃ»À» Ãë¼ÒÇÏ½Ã°Ú½À´Ï±î?");
+            printf("ï¿½ï¿½Ã»ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï½Ã°Ú½ï¿½ï¿½Ï±ï¿??");
         } else {
-            printf("½ÅÃ»ÇÏ½Ã°Ú½À´Ï±î?");
+            printf("ï¿½ï¿½Ã»ï¿½Ï½Ã°Ú½ï¿½ï¿½Ï±ï¿½?");
         }
 
         goto_ansi(START_X, START_Y + 13);
-        if (selected == 0) printf("%s[È®ÀÎ]%s  [Ãë¼Ò]", UI_REVERSE, UI_RESET);
-        else printf("[È®ÀÎ]  %s[Ãë¼Ò]%s", UI_REVERSE, UI_RESET);
+        if (selected == 0) printf("%s[È®ï¿½ï¿½]%s  [ï¿½ï¿½ï¿?]", UI_REVERSE, UI_RESET);
+        else printf("[È®ï¿½ï¿½]  %s[ï¿½ï¿½ï¿?]%s", UI_REVERSE, UI_RESET);
 
         goto_ansi(START_X, START_Y + 16);
-        printf("%s¡ç/¡æ ÀÌµ¿, Enter ¼±ÅÃ%s", UI_DIM, UI_RESET);
+        printf("%sï¿½ï¿½/ï¿½ï¿½ ï¿½Ìµï¿½, Enter ï¿½ï¿½ï¿½ï¿½%s", UI_DIM, UI_RESET);
 
         int ch = read_key();
         if (ch == LEFT_ARROW) selected = 0;
@@ -370,21 +359,21 @@ static ApplyResult show_apply_screen(BoardPost *post, int user_id) {
                 printf("\x1B[2J\x1B[H");
                 if (code == SUCCESS) {
                     if (already_applied) {
-                        print_center("½ÅÃ»ÀÌ Ãë¼ÒµÇ¾ú½À´Ï´Ù!", 24, 6);
+                        print_center("ï¿½ï¿½Ã»ï¿½ï¿½ ï¿½ï¿½ÒµÇ¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿?!", 24, 6);
                         result = APPLY_CANCELLED;
                     } else {
-                        print_center("½ÅÃ»ÀÌ ¿Ï·áµÇ¾ú½À´Ï´Ù!", 24, 6);
+                        print_center("ï¿½ï¿½Ã»ï¿½ï¿½ ï¿½Ï·ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿?!", 24, 6);
                         result = APPLY_APPLIED;
                         if (post->current_students >= post->target_students) {
                             result = APPLY_FILLED;
                         }
                     }
                 } else {
-                    print_center("Ã³¸®¿¡ ½ÇÆÐÇß½À´Ï´Ù.", 22, 6);
+                    print_center("Ã³ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ß½ï¿½ï¿½Ï´ï¿½.", 22, 6);
                 }
                 goto_ansi(START_X, START_Y + 8);
-                printf("°á°ú ÄÚµå: %d", code);
-                pause_message("°è¼ÓÇÏ·Á¸é ¾Æ¹« Å°³ª ´©¸£¼¼¿ä...");
+                printf("ï¿½ï¿½ï¿? ï¿½Úµï¿½: %d", code);
+                pause_message("ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿? ï¿½Æ¹ï¿½ Å°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½...");
             }
             return result;
         }
@@ -428,23 +417,23 @@ static void move_to_planned(BoardPost *planned, int *planned_count, BoardPost *p
 static void show_planned_courses(const BoardPost *planned, int planned_count) {
     while (1) {
         printf("\x1B[2J\x1B[H");
-        print_center("[°³¼³ ¿¹Á¤ °ú¸ñ]", 20, 2);
+        print_center("[ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½]", 20, 2);
 
         if (planned_count == 0) {
             goto_ansi(START_X, START_Y + 5);
-            printf("¾ÆÁ÷ °³¼³ ¿¹Á¤ÀÎ °ú¸ñÀÌ ¾ø½À´Ï´Ù.");
+            printf("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
         } else {
             goto_ansi(START_X, START_Y + 4);
-            printf("%sID | °ú¸ñ | È«º¸¹®±¸%s", UI_DIM, UI_RESET);
+            printf("%sID | ï¿½ï¿½ï¿½ï¿½ | È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½%s", UI_DIM, UI_RESET);
             for (int i = 0; i < planned_count && i < VISIBLE_ROWS; i++) {
                 goto_ansi(START_X, START_Y + 6 + i);
                 const BoardPost *p = &planned[i];
-                printf("#%02d | %s | %s", p->id, p->subject ? p->subject->name : "(Á¦¸ñ ¾øÀ½)", p->promo_message);
+                printf("#%02d | %s | %s", p->id, p->subject ? p->subject->name : "(ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)", p->promo_message);
             }
         }
 
         goto_ansi(START_X, START_Y + 18);
-        printf("%s[È®ÀÎ]%s", UI_REVERSE, UI_RESET);
+        printf("%s[È®ï¿½ï¿½]%s", UI_REVERSE, UI_RESET);
 
         int ch = read_key();
         if (ch == ENTER || ch == ESC) return;
@@ -456,13 +445,54 @@ int board_main(int user_id) {
     enable_virtual_terminal_processing();
 #endif
 
-    BoardPost posts[MAX_POSTS] = {0};
-    BoardPost planned[MAX_POSTS] = {0};
     int post_count = 0;
     int planned_count = 0;
     int selected_index = 0;
     int scroll_offset = 0;
+    int state[3] = {post_count,
+                    planned_count,
+                    selected_index};
+    BoardPost posts[MAX_POSTS] = {0};
+    BoardPost planned[MAX_POSTS] = {0};
 
+    char dir_path[PATH_LENGTH] = "./dataset/enrollment_board";
+    char file_path[PATH_LENGTH + 20];
+    FILE *fp = NULL;
+
+    sprintf(file_path, "%s/state.dat", dir_path);
+    fp = fopen(file_path, "rb");
+    if(fp == NULL){
+        fp = fopen(file_path, "wb");
+        fwrite(state, sizeof(int), 3, fp);
+    }
+    else{
+        fread(state, sizeof(int), 3, fp);
+    }
+    fclose(fp);
+    
+    sprintf(file_path, "%s/posts.dat", dir_path);
+    fp = fopen(file_path, "rb");
+    if(fp == NULL){
+        fp = fopen(file_path, "wb");
+        fwrite(posts, sizeof(BoardPost), MAX_POSTS, fp);
+    }
+    else{
+        fread(posts, sizeof(BoardPost), MAX_POSTS, fp);
+    }
+    fclose(fp);
+
+    sprintf(file_path, "%s/planned.dat", dir_path);
+    fp = fopen(file_path, "rb");
+    if(fp == NULL){
+        fp = fopen(file_path, "wb");
+        fwrite(planned, sizeof(BoardPost), MAX_POSTS, fp);
+    }
+    else{
+        fread(planned, sizeof(BoardPost), MAX_POSTS, fp);
+    }
+    fclose(fp);
+
+    
     while (1) {
         int total_items = post_count + 3; // posts + create + planned + exit
         if (selected_index >= total_items) selected_index = total_items - 1;
@@ -498,7 +528,7 @@ int board_main(int user_id) {
             int exit_idx = post_count + 2;
 
             if (selected_index < post_count) {
-                ApplyResult result = show_apply_screen(&posts[selected_index], user_id);
+                ApplyResultEnum result = show_apply_screen(&posts[selected_index], user_id);
                 if (result == APPLY_FILLED) {
                     move_to_planned(planned, &planned_count, &posts[selected_index]);
                     shift_left(posts, &post_count, selected_index, 0);
@@ -512,6 +542,21 @@ int board_main(int user_id) {
             } else if (selected_index == exit_idx) {
                 for (int i = 0; i < post_count; i++) clear_board_post(&posts[i]);
                 for (int i = 0; i < planned_count; i++) clear_board_post(&planned[i]);
+                
+                sprintf(file_path, "%s/state.dat", dir_path);
+                fp = fopen(file_path, "wb");
+                fwrite(state, sizeof(int), 3, fp);
+                fclose(fp);
+                
+                sprintf(file_path, "%s/posts.dat", dir_path);
+                fp = fopen(file_path, "wb");
+                fwrite(posts, sizeof(BoardPost), MAX_POSTS, fp);
+                fclose(fp);
+
+                sprintf(file_path, "%s/planned.dat", dir_path);
+                fp = fopen(file_path, "wb");
+                fwrite(planned, sizeof(BoardPost), MAX_POSTS, fp);
+                fclose(fp);
                 return 0;
             }
         }
@@ -519,8 +564,8 @@ int board_main(int user_id) {
 }
 
 #ifdef _WIN32
-// ÀÏºÎ MinGW ¼³Á¤¿¡¼­ GUI ¼­ºê½Ã½ºÅÛÀ» ±âº»°ªÀ¸·Î »ç¿ëÇÒ ¶§ WinMainÀÌ ÇÊ¿äÇÏ¹Ç·Î
-// ÄÜ¼Ö ÇÁ·Î±×·¥ ¿£Æ®¸®¸¦ main¿¡ À§ÀÓÇÑ´Ù.
+// ï¿½Ïºï¿½ MinGW ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ GUI ï¿½ï¿½ï¿½ï¿½Ã½ï¿½ï¿½ï¿½ï¿½ï¿? ï¿½âº»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿? ï¿½ï¿½ WinMainï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½Ï¹Ç·ï¿½
+// ï¿½Ü¼ï¿½ ï¿½ï¿½ï¿½Î±×·ï¿½ ï¿½ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ mainï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
 // int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 //     (void)hInstance;
 //     (void)hPrevInstance;

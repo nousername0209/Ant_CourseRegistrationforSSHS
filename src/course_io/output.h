@@ -1,4 +1,9 @@
-// 이연지 작업
+/*
+ 2025-11-25 김주환: output.c 수정
+ 2025-11-25 김주환: output 업데이트 revert 발생
+ 2025-11-25 이연지: output difficulty UI 제작
+ 2025-11-25 이연지: calculator 호환 output 개선
+*/
 
 #ifndef COURSE_OUTPUT_H
 #define COURSE_OUTPUT_H

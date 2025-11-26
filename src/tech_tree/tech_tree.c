@@ -1,5 +1,6 @@
 /*
- 2025-11-26 장민준: subjects_stats.txt, subjects.txt, techtrees.txt 가상 데이터 작성 
+ 2025-11-26 장민준: subjects_stats.txt, subjects.txt, techtrees.txt 가상 데이터 작성
+ 2025-11-25 장민준: 학생 성적 입력받아서 추천 테크트리 순위를 반환하는 함수 작성
  2025-11-25 이연지: tech_tree.c 파일 추가
  2025-11-23 장민준: tech_tree.h 함수 선언
 */

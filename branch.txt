@@ -1,0 +1,173 @@
+🗓 11월 26일 2025 (Nov 26, 2025)
+
+Readme edited
+
+진짜 진짜 진짜 찐찐찐완성
+
+Merge branch 'main' of https://github.com/nousername0209/Ant_CourseRegistrationforSSHS
+
+찐완성
+
+완성!!
+
+output 코드 양식 수정
+
+주석 중간점검
+
+tech_tree.h 주석
+
+최종 프로그램 완성
+
+techtrees.txt 가상 데이터 작성
+
+주석 족므 달림
+
+찐일차 완성
+
+일차 완성
+
+techtree 중간점검2
+
+subjects_stats.txt 추가
+
+subjects.txt 추가
+
+techtree 중간 점검
+
+StatusCodeEnum 호환시키고, struct.h 하나로 통일
+
+🗓 11월 25일 2025 (Nov 25, 2025)
+
+Merge branch 'main' of https://github.com/nousername0209/Ant_CourseRegistrationforSSHS
+
+주석 추가했습니다
+
+board Error code 2 수정됨
+
+recommender 파일 추가
+
+imsi push
+
+중간점검
+
+board에 일부 주석 작성
+
+input 문법 정리 끝
+
+login 문법 정리 끝
+
+board 글씨 정렬
+
+calculator 문법 정리 끝
+
+rollback ended
+
+Revert "Merge pull request #1 from nousername0209/codex/refactor-code-to-follow-coding-standards"
+
+Revert "Update output.c"
+
+Update output.c
+
+Update input.h
+
+Update input.c
+
+Merge pull request #1 from nousername0209/codex/refactor-code-to-follow-coding-standards
+
+Apply coding guidelines
+
+HOME PAGE 개발 완료
+
+struct file io
+
+home page 만들기 및 board_test 수정
+
+board test main.c erase
+
+encoding & cmd changed
+
+parksieul watdagam
+
+data added & some code edited
+
+caluclator 파일 최종 완성
+
+difficulty_calculator data erase
+
+calculator 파일 진행사항 확인
+
+calculator 폴더 파일 정리
+
+calculator.c 및 output.c와 호환 완성
+
+�caclulate_difficulty changed
+
+difficulty 출력 중간 점검
+
+input difficulty 완성
+
+output difficulty UI 제작
+
+다 만들었다 야호
+
+🗓 11월 24일 2025 (Nov 24, 2025)
+
+Merge branch 'main' of https://github.com/nousername0209/Ant_CourseRegistrationforSSHS
+
+Refactor user data handling and improve login functionality; add new user data loading mechanism and update related structures.
+
+output 수정
+
+calculator parameter changed
+
+calculator 최종 마감
+
+recommend.c
+
+🗓 11월 23일 2025 (Nov 23, 2025)
+
+Merge remote-tracking branch 'origin/HEAD'
+
+difficulty_calculator 완성
+
+recommender.h 함수 선언
+
+구조체 몇개 추가
+
+구조체 몇 개 추가
+
+🗓 11월 22일 2025 (Nov 22, 2025)
+
+debugging difficulty calculator
+
+calculator 1차완성
+
+이미있었네
+
+struct.h 파일 추가
+
+calcultor 중간제작
+
+🗓 11월 20일 2025 (Nov 20, 2025)
+
+과목 파일 및 input 완성
+
+데이터 파일 및 input 중간 완성
+
+🗓 11월 19일 2025 (Nov 19, 2025)
+
+로그인 페이지 완성
+
+🗓 11월 17일 2025 (Nov 17, 2025)
+
+main.h file made
+
+changed by yj
+
+🗓 11월 9일 2025 (Nov 9, 2025)
+
+1109 Base File Created
+
+🗓 11월 6일 2025 (Nov 6, 2025)
+
+Initial commit

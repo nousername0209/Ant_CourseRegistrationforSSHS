@@ -9,10 +9,11 @@ static void render_home_page(int selected_index) {
         "[1] 시간표 입력/수정",
         "[2] 난이도 분석 및 추가",
         "[3] 수강 신청 게시판",
-        "[4] 사용자 ID 변경 (로그인)",
+        "[4] 성적 입력 및 테크 트리 추천",
+        "[5] 사용자 ID 변경 (로그인)",
         "[ESC] 종료" // 4
     };
-    const int menu_count = 5;
+    const int menu_count = 6;
     const int start_y = 10;
 
     print_center("=== HOME PAGE ===", 17, 8);
@@ -65,8 +66,9 @@ PageEnum run_home_page() {
             if (home_selected_index == 0) return INPUT_PAGE;
             if (home_selected_index == 1) return OUTPUT_PAGE;
             if (home_selected_index == 2) return BOARD_PAGE;
-            if (home_selected_index == 3) return LOGIN_PAGE;
-            if (home_selected_index == 4) return ESC_PAGE;
+            if (home_selected_index == 3) return TECHTREE_PAGE;
+            if (home_selected_index == 4) return LOGIN_PAGE;
+            if (home_selected_index == 5) return ESC_PAGE;
         } else if (ch == ESC) {
             return ESC_PAGE;
         }

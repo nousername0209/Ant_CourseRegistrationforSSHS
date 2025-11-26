@@ -55,6 +55,7 @@ typedef enum _Page {
     INPUT_PAGE,
     OUTPUT_PAGE,
     ESC_PAGE,
+    TECHTREE_PAGE,
     BOARD_PAGE
 } PageEnum;
 

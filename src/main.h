@@ -5,7 +5,7 @@
 #include "course_io/output.c"
 #include "difficulty_calculator/calculator.c"
 #include "login/login.c"
-#include "JangMinjoon/tech_tree.c"
+#include "tech_tree/tech_tree.c"
 #include "enrollment_board/board.c"
 #include "home/home.c"
 

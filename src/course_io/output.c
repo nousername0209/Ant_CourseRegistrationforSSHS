@@ -1,3 +1,5 @@
+// 이연지 작업
+
 #include "output.h"
 #include "../difficulty_calculator/calculator.h"
 
@@ -105,6 +107,9 @@ void popup_show_message(const char* title, const char* msg) {
     
     // 팝업 닫기 (화면 복구는 draw_screen에서 처리됨)
 }
+
+
+// 김주환 작업
 
 /**
  * @brief 시간표의 난이도를 계산하고, 전체 난이도와 가장 힘든 과목& 과목쌍을 출력한다.
@@ -295,6 +300,7 @@ StatusCodeEnum popup_input_difficulty(TimeTable* table, int semester) {
 }
 
 
+// 이연지 작업
 
 /**
  * @brief 시간표 최종확인 후 시간표를 cmd창에 출력해준다.

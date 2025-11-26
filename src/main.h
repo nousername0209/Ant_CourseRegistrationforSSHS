@@ -1,3 +1,5 @@
+// 이연지 작업
+
 #ifndef MAIN_H
 #define MAIN_H
 

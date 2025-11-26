@@ -2,6 +2,8 @@
     "files.associations": {
         "login.h": "c",
         "struct.h": "c",
-        "calculator.c": "cpp"
+        "calculator.c": "cpp",
+        "calculator.h": "c",
+        "math.h": "c"
     }
 }

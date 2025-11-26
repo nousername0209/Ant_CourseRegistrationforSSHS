@@ -1,11 +1,12 @@
+// ÀÌ¿¬Áö ÀÛ¾÷
 #include "login.h"
 #include "windows.h"
 
 /**
- * @brief ê¸°ë³¸ì ì¸ ë¡œê·¸ì¸ UIë¥¼ ë„ì›Œì¤€ë‹¤.(ë§¤ í‹±ë§ˆë‹¤ ì‹¤í–‰ë˜ì–´ì•¼ í•¨)
- * @param select í˜„ì¬ ì»¤ì„œê°€ ì˜¬ë¼ì™€ ìˆëŠ” í•­ëª©ì´ë‹¤.(ë¡œê·¸ì¸/ ì´ë¦„ ìˆ˜ì •)
- * @param id_buffer í˜„ì¬ê¹Œì§€ ì…ë ¥í•œ idì˜ ë¬¸ìì—´ì´ë‹¤.
- * @return ì„±ê³µ ì—¬ë¶€ë¥¼ StatusCodeEnumìœ¼ë¡œ ë°˜í™˜í•œë‹¤. í•­ìƒ SUCCESSë¥¼ ë°˜í™˜í•œë‹¤.
+ * @brief ±âº»ÀûÀÎ ·Î±×ÀÎ UI¸¦ ¶ç¿öÁØ´Ù.(¸Å Æ½¸¶´Ù ½ÇÇàµÇ¾î¾ß ÇÔ)
+ * @param select ÇöÀç Ä¿¼­°¡ ¿Ã¶ó¿Í ÀÖ´Â Ç×¸ñÀÌ´Ù.(·Î±×ÀÎ/ ÀÌ¸§ ¼öÁ¤)
+ * @param id_buffer ÇöÀç±îÁö ÀÔ·ÂÇÑ idÀÇ ¹®ÀÚ¿­ÀÌ´Ù.
+ * @return ¼º°ø ¿©ºÎ¸¦ StatusCodeEnumÀ¸·Î ¹İÈ¯ÇÑ´Ù. Ç×»ó SUCCESS¸¦ ¹İÈ¯ÇÑ´Ù.
  */
 StatusCodeEnum draw_ui(SelectEnum select, const char* id_buffer) {
     system("cls");
@@ -32,10 +33,10 @@ StatusCodeEnum draw_ui(SelectEnum select, const char* id_buffer) {
 }
 
 /**
- * @brief ë¡œê·¸ì¸ UIë¥¼ ë„ìš°ê³  ë¡œê·¸ì¸ ì •ë³´ë¥¼ ì…ë ¥ë°›ëŠ” í•¨ìˆ˜ì´ë‹¤.
- * @param id_buffer ì…ë ¥ë°›ì€ idë¥¼ ì €ì¥í•˜ê³ , ë°˜í™˜í•˜ëŠ” ë¬¸ìì—´ì´ë‹¤. í•´ë‹¹ í¬ì¸í„°ì— ì•„ì´ë””ê°€ ì €ì¥ëœë‹¤.
- * @param max_len ì…ë ¥ë°›ì„ idì˜ ìµœëŒ€ ê¸¸ì´ì´ë‹¤.
- * @return ì„±ê³µ ì—¬ë¶€ë¥¼ StatusCodeEnumìœ¼ë¡œ ë°˜í™˜í•œë‹¤. í•­ìƒ SUCCESSë¥¼ ë°˜í™˜í•œë‹¤.
+ * @brief ë¡œê·¸?¸ UIë¥? ?„?š°ê³? ë¡œê·¸?¸ ? •ë³´ë?? ?…? ¥ë°›ëŠ” ?•¨?ˆ˜?´?‹¤.
+ * @param id_buffer ?…? ¥ë°›ì?? idë¥? ????¥?•˜ê³?, ë°˜í™˜?•˜?Š” ë¬¸ì?—´?´?‹¤. ?•´?‹¹ ?¬?¸?„°?— ?•„?´?””ê°? ????¥?œ?‹¤.
+ * @param max_len ?…? ¥ë°›ì„ id?˜ ìµœë?? ê¸¸ì´?´?‹¤.
+ * @return ?„±ê³? ?—¬ë¶?ë¥? StatusCodeEnum?œ¼ë¡? ë°˜í™˜?•œ?‹¤. ?•­?ƒ SUCCESSë¥? ë°˜í™˜?•œ?‹¤.
  */
 StatusCodeEnum show_login_screen(char *id_buffer, int max_len) {
     SelectEnum current = ID_FIELD;
@@ -84,9 +85,9 @@ StatusCodeEnum show_login_screen(char *id_buffer, int max_len) {
 }
 
 /**
- * @brief ë¡œê·¸ì¸ UIë¥¼ ë„ìš°ê³  ë¡œê·¸ì¸ ì •ë³´ë¥¼ ì…ë ¥ë°›ëŠ” í•¨ìˆ˜ì´ë‹¤. show_login_screenì— í•„ìš”í•œ ê¸°ëŠ¥ë“¤ì„ ì •ë¦¬í•´ë†“ì€ í•¨ìˆ˜ì´ë‹¤.
- * @param user_id ì…ë ¥ë°›ì€ idë¥¼ ì €ì¥í•˜ê³ , ë°˜í™˜í•˜ëŠ” ë¬¸ìì—´ì´ë‹¤. í•´ë‹¹ í¬ì¸í„°ì— ì•„ì´ë””ê°€ ì €ì¥ëœë‹¤.
- * @return ì„±ê³µ ì—¬ë¶€ë¥¼ StatusCodeEnumìœ¼ë¡œ ë°˜í™˜í•œë‹¤. í•­ìƒ SUCCESSë¥¼ ë°˜í™˜í•œë‹¤.
+ * @brief ë¡œê·¸?¸ UIë¥? ?„?š°ê³? ë¡œê·¸?¸ ? •ë³´ë?? ?…? ¥ë°›ëŠ” ?•¨?ˆ˜?´?‹¤. show_login_screen?— ?•„?š”?•œ ê¸°ëŠ¥?“¤?„ ? •ë¦¬í•´?†“??? ?•¨?ˆ˜?´?‹¤.
+ * @param user_id ?…? ¥ë°›ì?? idë¥? ????¥?•˜ê³?, ë°˜í™˜?•˜?Š” ë¬¸ì?—´?´?‹¤. ?•´?‹¹ ?¬?¸?„°?— ?•„?´?””ê°? ????¥?œ?‹¤.
+ * @return ?„±ê³? ?—¬ë¶?ë¥? StatusCodeEnum?œ¼ë¡? ë°˜í™˜?•œ?‹¤. ?•­?ƒ SUCCESSë¥? ë°˜í™˜?•œ?‹¤.
  */
 StatusCodeEnum login(int *user_id) {
     system("cls");

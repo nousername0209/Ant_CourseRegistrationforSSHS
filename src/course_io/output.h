@@ -1,3 +1,5 @@
+// 이연지 작업
+
 #ifndef COURSE_OUTPUT_H
 #define COURSE_OUTPUT_H
 

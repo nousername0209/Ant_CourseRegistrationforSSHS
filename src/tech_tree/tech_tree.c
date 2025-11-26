@@ -1,3 +1,5 @@
+// 장민준 작업
+
 #include <string.h>
 #include <math.h>
 
@@ -9,6 +11,7 @@
 #define STATS_FILE     "./dataset/tech_tree/subject_stats.txt"
 
 #define MAX_VISIBLE_SUBJECTS 6
+#define PERFECT_SCORE 100.0
 
 static SubjectInfo  g_subjects[MAX_SUBJECT_NUM];
 static int          g_subject_count = 0;
@@ -308,7 +311,7 @@ StatusCodeEnum compute_z_and_percentile(const SubjectInfo *subject,
     double phi = normal_cdf(z);
 
     /* 상위 퍼센트 (Top x%) = (1 - phi) * 100 */
-    double top_percent = (1.0 - phi) * 100.0;
+    double top_percent = (1.0 - phi) * PERFECT_SCORE;
 
     *out_z = z;
     *out_percentile_top = top_percent;
@@ -491,6 +494,7 @@ StatusCodeEnum rank_techtrees(const TechTree *trees,
     return SUCCESS;
 }
 
+// 이연지 작업
 
 /**
  * @brief 주어진 시간표(TimeTable)의 과목들에 대해 원점수(raw_score)를 입력받는 팝업 UI를 그린다.
@@ -869,7 +873,7 @@ StatusCodeEnum run_recommendation_ui(const TechTree *trees,
 
         if (subj_info != NULL) {
             // 이 과목의 가장 좋은 성적(최소 percentile_top) 찾기
-            double best_percentile = 101.0;
+            double best_percentile = PERFECT_SCORE + 1;
             int found_score = 0;
             for (int j = 0; j < score_count; j++) {
                 if (scores[j].user_id == user_id && scores[j].subject_id == ts->subject_id) {
@@ -885,7 +889,7 @@ StatusCodeEnum run_recommendation_ui(const TechTree *trees,
             
             if (found_score) {
                 // 점수 계산 공식: (100 - percentile_top) * weight 
-                double contribution = (100.0 - best_percentile) * (double)ts->weight;
+                double contribution = (PERFECT_SCORE - best_percentile) * (double)ts->weight;
                 goto_ansi(40, current_y - 1);
                 printf("| 기여 점수: %s%.2f%s (상위 %.2f%%)", UI_COLOR_CYAN, contribution, UI_RESET, best_percentile);
             } else {

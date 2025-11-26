@@ -1,6 +1,4 @@
-//
-// Created by ê¹€ì£¼í™˜ on 25. 11. 9.
-//
+// ¹ÚÁÖÇå ÀÛ¾÷
 
 #ifndef ENROLLMENT_BOARD_H
 #define ENROLLMENT_BOARD_H

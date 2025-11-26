@@ -1,6 +1,4 @@
-//
-// Created by 김주환 on 25. 11. 9.
-//
+// 김주환 작업
 
 #include "../struct.h" 
 

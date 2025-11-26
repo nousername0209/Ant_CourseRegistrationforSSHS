@@ -1,5 +1,5 @@
-/* modified by 장민준 on 2025.11.26. tech_tree에서 사용되는 매크로 상수와 
-구조체(SubjectStats, SubjectInfo, TreeSubject, TechTree, StudentScore) 정의 */
+// 공동 작업
+
 #ifndef STRUCT_H
 #define STRUCT_H
 
@@ -75,20 +75,10 @@ static inline void print_center(const char* title, int len, int y_pos) {
     printf("%s", title);
 }
 
-/* 테크트리 추천 기능 */
-/* 이름(과목명, 테크트리명 등) 최대 길이 */
 #define NAME_LENGTH            64
-
-/* 한 과목에 저장 가능한 성적 통계(연도/학기별) 최대 개수 */
 #define MAX_SUBJECT_STATS      16
-
-/* 한 테크트리에 들어갈 수 있는 과목 최대 개수 */
 #define MAX_TREE_SUBJECTS      32
-
-/* 전체 테크트리 최대 개수 */
 #define MAX_TECH_TREES         32
-
-/* 전체 학생 성적 기록 최대 개수 */
 #define MAX_SCORES             512
 
 /* 한 과목의 특정 학기(연도, 학기)의 원점수에 대한 통계 정보 */
@@ -258,7 +248,7 @@ static void trim_newline(char* str) {
 }
 
 static void load_user_data(User* user, int id, int *is_first) {
-    char filename[100];
+    char filename[PATH_LENGTH];
     sprintf(filename, "dataset/course_io/user/user_%d.txt", id);
     
     user->id = id;
@@ -272,7 +262,7 @@ static void load_user_data(User* user, int id, int *is_first) {
 
     *is_first = 0;
     
-    char line[256];
+    char line[LINE_LENGTH];
     int current_sem_idx = -1;
     int subjects_to_read = 0;
 

@@ -471,8 +471,9 @@ static ApplyResultEnum show_apply_screen(BoardPost *post, int user_id) {
                 } else {
                     print_center("처리 중 오류가 발생했습니다.", 22, 6);
                 }
-                goto_ansi(START_X, START_Y + 8);
-                printf("에러 코드: %d", code);
+                if(code !=SUCCESS)
+                    goto_ansi(START_X, START_Y + 8);
+                    printf("에러 코드: %d", code);
                 pause_message("돌아가려면 아무 키나 누르세요...");
             }
             return result;

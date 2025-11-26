@@ -254,7 +254,7 @@ StatusCodeEnum popup_input_difficulty(TimeTable* table, int student_id, int seme
             }
 
             // 성공 메시지 팝업 후 종료
-            popup_show_message("완료", "난이도 정보가 성공적으로 저장되었습니다.");
+            popup_show_message("완료", "난이도 정보가 성공적으로 저장되었\n습니다.");
             return SUCCESS;
         } else if (ch >= '0' && ch <= '9') {
             // 숫자 입력 처리 (단일 숫자 입력만 가능하다고 가정)

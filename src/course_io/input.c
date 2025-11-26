@@ -588,6 +588,13 @@ void run_registration(int student_id) {
     }
 }
 
+/**
+ * @brief 수강신청 프로그램을 실행하는 메인에 들어가는 함수이다.
+ * 
+ * @param id 현재 사용자의 학번
+ * 
+ * @return StatusCodeEnum
+ */
 StatusCodeEnum input(int id) {
     run_registration(id);
     return SUCCESS;

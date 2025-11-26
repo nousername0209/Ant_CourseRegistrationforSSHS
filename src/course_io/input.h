@@ -19,8 +19,6 @@ Subject* load_data_from_file();
 
 void save_user_data(User* user);
 
-void load_user_data(User* user, int id, int *is_first);
-
 int popup_select_semester(int start_sem, int end_sem, const char* title);
 
 int popup_edit_menu();
@@ -34,7 +32,6 @@ void draw_screen(User* user, Subject* root, int col_idx, int row_indices[3],
 
 void run_registration(int student_id);
 
-// to main:
 StatusCodeEnum input(int id);
 
 #endif //COURSE_INPUT_H

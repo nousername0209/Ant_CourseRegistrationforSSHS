@@ -7,8 +7,6 @@
 
 StatusCodeEnum draw_ui(SelectEnum select, const char* id_buffer);
 StatusCodeEnum show_login_screen(char *id_buffer, int max_len);
-
-// to main:
 StatusCodeEnum login(int *user_id);
 
 

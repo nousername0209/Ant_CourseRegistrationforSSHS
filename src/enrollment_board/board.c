@@ -8,6 +8,8 @@
 
 #define MAX_POSTS 20
 #define VISIBLE_ROWS 12
+#define DOT_LENGTH 3
+#define STATE_LENGTH 3
 
 /**
  * @brief post_id를 관리하는 함수이다. 이전에 호출됐었다면 그 때 나왔던 값 +1을, 처음 호출됐다면 0을 반환한다.
@@ -318,7 +320,7 @@ static void get_truncated_text(char *dest, const char *src, int max_len) {
     }
 
     // '...'이 들어갈 공간(3바이트)을 뺀 길이만큼만 복사 시도
-    int limit = max_len - 3;
+    int limit = max_len - DOT_LENGTH;
     int i = 0;
     
     while (i < limit && src[i] != '\0') {
@@ -582,7 +584,7 @@ int board_main(int user_id) {
     int planned_count = 0;
     int selected_index = 0;
     int scroll_offset = 0;
-    int state[3] = {post_count,
+    int state[STATE_LENGTH] = {post_count,
                     planned_count,
                     selected_index};
     BoardPost posts[MAX_POSTS] = {0};
@@ -596,10 +598,10 @@ int board_main(int user_id) {
     fp = fopen(file_path, "rb");
     if(fp == NULL){
         fp = fopen(file_path, "wb");
-        fwrite(state, sizeof(int), 3, fp);
+        fwrite(state, sizeof(int), STATE_LENGTH, fp);
     }
     else{
-        fread(state, sizeof(int), 3, fp);
+        fread(state, sizeof(int), STATE_LENGTH, fp);
     }
     fclose(fp);
     

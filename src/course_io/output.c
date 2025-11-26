@@ -369,7 +369,13 @@ void draw_output_view(User* user, int btn_idx) {
     }
 }
 
-// Output 모드 실행 함수
+/**
+ * @brief ouput을 실행하고 main 파일에 사용된다.
+ * 
+ * @param student_id 학생의 id이다.
+ * 
+ * @return 살행결과를 StatusCodeEnum으로 반환한다.
+ */
 int run_output(int student_id) {
     User user;
     int is_first;

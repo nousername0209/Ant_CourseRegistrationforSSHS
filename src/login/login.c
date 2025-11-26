@@ -49,8 +49,8 @@ StatusCodeEnum show_login_screen(char *id_buffer, int max_len) {
         ch = _getch(); 
 
         switch (ch) {
-            case 224:
-            case 0:
+            case PRE_INPUT1:
+            case PRE_INPUT2:
                 ch = _getch();
                 if (ch == UP_ARROW || ch == LEFT_ARROW) { // Up or Left
                     current = (current == ID_FIELD) ? LOGIN_BUTTON : ID_FIELD;

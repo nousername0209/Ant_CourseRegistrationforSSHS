@@ -1,6 +1,10 @@
 #include "home.h"
 
-// HOME_PAGE 화면을 그리는 헬퍼 함수
+/**
+ * @brief 홈페이지 화면을 그린다.
+ * 
+ * @param selected_index 홈페이지에서 선택된 선택지 번호이다.
+ */
 static void render_home_page(int selected_index) {
     system("cls");
     

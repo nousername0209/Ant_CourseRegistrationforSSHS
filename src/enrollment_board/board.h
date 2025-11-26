@@ -1,4 +1,4 @@
-// 冠林清 累诀
+// 2025-11-22 冠林清: board.h 累己
 
 #ifndef ENROLLMENT_BOARD_H
 #define ENROLLMENT_BOARD_H

@@ -1,3 +1,5 @@
+// 2025-11-24 장민준: tech_tree.h 제작
+
 #ifndef TECH_TREE_H
 #define TECH_TREE_H
 

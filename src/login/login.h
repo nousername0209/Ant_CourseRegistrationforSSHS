@@ -1,4 +1,5 @@
-// 이연지 작업
+// 2025-11-20 이연지: 로그인 페이지 제작
+
 #ifndef LOGIN_H
 #define LOGIN_H
 

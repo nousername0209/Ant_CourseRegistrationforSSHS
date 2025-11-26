@@ -1,4 +1,4 @@
-// 이연지 작업
+// 2025-11-24 이연지: home.h 제작
 
 #ifndef HOME_H
 #define HOME_H

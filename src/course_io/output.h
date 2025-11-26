@@ -1,5 +1,6 @@
-// ì´ì—°ì§€ ì‘ì—…
-
+/*
+ 2025-11-26 ÀÌ¿¬Áö : output.h ÆÄÀÏ °ü¸®
+*/
 #ifndef COURSE_OUTPUT_H
 #define COURSE_OUTPUT_H
 

@@ -2,9 +2,9 @@
 #include "../difficulty_calculator/calculator.h"
 
 /**
- * @brief 난이도 입력 값이 유효한지 검사한다 (0~9 사이 정수)
+ * @brief 난이도 입력 값이 유효한지 검사한다 (0~10 사이 정수)
  * 
- * @param buf 입력 문자열
+ * @param buf 입력문자열(난이도가 적힌 문자열)을 입력받는다.
  * 
  * @return int 유효하면 1, 아니면 0 반환
  */
@@ -71,6 +71,12 @@ void draw_input_difficulty_popup(TimeTable* table, int semester, int total_diffi
     printf("%s[ ↑/↓: 이동 | 숫자: 입력 | ENTER: 저장 | ESC: 취소 ]%s", UI_BOLD, UI_RESET);
 }
 
+/**
+ * @brief 입력된 title과 message를 cmd창에 출력해준다.
+ * 
+ * @param title 출력할 제목이다.
+ * @param msg 출력할 메세지이다.
+ */
 void popup_show_message(const char* title, const char* msg) {
     int box_w = 40;
     int box_h = 7;
@@ -100,7 +106,13 @@ void popup_show_message(const char* title, const char* msg) {
     // 팝업 닫기 (화면 복구는 draw_screen에서 처리됨)
 }
 
-void popup_show_difficulty_result(int sem, TimeTable *t) {
+/**
+ * @brief 시간표의 난이도를 계산하고, 전체 난이도와 가장 힘든 과목& 과목쌍을 출력한다.
+ * 
+ * @param sem 선택한 학기(1~6중 하나의 값을 가진다.)
+ * @param table 난이도를 계산할 시간표이다.
+ */
+void popup_show_difficulty_result(int sem, TimeTable *table) {
     int box_w = 50;
     int box_h = 12;
     int start_x = (CONSOLE_WIDTH - box_w) / 2;
@@ -113,7 +125,7 @@ void popup_show_difficulty_result(int sem, TimeTable *t) {
     printf("%s %d학기 난이도 분석 결과 %s", UI_BOLD, sem, UI_RESET);
 
     goto_ansi(start_x + 2, start_y + 3);
-    if (t->argmax_load == NULL) {
+    if (table->argmax_load == NULL) {
         printf("%s1. 최고 난이도 과목 (argmax_load)%s", UI_COLOR_YELLOW, UI_RESET);
         goto_ansi(start_x + 5, start_y + 4);
         printf("-> 과목이 없어 분석 불가");
@@ -121,22 +133,22 @@ void popup_show_difficulty_result(int sem, TimeTable *t) {
         goto_ansi(start_x + 2, start_y + 3);
         printf("%s1. 최고 난이도 과목 (argmax_load)%s", UI_COLOR_YELLOW, UI_RESET);
         goto_ansi(start_x + 5, start_y + 4);
-        printf("-> %s (%d학점)", t->argmax_load->name, t->argmax_load->credit);
+        printf("-> %s (%d학점)", table->argmax_load->name, table->argmax_load->credit);
     }
     goto_ansi(start_x + 2, start_y + 6);
     printf("%s2. 최악의 조합 (argmax_synergy)%s", UI_COLOR_YELLOW, UI_RESET);
     goto_ansi(start_x + 5, start_y + 7);
-    if (((*t->argmax_synergy)[0].id) == ((*t->argmax_synergy)[1].id)) {
+    if (((*table->argmax_synergy)[0].id) == ((*table->argmax_synergy)[1].id)) {
         printf("-> 과목이 부족하여 분석 불가");
     } else {
         if(DEBUG_MODE){
-            printf("%d %d\n", t->argmax_synergy[0]->id, (*t->argmax_synergy)[1].id);
+            printf("%d %d\n", table->argmax_synergy[0]->id, (*table->argmax_synergy)[1].id);
         }
-        printf("-> %s + %s", (*t->argmax_synergy)[0].name, (*t->argmax_synergy)[1].name);
+        printf("-> %s + %s", (*table->argmax_synergy)[0].name, (*table->argmax_synergy)[1].name);
     }
 
     goto_ansi(start_x + 2, start_y + 9);
-    printf("%s3. 총 난이도 (total_difficulty)%s: %.1f / 10.0", UI_COLOR_YELLOW, UI_RESET, t->difficulty);
+    printf("%s3. 총 난이도 (total_difficulty)%s: %.1f / 10.0", UI_COLOR_YELLOW, UI_RESET, table->difficulty);
 
     goto_ansi(start_x + 12, start_y + 11);
     printf("%s[ 확인 ]%s", UI_BOLD, UI_RESET);
@@ -147,7 +159,15 @@ void popup_show_difficulty_result(int sem, TimeTable *t) {
     }
 }
 
-StatusCodeEnum popup_input_difficulty(TimeTable* table, int student_id, int semester) {
+/**
+ * @brief 난이도 데이터 추가하는 창을 띄운다.
+ * 
+ * @param table 데이터에 추가할 시간표이다.
+ * @param semester 추가할 학기를 선택한다.(홤녀에 출력 시 필요하다.)
+ * 
+ * @return 살행결과를 StatusCodeEnum으로 반환한다.
+ */
+StatusCodeEnum popup_input_difficulty(TimeTable* table, int semester) {
     if (table == NULL) return ERROR_INVALID_INPUT;
 
     // 팝업 설정
@@ -275,7 +295,15 @@ StatusCodeEnum popup_input_difficulty(TimeTable* table, int student_id, int seme
 }
 
 
-// 출력 화면 그리기
+
+/**
+ * @brief 시간표 최종확인 후 시간표를 cmd창에 출력해준다.
+ * 
+ * @param user 시간표를 확인하는 사용자에 대응되는 User의 포인터이다.
+ * @param semester 추가할 학기를 선택한다.(홤녀에 출력 시 필)
+ * 
+ * @return 살행결과를 StatusCodeEnum으로 반환한다.
+ */
 void draw_output_view(User* user, int btn_idx) {
     system("cls");
 
@@ -391,7 +419,7 @@ int run_output(int student_id) {
                         } 
                         else { 
                             // [데이터 추가] 로직 (신규 팝업 호출)
-                            StatusCodeEnum status = popup_input_difficulty(t, student_id, selected_sem);
+                            StatusCodeEnum status = popup_input_difficulty(t, selected_sem);
                             if (status == ERROR_FILE_NOT_FOUND) {
                                 popup_show_message("오류", "파일 저장 경로에 접근할 수 없습니다.");
                             }

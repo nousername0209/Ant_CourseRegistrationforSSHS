@@ -1,4 +1,8 @@
-// 장민준 작업
+/*
+ 2025-11-26 장민준: subjects_stats.txt, subjects.txt, techtrees.txt 가상 데이터 작성 
+ 2025-11-25 이연지: tech_tree.c 파일 추가
+ 2025-11-23 장민준: tech_tree.h 함수 선언
+*/
 
 #include <string.h>
 #include <math.h>

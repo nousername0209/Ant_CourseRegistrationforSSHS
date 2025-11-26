@@ -1,4 +1,9 @@
-// 김주환 작업
+/*
+ 2025-11-25 이연지: calculator 파일 최종 정리 및 호환 점검
+ 2025-11-25 김주환: calculate_difficulty 수정, difficulty logic 중간 점검
+ 2025-11-24 김주환: calculator parameter 조정 및 최종 마감
+ 2025-11-22 김주환: calculator 1차 완성
+*/
 
 #include "../struct.h" 
 #include "calculator.h"

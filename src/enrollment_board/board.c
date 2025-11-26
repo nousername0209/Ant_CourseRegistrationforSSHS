@@ -1,4 +1,9 @@
-// 박주헌 작업
+/*
+ 2025-11-25 김주환: board Error code 2 수정
+ 2025-11-25 김주환: board에 일부 주석 작성
+ 2025-11-25 이연지: board 글씨 정렬
+ 2025-11-25 박주헌: board test main.c 정리
+*/
 
 #include <stdio.h>
 #include <stdlib.h>

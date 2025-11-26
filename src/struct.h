@@ -1,4 +1,8 @@
-// 공동 작업
+/*
+ 2025-11-26 김주환: StatusCodeEnum 통합, 구조체 정리
+ 2025-11-23 장민준: tech_tree 관련 구조체 다수 추가
+ 2025-11-22 김주환: struct.h 신규 파일 생성
+*/
 
 #ifndef STRUCT_H
 #define STRUCT_H

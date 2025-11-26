@@ -1,5 +1,3 @@
-// 이연지 작업
-
 #ifndef TECH_TREE_H
 #define TECH_TREE_H
 

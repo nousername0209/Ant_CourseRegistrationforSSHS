@@ -1,0 +1,107 @@
+1 Korean_I 3
+2 Korean_II 3
+3 Reading_I 2
+4 Reading_II 2
+5 Writing 3
+6 Literature 3
+7 Grammar 3
+8 Media_Language_Criticism 2
+9 Economics 2
+10 World_History_Special 2
+11 AngloAmerican_Culture_Exploration 2
+12 History_of_Art 2
+13 Design 2
+
+14 English_I 3
+15 English_Conversation_I 1
+16 English_II 3
+17 English_Conversation_II 1
+18 Communication 2
+19 English_Novel 3
+20 English_Writing 3
+21 Current_English 3
+22 English_Reading 3
+23 Advanced_Communication 3
+24 Chinese 3
+
+25 Politics_and_Law 3
+26 Korean_History 3
+27 Philosophy 3
+28 World_History 3
+29 World_Cultural_Geography 3
+
+30 Health_and_PE_I 1
+31 Health_and_PE_II 1
+32 Leisure_and_PE_I 1
+33 Leisure_and_PE_II 1
+34 Music_I 1
+35 Music_II 1
+36 Art_I 1
+37 Art_II 1
+
+38 Life_Sports 2
+39 Life_Music 2
+40 Life_Art 2
+
+41 Integrated_Science_Exploration 3
+42 Creative_Convergence_Seminar 2
+43 Science_Philosophy_Seminar 2
+
+44 Math_I 4
+45 Math_II 4
+46 Math_III 3
+47 Math_IV 4
+
+48 Probability_and_Statistics 4
+49 Calculus_I 4
+50 Calculus_II 4
+
+51 Number_Theory 3
+52 Linear_Algebra 3
+
+53 Physics_I 4
+54 Physics_II 3
+55 Chemistry_I 3
+56 Chemistry_II 4
+57 Biology_I 3
+58 Biology_II 3
+59 Earth_Science_I 3
+60 Earth_Science_II 3
+
+61 Physics_III 4
+62 Chemistry_III 4
+63 Biology_III 4
+64 Earth_Science_III 3
+65 Physics_IV 3
+66 Chemistry_IV 3
+67 Biology_IV 3
+
+68 Advanced_Physics_I 3
+69 Advanced_Physics_II 3
+70 Quantum_Mechanics 3
+71 Advanced_Chemistry_I 3
+72 Advanced_Chemistry_II 3
+73 Advanced_Biology_I 3
+74 Advanced_Biology_II 3
+75 Advanced_Earth_Science_I 3
+76 Advanced_Earth_Science_II 3
+77 Data_Structures 3
+78 Artificial_Intelligence 3
+
+79 Computer_Science_I 3
+80 Computer_Science_II 2
+81 Data_Science 2
+
+82 Computer_Science_Project 3
+83 Advanced_Programming 3
+
+84 Physics_Lab 2
+85 Chemistry_Lab 2
+86 Biology_Lab 2
+87 Earth_Science_Lab 2
+
+88 Advanced_Physics_Lab 2
+89 Advanced_Chemistry_Lab 2
+90 Advanced_Biology_Lab 2
+
+91 Robotics_Intro_Practice 2

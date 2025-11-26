@@ -30,7 +30,12 @@ int is_valid_difficulty_input(const char* buf) {
  * 
  * @return void
  */
-void draw_input_difficulty_popup(TimeTable* table, int semester, int total_difficulty_input, int subject_difficulties[], int current_idx, int box_w, int box_h, int start_x, int start_y) {
+void draw_input_difficulty_popup(TimeTable* table, int semester,
+                                int total_difficulty_input,
+                                int subject_difficulties[],
+                                int current_idx,
+                                int box_w, int box_h,
+                                int start_x, int start_y) {
     system("cls");
     int cursor_y;
 

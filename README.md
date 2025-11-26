@@ -4,7 +4,9 @@ We make advice program for sshs who needs help with the course registration.
 
 만약 당신이 Mac을 사용하신다면 해당 프로그램을 사용할 수 없습니다 ㅠㅠ
 
-만약 당신이 Windows 11을 쓴다면 5행으로 넘어가세요
+만약 당신이 Windows 11을 쓴다면 실행방법으로 넘어가세요
+
+만약 Window 10이라면?
 설정 -> 검색 -> 터미널 설정 -> 터미널 옆의 아래꺽새 눌러서 펼치기 -> Windows 콘솔 호스트 선택
 
 실행 방법

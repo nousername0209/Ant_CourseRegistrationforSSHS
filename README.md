@@ -17,3 +17,6 @@ We make advice program for sshs who needs help with the course registration.
 5. 터미널에 "main"을 입력하여 C 파일을 실행하세요!
 
 해당 지시사항을 다 따르고 화면 UI가 정상적이지 않은 것 같다면 Windows 11로 업데이트해보세요
+
+
+만약 로그를 보다가 한글이 깨진다면 인코딩을 UTF-8이 아니라 EUC-KR로 바꿔주세요

@@ -1,3 +1,5 @@
+/* modified by 장민준 on 2025.11.26. tech_tree에서 사용되는 매크로 상수와 
+구조체(SubjectStats, SubjectInfo, TreeSubject, TechTree, StudentScore) 정의 */
 #ifndef STRUCT_H
 #define STRUCT_H
 

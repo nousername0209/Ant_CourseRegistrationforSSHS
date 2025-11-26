@@ -505,7 +505,8 @@ StatusCodeEnum rank_techtrees(const TechTree *trees,
  * @param box_w, box_h, start_x, start_y 팝업 박스 위치/크기
  * * @return void
  */
-void draw_score_input_popup(TimeTable* t, double raw_scores[], int current_idx, int scroll_offset, int box_w, int box_h, int start_x, int start_y) {
+void draw_score_input_popup(TimeTable* t, double raw_scores[], int current_idx,
+    int scroll_offset, int box_w, int box_h, int start_x, int start_y) {
     if (t == NULL) return;
 
     // 팝업 박스 그리기 (기존 코드가 없으므로 생략하고 내용만 그립니다)
@@ -744,7 +745,7 @@ StatusCodeEnum run_score_input_system(User* user,
     }
 
     if (temp_table.n == 0) {
-        popup_show_message("정보", "현재 학기 이전까지 이수한 과목이\n없습니다.");
+        popup_show_message("정보", "현재 학기 이전까지 이수한 과목이 없습니다.");
         return SUCCESS;
     }
 
@@ -782,13 +783,13 @@ StatusCodeEnum run_score_input_system(User* user,
                 scores[*score_count].raw_score = score;
                 (*score_count)++;
             } else {
-                popup_show_message("오류", "성적 배열이 가득 찼습니다. 일부 데\n이터는 저장되지 않습니다.");
+                popup_show_message("오류", "성적 배열이 가득 찼습니다.");
                 break;
             }
         }
     }
 
-    popup_show_message("성공", "성적 입력이 완료되고 데이터가 저장되\n었습니다.");
+    popup_show_message("성공", "성적 입력이 완료되었습니다.");
     return SUCCESS;
 }
 

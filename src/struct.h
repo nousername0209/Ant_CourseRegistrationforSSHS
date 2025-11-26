@@ -80,9 +80,6 @@ static inline void print_center(const char* title, int len, int y_pos) {
 /* 한 과목에 저장 가능한 성적 통계(연도/학기별) 최대 개수 */
 #define MAX_SUBJECT_STATS      16
 
-/* 전체 과목 최대 개수 */
-#define MAX_SUBJECTS           128
-
 /* 한 테크트리에 들어갈 수 있는 과목 최대 개수 */
 #define MAX_TREE_SUBJECTS      32
 
@@ -225,7 +222,9 @@ typedef enum {
     ERROR_INVALID_INPUT,
     ERROR_INDEX_OUT,
     ERROR_MEMORY_ALLOC,
-    STATUS_ERROR_PARSE          /* 텍스트 파싱 실패 */
+    STATUS_ERROR_PARSE,
+    ERROR_CANCEL,
+    ERROR_DEBUG        /* 텍스트 파싱 실패 */
 } StatusCodeEnum;
 
 typedef enum _Select {ID_FIELD, LOGIN_BUTTON} SelectEnum;

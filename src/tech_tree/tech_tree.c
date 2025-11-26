@@ -3,12 +3,12 @@
 
 #include "tech_tree.h"
 
-#define SUBJECT_FILE   "../dataset/tech_tree/subjects.dat"
-#define SCORE_FILE     "../dataset/tech_tree/scores.txt"
-#define TREE_FILE      "../dataset/tech_tree/techtrees.txt"
-#define STATS_FILE     "../dataset/tech_tree/subject_stats.txt"
+#define SUBJECT_FILE   "./dataset/tech_tree/subjects.txt"
+#define SCORE_FILE     "./dataset/tech_tree/scores.txt"
+#define TREE_FILE      "./dataset/tech_tree/techtrees.txt"
+#define STATS_FILE     "./dataset/tech_tree/subject_stats.txt"
 
-static SubjectInfo  g_subjects[MAX_SUBJECTS];
+static SubjectInfo  g_subjects[MAX_SUBJECT_NUM];
 static int          g_subject_count = 0;
 
 static StudentScore g_scores[MAX_SCORES];
@@ -24,26 +24,15 @@ static double normal_cdf(double x)
 }
 
 /* 수정 가능한 SubjectInfo 포인터를 찾기 위한 내부 함수 */
-static SubjectInfo *find_subject_mutable(SubjectInfo *subjects,
-                                         int subject_count,
-                                         int subject_id)
-{
-    for (int i = 0; i < subject_count; i++) {
-        if (subjects[i].id == subject_id) {
-            return &subjects[i];
-        }
-    }
-    return NULL;
-}
 
-const SubjectInfo *find_subject_by_id(const SubjectInfo *subjects,
+const SubjectInfo *find_subject_by_id(SubjectInfo *subjects,
                                       int subject_count,
-                                      int subject_id)
-{
+                                      int subject_id) {
     if (subjects == NULL || subject_count < 0) {
         return NULL;
     }
 
+
     for (int i = 0; i < subject_count; i++) {
         if (subjects[i].id == subject_id) {
             return &subjects[i];
@@ -51,11 +40,10 @@ const SubjectInfo *find_subject_by_id(const SubjectInfo *subjects,
     }
     return NULL;
 }
-
+ 
 const SubjectStats *find_subject_stats(const SubjectInfo *subject,
                                        int year,
-                                       int semester)
-{
+                                       int semester) {
     if (subject == NULL) {
         return NULL;
     }
@@ -72,13 +60,15 @@ const SubjectStats *find_subject_stats(const SubjectInfo *subject,
 StatusCodeEnum load_subjects_from_text(const char *path,
                                    SubjectInfo *subjects,
                                    int max_subjects,
-                                   int *out_count)
-{
+                                   int *out_count) {
     if (path == NULL || subjects == NULL || out_count == NULL) {
-        return ERROR_INVALID_INPUT;
+        if (path == NULL) return ERROR_INVALID_INPUT;
+        else if (subjects == NULL) return ERROR_DEBUG;
+        else return ERROR_DEBUG;
     }
+
     if (max_subjects <= 0) {
-        return ERROR_INVALID_INPUT;
+        return ERROR_DEBUG;
     }
 
     FILE *fp = fopen(path, "r");
@@ -94,7 +84,7 @@ StatusCodeEnum load_subjects_from_text(const char *path,
         int credit;
 
         /* 한 줄에서 id, name, credit을 읽어 온다. */
-        int scanned = fscanf(fp, "%d %63s %d", &id, name, &credit);
+        int scanned = fscanf(fp, "%d|%[^|]|%d", &id, name, &credit);
         if (scanned == EOF || scanned == 0) {
             break;
         }
@@ -128,8 +118,7 @@ StatusCodeEnum load_subjects_from_text(const char *path,
 
 StatusCodeEnum load_subject_stats_from_text(const char *path,
                                         SubjectInfo *subjects,
-                                        int subject_count)
-{
+                                        int subject_count) {
     if (path == NULL || subjects == NULL) {
         return ERROR_INVALID_INPUT;
     }
@@ -160,7 +149,7 @@ StatusCodeEnum load_subject_stats_from_text(const char *path,
             return STATUS_ERROR_PARSE;
         }
 
-        SubjectInfo *subj = find_subject_mutable(subjects,
+        SubjectInfo *subj = find_subject_by_id(subjects,
                                                  subject_count,
                                                  subject_id);
         if (subj == NULL) {
@@ -290,78 +279,12 @@ StatusCodeEnum load_techtrees_from_text(const char *path, TechTree *trees,
     return SUCCESS;
 }
 
-/**
- * @brief 사용자 성적 데이터를 파일에서 로드한다.
- * * 파일 형식 (각 줄): <subject_id> <year> <semester> <raw_score>
- */
-StatusCodeEnum load_student_scores_from_text(StudentScore *scores,
-                                             int max_scores,
-                                             int *inout_score_count,
-                                             int user_id,
-                                             const SubjectInfo *subjects,
-                                             int subject_count)
-{
-    char filepath[STR_LENGTH * 2];
-    get_score_filename(user_id, filepath);
-    
-    FILE *fp = fopen(filepath, "r");
-    if (fp == NULL) {
-        // 파일이 없을 경우 (초기 사용자), 오류가 아닌 성공으로 간주하고 count=0 반환
-        *inout_score_count = 0;
-        return SUCCESS; 
-    }
-
-    int subject_id, year, semester;
-    double raw_score;
-    char line[LINE_LENGTH];
-    StatusCodeEnum status = SUCCESS;
-
-    *inout_score_count = 0; // 로드 시작 전 카운트 초기화
-
-    while (fgets(line, sizeof(line), fp)) {
-        // 빈 줄 무시
-        if (line[0] == '\n' || line[0] == '\r' || line[0] == '\0') continue;
-
-        // <subject_id> <year> <semester> <raw_score> 형식으로 파싱
-        if (sscanf(line, "%d %d %d %lf", &subject_id, &year, &semester, &raw_score) == 4) {
-            
-            // 배열 크기 초과 확인
-            if (*inout_score_count >= max_scores) {
-                status = ERROR_INDEX_OUT; // 용량 초과 경고
-                break; 
-            }
-
-            // 기존에 구현된 add_student_score 함수를 사용하여 성적 추가 및 Z-score/Percentile 계산
-            StatusCodeEnum add_status = add_student_score(scores, max_scores, inout_score_count, 
-                                                            user_id, subject_id, 
-                                                            year, semester, 
-                                                            raw_score, 
-                                                            subjects, subject_count);
-            
-            // 성적 추가 로직이 실패하면 해당 줄은 무시하고 다음 줄로 진행
-            if (add_status != SUCCESS) {
-                // 로드 중 데이터 문제 발생 (예: 과목 ID를 찾을 수 없음, 통계 데이터 부족)
-                fprintf(stderr, "경고: 성적 로드 중 문제 발생 (User:%d, Subject:%d, Code:%d). 해당 성적 무시.\n", 
-                        user_id, subject_id, add_status);
-                // inout_score_count는 add_student_score 내에서 증가하지 않았을 것임.
-            }
-        } else {
-            // 파일 형식 오류
-            fprintf(stderr, "경고: 성적 파일 형식 오류 발생. 해당 줄 무시: %s", line);
-        }
-    }
-
-    fclose(fp);
-    return status;
-}
-
 StatusCodeEnum compute_z_and_percentile(const SubjectInfo *subject,
                                     int year,
                                     int semester,
                                     double raw_score,
                                     double *out_z,
-                                    double *out_percentile_top)
-{
+                                    double *out_percentile_top) {
     if (subject == NULL || out_z == NULL || out_percentile_top == NULL) {
         return ERROR_INVALID_INPUT;
     }
@@ -397,8 +320,7 @@ StatusCodeEnum add_student_score(StudentScore *scores,
                              int semester,
                              double raw_score,
                              const SubjectInfo *subjects,
-                             int subject_count)
-{
+                             int subject_count) {
     if (scores == NULL || inout_count == NULL || subjects == NULL) {
         return ERROR_INVALID_INPUT;
     }
@@ -441,13 +363,10 @@ StatusCodeEnum add_student_score(StudentScore *scores,
     return SUCCESS;
 }
 
-/* 특정 학생이 특정 과목에서 기록한 성적들 중
- * 가장 좋은(가장 작은) 상위 퍼센트를 찾는다. */
 static double find_best_percentile_for_subject(const StudentScore *scores,
                                                int score_count,
                                                int user_id,
-                                               int subject_id)
-{
+                                               int subject_id) {    
     double best = -1.0;
 
     for (int i = 0; i < score_count; i++) {
@@ -468,6 +387,7 @@ static double find_best_percentile_for_subject(const StudentScore *scores,
     return best;
 }
 
+
 StatusCodeEnum rank_techtrees(const TechTree *trees,
                           int tree_count,
                           const StudentScore *scores,
@@ -476,8 +396,7 @@ StatusCodeEnum rank_techtrees(const TechTree *trees,
                           int *out_indices,
                           double *out_scores,
                           int max_out,
-                          int *out_returned)
-{
+                          int *out_returned) {
     if (trees == NULL || scores == NULL || out_indices == NULL || out_returned == NULL) {
         return ERROR_INVALID_INPUT;
     }
@@ -567,192 +486,274 @@ StatusCodeEnum rank_techtrees(const TechTree *trees,
     return SUCCESS;
 }
 
-static StatusCodeEnum popup_enter_grade(Subject **subjects_to_enter,
-                                        int count,
-                                        User *user,
-                                        SubjectInfo *subjects,
-                                        int subject_count,
-                                        StudentScore *scores,
-                                        int max_scores,
-                                        int *inout_score_count) {
-    if (count <= 0) return SUCCESS;
+StatusCodeEnum save_scores(const StudentScore *scores, int score_count) {
+    FILE * fp = fopen(SCORE_FILE, "wb");
+    fwrite(&score_count, sizeof(int), 1, fp);
+    fwrite(scores, sizeof(StudentScore), score_count, fp);
+    fclose(fp);
+}
 
-    int selected_idx = 0;
-    int box_w = 40;
-    int box_h = count + 6;
-    int start_x = (CONSOLE_WIDTH - box_w) / 2;
-    int start_y = 5;
-    int ch;
-
-    // 배경 그리기
-    for(int i=0; i<box_h; i++) {
-        goto_ansi(start_x, start_y + i);
-        printf("%s%*s%s", UI_REVERSE, box_w, "", UI_RESET); 
+StatusCodeEnum load_scores(StudentScore *scores, int max_scores, int *out_count) {
+    FILE * fp = fopen(SCORE_FILE, "rb");
+    if (fp == NULL) {
+        *out_count = 0;
+        return ERROR_FILE_NOT_FOUND;
     }
-
-    while(1) {
-        // 제목
-        goto_ansi(start_x + 2, start_y + 1);
-        printf("%s 성적 입력 과목 선택 %s", UI_BOLD, UI_RESET); 
-
-        // 과목 목록
-        for(int i=0; i<count; i++) {
-            Subject *s = subjects_to_enter[i];
-            goto_ansi(start_x + 2, start_y + 3 + i);
-            
-            char display_text[STR_LENGTH];
-            sprintf(display_text, "%s (%d학점, %d학기)", s->name, s->credit, s->semester);
-
-            if (i == selected_idx) {
-                printf("%s%s > %s %s", UI_REVERSE, UI_COLOR_YELLOW, display_text, UI_RESET);
-            } else {
-                printf("%s   %s %s", UI_REVERSE, display_text, UI_RESET);
-            }
-        }
-        
-        // 안내
-        goto_ansi(start_x + 2, start_y + box_h - 2);
-        printf("선택: ENTER, 취소: ESC");
-
-        goto_ansi(1, 1);
-        ch = getch(); // struct.h의 getch() 사용
-
-        if (ch == 224 || ch == 0) {
-            ch = getch();
-            if (ch == UP_ARROW && selected_idx > 0) selected_idx--;
-            if (ch == DOWN_ARROW && selected_idx < count - 1) selected_idx++;
-        }
-        else if (ch == ENTER) {
-            Subject *selected_subj = subjects_to_enter[selected_idx];
-            
-            // 팝업 지우기
-            for(int i=0; i<box_h; i++) {
-                goto_ansi(start_x, start_y + i);
-                printf("%*s", box_w, ""); 
-            }
-
-            double raw_score = 0.0;
-            
-            // 성적 입력 프롬프트
-            goto_ansi(start_x, start_y);
-            printf("%s%*s%s", UI_REVERSE, box_w, "", UI_RESET);
-            goto_ansi(start_x + 2, start_y + 1);
-            printf("%s %s 점수 입력 (0.0~100.0): %s", UI_BOLD, selected_subj->name, UI_RESET); 
-            goto_ansi(start_x + 2, start_y + 2);
-            printf("> Raw Score: ");
-            
-            // TUI 환경에서 입력 단순화
-            scanf("%lf", &raw_score); 
-            
-            // 성적 추가 또는 수정
-            int year = 2024; // 임시 연도 설정
-            StatusCodeEnum status;
-            
-            // 기존 성적 확인
-            int found_index = -1;
-            for (int i = 0; i < *inout_score_count; i++) {
-                if (scores[i].user_id == user->id && scores[i].subject_id == selected_subj->id) {
-                    found_index = i; // 같은 과목 ID가 있는 경우 찾음
-                    break;
-                }
-            }
-            
-            if (found_index != -1) {
-                // 이미 성적이 있으면 수정
-                scores[found_index].raw_score = raw_score;
-                const SubjectInfo *info = find_subject_by_id(subjects, subject_count, selected_subj->id);
-                if (info != NULL) {
-                    status = compute_z_and_percentile(info, year, selected_subj->semester, 
-                                                      raw_score, 
-                                                      &scores[found_index].z_score, 
-                                                      &scores[found_index].percentile_top);
-                } else {
-                    status = ERROR_FILE_NOT_FOUND;
-                }
-            } else {
-                // 새 성적 추가
-                status = add_student_score(scores, max_scores, inout_score_count, 
-                                           user->id, selected_subj->id, 
-                                           year, selected_subj->semester, 
-                                           raw_score, 
-                                           subjects, subject_count);
-            }
-            
-            // 결과 메시지 표시
-            goto_ansi(start_x, start_y);
-            printf("%*s", box_w, "");
-            goto_ansi(start_x + 2, start_y + 1);
-            printf("%*s", box_w - 4, "");
-            goto_ansi(start_x + 2, start_y + 2);
-            printf("%*s", box_w - 4, "");
-            
-            goto_ansi(start_x + 2, start_y + 1);
-            if (status == SUCCESS) {
-                printf("%s%s 성적 입력 완료. %s", UI_COLOR_GREEN, selected_subj->name, UI_RESET);
-            } else {
-                printf("%s성적 입력 오류 (Code: %d)%s", UI_COLOR_YELLOW, status, UI_RESET);
-            }
-            getch(); // 확인 대기
-            
-            // 다시 목록 팝업 그리기
-            for(int i=0; i<box_h; i++) {
-                goto_ansi(start_x, start_y + i);
-                printf("%s%*s%s", UI_REVERSE, box_w, "", UI_RESET); 
-            }
-        }
-        else if (ch == ESC) {
-            // 팝업 지우기
-            for(int i=0; i<box_h; i++) {
-                goto_ansi(start_x, start_y + i);
-                printf("%*s", box_w, ""); 
-            }
-            return SUCCESS;
-        }
+    int score_count = 0;
+    fread(&score_count, sizeof(int), 1, fp);
+    if (score_count > max_scores) {
+        fclose(fp);
+        *out_count = 0;
+        return ERROR_INDEX_OUT;
     }
+    fread(scores, sizeof(StudentScore), score_count, fp);
+    fclose(fp);
+    *out_count = score_count;
+    return SUCCESS;
 }
 
 
-/* ==========================================================
- * Tech Tree 메인 UI 함수
- * ========================================================== */
+/**
+ * @brief 주어진 시간표(TimeTable)의 과목들에 대해 원점수(raw_score)를 입력받는 팝업 UI를 그린다.
+ * * 이 함수는 output.c의 popup_input_difficulty 함수와 유사하게 작동하도록 구현.
+ * * @param t               성적을 입력할 과목 목록 (TimeTable)
+ * @param raw_scores      입력된 원점수(0~100)를 저장할 배열
+ * @param current_idx     현재 선택된 입력 필드 인덱스 (0~n-1: 과목 인덱스)
+ * @param box_w, box_h, start_x, start_y 팝업 박스 위치/크기
+ * * @return void
+ */
+void draw_score_input_popup(TimeTable* t, double raw_scores[], int current_idx, int box_w, int box_h, int start_x, int start_y) {
+    if (t == NULL) return;
 
-StatusCodeEnum run_grade_input_ui(User *user,
-                                SubjectInfo *subjects,
-                                int subject_count,
-                                StudentScore *scores,
-                                int max_scores,
-                                int *inout_score_count) {
-    // 이수한 과목 목록을 수집 (user->current_sem까지의 학기)
-    Subject *taken_subjects[SEMESTER_NUM * MAX_SUBJECT_NUM];
-    int count = 0;
+    // 과목 목록과 입력 필드 표시
+    for (int i = 0; i < t->n; i++) {
+        Subject* s = t->subjects[i];
+        int y_pos = start_y + 3 + i * 2;
+        
+        // 과목 이름
+        goto_ansi(start_x + 2, y_pos);
+        printf("%-25s", s->name);
 
-    for (int sem_idx = 0; sem_idx < user->current_sem; sem_idx++) {
-        TimeTable *t = user->table[sem_idx];
-        if (t != NULL) {
-            for (int i = 0; i < t->n; i++) {
-                if (count < SEMESTER_NUM * MAX_SUBJECT_NUM) {
-                    taken_subjects[count++] = t->subjects[i];
-                }
-            }
+        // 원점수 입력 필드
+        goto_ansi(start_x + 30, y_pos);
+        if (i == current_idx) {
+            printf(UI_REVERSE "  %.1f  " UI_RESET, raw_scores[i]);
+        } else {
+            printf("  %.1f  ", raw_scores[i]);
         }
     }
-
-    if (count == 0) {
-        goto_ansi(START_X, START_Y + 10);
-        printf("%s%s이수한 과목이 없습니다.%s", UI_COLOR_YELLOW, UI_BOLD, UI_RESET);
-        getch();
-        return SUCCESS;
-    }
     
-    // 성적 입력 팝업 호출
-    return popup_enter_grade(taken_subjects, count, 
-                             user, subjects, subject_count,
-                             scores, max_scores, inout_score_count);
+    // 버튼 그리기
+    int btn_y = start_y + box_h - 3;
+    goto_ansi(start_x + box_w / 2 - 4, btn_y);
+    printf(UI_COLOR_GREEN " [ 저장 ] " UI_RESET);
 }
 
 /**
- * @brief 계산된 테크트리 점수 순위를 화면에 표시하는 UI를 제공한다.
+ * @brief 난이도 입력 값이 유효한지 검사한다 (0~100 사이 실수)
+ * * @param buf 입력 문자열
+ * * @return int 유효하면 1, 아니면 0 반환
  */
+int is_valid_score_input(const char* buf) {
+    int val;
+    // 입력 버퍼가 비어있지 않고, 숫자로 시작하며, 소수점 이하 첫째 자리까지만 유효하도록 간소화
+    if (sscanf(buf, "%d", &val) != 1) {
+        return 0; // 숫자로 파싱 실패
+    }
+    // 0.0 이상 100.0 이하인지 확인
+    return (val >= 0 && val <= 1000);
+}
+
+/**
+ * @brief 성적 입력 팝업 UI를 실행하고 입력된 데이터를 반환한다.
+ * * @param t               성적을 입력할 과목 목록 (TimeTable)
+ * @param raw_scores      입력된 원점수(0~100)를 저장할 배열
+ * * @return StatusCodeEnum 성공 시 SUCCESS, 취소 시 ERROR_CANCEL
+ */
+StatusCodeEnum popup_input_scores(TimeTable* t, double raw_scores[], int user_id, int year, int semester) {
+    if (t == NULL || t->n == 0) return SUCCESS;
+
+    const int box_w = 40;
+    const int box_h = 6 + t->n * 2;
+    const int start_x = (80 - box_w) / 2;
+    const int start_y = (30 - box_h) / 2;
+    
+    int current_idx = 0; // 0 ~ t->n - 1
+    char input_buf[STR_LENGTH] = "";
+
+    // 초기 성적 값은 모두 0.0으로 설정
+    for (int i = 0; i < t->n; i++) {
+        raw_scores[i] = 0.0;
+    }
+
+    while (1) {
+        system("cls");
+        draw_score_input_popup(t, raw_scores, current_idx, box_w, box_h, start_x, start_y);
+
+        // 현재 선택된 입력 필드의 위치
+        int x_pos = start_x + 32;
+        int y_pos = start_y + 3 + current_idx * 2;
+        
+        // 입력 필드에 커서 위치시키기
+        goto_ansi(x_pos, y_pos);
+
+        // 입력 처리
+        int ch = getch();
+
+        if (ch == ENTER) {
+            // 저장 버튼을 누른 경우 (마지막 과목에서 ENTER)
+            if (current_idx == t->n) {
+                add_student_score(g_scores, MAX_SCORES, &g_score_count,
+                                  user_id, // user_id는 나중에 채워짐
+                                  t->subjects[0]->id, // subject_id는 나중에 채워짐
+                                  year, // year는 나중에 채워짐
+                                  semester, // semester는 나중에 채워짐
+                                  raw_scores[0], // raw_score는 나중에 채워짐
+                                  g_subjects,
+                                  g_subject_count);
+                return SUCCESS;
+            }
+            // 다음 필드로 이동
+            current_idx++;
+            if (current_idx > t->n) current_idx = t->n; // t->n은 저장 버튼 인덱스
+        } 
+        else if (ch == ESC) {
+            return ERROR_CANCEL; // 취소
+        } 
+        else if (ch == UP_ARROW) {
+            if (current_idx > 0) current_idx--;
+        } 
+        else if (ch == DOWN_ARROW) {
+            if (current_idx < t->n) current_idx++;
+        } 
+        else {
+            // 성적 입력 처리
+            int max_len = 5; // 예: 100.0
+            
+            // 현재 입력 필드의 값으로 input_buf 초기화
+            int current_score_times10 = (int)(raw_scores[current_idx]*10+0.1);
+            sprintf(input_buf, "%d", current_score_times10);
+            
+            if (ch == BACKSPACE) {
+                if (strlen(input_buf) > 1) {
+                    input_buf[strlen(input_buf) - 1] = '\0';
+                } else if (strlen(input_buf) == 1) {
+                    input_buf[0] = '0'; input_buf[1] = '\0';
+                }
+            } else if (ch >= '0' && ch <= '9') {
+                if (strlen(input_buf) < max_len) {
+                    char temp[2] = {(char)ch, '\0'};
+                    strcat(input_buf, temp);
+                }
+            }
+
+            // 유효성 검사 및 값 업데이트
+            if (is_valid_score_input(input_buf)) {
+                current_score_times10 = atoi(input_buf);
+                raw_scores[current_idx] = (float)current_score_times10 /10.0f;
+            }
+        }
+
+        if (current_idx == t->n) {
+            // 마지막 인덱스는 "저장" 버튼
+            goto_ansi(start_x + box_w / 2 - 4, start_y + box_h - 3);
+            printf(UI_REVERSE UI_COLOR_GREEN " [ 저장 ] " UI_RESET);
+        }
+    }
+}
+
+/**
+ * @brief 성적 입력 및 저장 시스템을 실행한다.
+ * * user.current_sem - 1 학기까지의 이수 과목에 대해
+ * raw_score(원점수)를 입력받아 StudentScore 구조체에 저장하고 파일에 추가한다.
+ * * @param user          사용자 정보 구조체 (이수 과목 정보 포함)
+ * @param scores        성적 배열의 포인터
+ * @param score_count   성적 개수의 포인터
+ * @param max_scores    성적 배열의 최대 크기
+ * @param student_id    대상 학생 ID
+ * * @return StatusCodeEnum 성공 시 SUCCESS, 실패 시 오류 코드
+ */
+StatusCodeEnum run_score_input_system(User* user, 
+                                        StudentScore *scores, 
+                                        int *score_count, 
+                                        int max_scores, 
+                                        int student_id) 
+{
+    // 마지막 학기를 제외한 기이수 학기 수 (1학기부터 user->current_sem - 1 학기까지)
+    int end_sem_idx = user->current_sem - 1; 
+
+    // 모든 학기의 과목을 담을 임시 리스트
+    TimeTable temp_table = {0};
+
+    // 1. 성적 입력 대상 과목 수집 (1학기부터 end_sem_idx 학기까지)
+    for (int sem_idx = 0; sem_idx < end_sem_idx && sem_idx < SEMESTER_NUM; sem_idx++) {
+        TimeTable* t = user->table[sem_idx];
+        if (t != NULL) {
+            for (int i = 0; i < t->n; i++) {
+                Subject* s = t->subjects[i];
+                if (s != NULL && temp_table.n < MAX_SUBJECT_NUM) {
+                    temp_table.subjects[temp_table.n++] = s;
+                }
+            }
+        }
+    }
+
+    if (temp_table.n == 0) {
+        popup_show_message("정보", "현재 학기 이전까지 이수한 과목이 없습니다.");
+        return SUCCESS;
+    }
+
+    // 2. 성적 입력
+    double raw_scores[MAX_SUBJECT_NUM] = {0.0};
+    StatusCodeEnum status = popup_input_scores(&temp_table, raw_scores, year, semester, student_id);
+
+    if (status == ERROR_CANCEL) {
+        return ERROR_CANCEL;
+    }
+
+    // 3. 입력된 성적을 StudentScore 배열에 추가
+    for (int i = 0; i < temp_table.n; i++) {
+        Subject* s = temp_table.subjects[i];
+        double score = raw_scores[i];
+        
+        // 기존 성적 데이터 중복 체크 및 업데이트 (만약 이미 성적이 있다면)
+        int found = 0;
+        for (int j = 0; j < *score_count; j++) {
+            if (scores[j].user_id == student_id && scores[j].subject_id == s->id) {
+                // 이미 성적 데이터가 있으면 업데이트 (가장 최근 입력된 점수로)
+                scores[j].raw_score = score;
+                found = 1;
+                break;
+            }
+        }
+
+        // 새로운 성적 데이터 추가
+        if (!found) {
+            if (*score_count < max_scores) {
+                scores[*score_count].user_id = student_id;
+                scores[*score_count].subject_id = s->id;
+                scores[*score_count].year = 0; // 성적 입력 시스템에서는 년도/학기 정보는 사용 안함
+                scores[*score_count].semester = 0; 
+                scores[*score_count].raw_score = score;
+                (*score_count)++;
+            } else {
+                popup_show_message("오류", "성적 배열이 가득 찼습니다. 일부 데이터는 저장되지 않습니다.");
+                break;
+            }
+        }
+    }
+    
+    // 4. StudentScore 데이터를 파일에 저장
+    status = save_scores(scores, *score_count);
+    if (status != SUCCESS) {
+        popup_show_message("오류", "성적 데이터 파일 저장 실패.");
+        return status;
+    }
+
+    popup_show_message("성공", "성적 입력이 완료되고 데이터가 저장되었습니다.");
+    return SUCCESS;
+}
+
 StatusCodeEnum run_recommendation_ui(const TechTree *trees,
                                    int tree_count,
                                    const StudentScore *scores,
@@ -766,7 +767,7 @@ StatusCodeEnum run_recommendation_ui(const TechTree *trees,
     int returned_count;
 
     // 1. 테크트리 점수 계산 및 순위 정렬 (제공된 내부 함수 사용)
-    StatusCodeEnum status = compute_tech_tree_scores(
+    StatusCodeEnum status = rank_techtrees(
         trees, tree_count, 
         scores, score_count, 
         user_id, 
@@ -870,85 +871,72 @@ StatusCodeEnum run_recommendation_ui(const TechTree *trees,
 }
 
 /**
- * @brief 사용자 ID를 받아 테크트리 시스템의 전체 로직 (성적 입력 및 추천 UI)을 실행한다.
+ * @brief 테크트리 시스템의 메인 함수. 성적 입력, 계산, 출력을 수행한다.
+ * * @param student_id 대상 학생 ID
  */
-StatusCodeEnum run_tech_tree_system(int user_id) {
+void run_tech_tree(int student_id) {
     User user = {0};
-    int is_first = 0; // 사용자 데이터 파일이 없는 경우
-    
-    SubjectInfo *subjects = NULL;
-    int subject_count = 0;
-    
-    TechTree *trees = NULL;
-    int tree_count = 0;
-    
-    // 학생 성적은 동적 배열로 관리
-    StudentScore *scores = NULL;
-    int score_count = 0;
-    int max_scores = MAX_SCORES;
-    
-    StatusCodeEnum status = SUCCESS;
+    int is_first = 0;
 
-    // 1. 사용자 데이터 로드 (struct.h의 함수 사용)
-    // NOTE: load_user_data는 과목 트리가 로드된 후 실행되어야 하지만,
-    // 이 예시에서는 User struct에 timetable만 로드한다고 가정하고 진행.
-    // TUI 메인에서 과목 트리를 로드하는 것이 일반적이지만, 여기서는 생략하고
-    // user.table에 이수한 과목 목록이 로드되었다고 가정함.
-    load_user_data(&user, user_id, &is_first);
-    user.id = user_id;
-    
-    // 2. 과목 정보 및 통계 로드
-    status = load_subjects_from_text(SUBJECT_FILE, subjects, MAX_SUBJECT_NUM, &subject_count);
-    status = load_subject_stats_from_text(STATS_FILE, subjects, subject_count);
+    // 1. 사용자 이수 과목 데이터 로드 (input.c의 함수 사용)
+    load_user_data(&user, student_id, &is_first);
+    if (user.id == 0) {
+        // load_user_data가 실패했거나 사용자 데이터가 없음
+        popup_show_message("오류", "사용자 과목 데이터 로드 실패.");
+        return;
+    }
+
+    // 2. 과목/통계/테크트리 정보 로드
+    StatusCodeEnum status = load_subjects_from_text(SUBJECT_FILE, g_subjects, MAX_SUBJECT_NUM, &g_subject_count);
     if (status != SUCCESS) {
+        goto_ansi(0, 0);
         printf("ERROR: 과목 데이터 로드 실패 (Code: %d)\n", status);
-        goto cleanup;
+        popup_show_message("오류", "테크트리 시스템 초기화 실패: 과목 데이터 로드 실패.");
+        return;
     }
     
-    // 3. 테크트리 정보 로드 (tech_tree.c의 함수 사용)
-    // load_techtrees_from_text 함수가 TechTree 배열과 그 크기를 반환하도록 가정
-    status = load_techtrees_from_text(TREE_FILE, trees, MAX_TECH_TREES, &tree_count);
+    status = load_subject_stats_from_text(STATS_FILE, g_subjects, g_subject_count);
+    if (status != SUCCESS) {
+        printf("ERROR: 과목 통계 로드 실패 (Code: %d)\n", status);
+        // 통계 데이터 없어도 시스템 진행 가능하도록 오류 메시지만 표시
+        popup_show_message("경고", "과목 통계 데이터 로드 실패. 일부 계산이 정확하지 않을 수 있습니다.");
+    }
+    
+    status = load_techtrees_from_text(TREE_FILE, g_trees, MAX_TECH_TREES, &g_tree_count);
     if (status != SUCCESS) {
         printf("ERROR: 테크트리 로드 실패 (Code: %d)\n", status);
-        goto cleanup;
+        popup_show_message("오류", "테크트리 시스템 초기화 실패: 테크트리 정보 로드 실패.");
+        return;
     }
 
-    // 4. 기존 성적 로드 (선택 사항: 파일에서 기존 성적 로드하는 함수가 있다고 가정)
-    // status = load_student_scores_from_text(&scores, &score_count, &max_scores, user_id);
-    // 이 예시에서는 성적 파일 로드 함수는 구현하지 않고, 초기 성적 배열만 생성.
-    scores = (StudentScore*)calloc(MAX_SCORES, sizeof(StudentScore));
-    if (scores == NULL) {
-        status = ERROR_MEMORY_ALLOC;
-        goto cleanup;
-    }
-
-    // 5. 성적 입력 UI 실행
-    // draw_screen 등을 호출하여 메인 화면을 먼저 그린 후 팝업을 띄우는 것이 좋으나,
-    // 여기서는 간단히 팝업만 띄우는 run_grade_input_ui를 호출합니다.
-    system("cls || clear");
-    goto_ansi(1, 1);
-    printf("%s[1. 성적 입력 단계]%s\n", UI_BOLD, UI_RESET);
-    run_grade_input_ui(&user, subjects, subject_count, scores, max_scores, &score_count);
-
-    // 6. 테크트리 추천 UI 실행
-    system("cls || clear");
-    goto_ansi(1, 1);
-    printf("%s[2. 테크트리 추천 단계]%s\n", UI_BOLD, UI_RESET);
-    run_recommendation_ui(trees, tree_count, (const StudentScore*)scores, score_count, 
-                          (const SubjectInfo*)subjects, subject_count, user_id);
-
-    // 7. 성적 데이터 저장 (선택 사항: 성적을 파일에 저장하는 함수가 있다고 가정)
-    // save_student_scores_to_text(scores, score_count, user_id);
-
-cleanup:
-    // 메모리 해제
-    if (subjects) free(subjects);
-    if (trees) free(trees);
-    if (scores) free(scores);
+    // 3. 기존 성적 로드
+    // g_scores, g_score_count 전역 변수 사용
+    StudentScore *scores = g_scores;
+    int *score_count = &g_score_count;
+    int max_scores = MAX_SCORES;
     
-    // User 구조체의 timetable 내부 Subject 노드들 해제 (필요시)
-    // free_user_timetable(&user); 
+    load_scores(scores, max_scores, score_count);
+    
+    // 4. 성적 입력 UI 실행
+    status = run_score_input_system(&user, scores, score_count, max_scores, student_id);
 
-    // 최종 상태 반환
-    return status;
+    // 사용자가 취소했으면 테크트리 계산은 생략
+    if (status == ERROR_CANCEL) {
+        popup_show_message("취소", "성적 입력이 취소되었습니다.");
+        return;
+    }
+    
+    // 5. 테크트리 순위 계산
+    int out_indices[MAX_TECH_TREES];
+    double out_scores[MAX_TECH_TREES];
+    int num_results = 0;
+
+    rank_techtrees(g_trees, g_tree_count, scores, *score_count, student_id, 
+                            out_indices, out_scores, MAX_TECH_TREES, &num_results);
+
+    // 6. 결과 출력
+    run_recommendation_ui(g_trees, g_tree_count, g_scores, g_score_count, g_subjects, g_subject_count, student_id);
+
+    // 임시로 로드한 user 데이터 해제 (free_user는 struct.h에 정의되어 있다고 가정)
+    // free_user(&user);
 }

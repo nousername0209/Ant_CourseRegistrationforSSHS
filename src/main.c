@@ -28,7 +28,8 @@ int main() {
                 page = run_home_page();
                 break;
             case TECHTREE_PAGE:
-                run_tech_tree_system(user_id);
+                run_tech_tree(user_id);
+                exit(0);
                 page = HOME_PAGE;
                 break;
             case ESC_PAGE:

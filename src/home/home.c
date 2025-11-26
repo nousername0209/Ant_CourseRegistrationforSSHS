@@ -11,7 +11,7 @@ static void render_home_page(int selected_index) {
         "[3] 수강 신청 게시판",
         "[4] 성적 입력 및 테크 트리 추천",
         "[5] 사용자 ID 변경 (로그인)",
-        "[ESC] 종료" // 4
+        "[ESC] 종료"
     };
     const int menu_count = 6;
     const int start_y = 10;
@@ -21,7 +21,7 @@ static void render_home_page(int selected_index) {
     // 메뉴 항목 출력
     for (int i = 0; i < menu_count; i++) {
         // 종료 항목은 다른 위치에 출력
-        if (i == 4) {
+        if (i == 5) {
              print_center("", 0, start_y + 6); // 커서 위치 초기화
              if (i == selected_index) {
                 printf("%s", UI_REVERSE);
@@ -47,8 +47,8 @@ static void render_home_page(int selected_index) {
 
 // HOME_PAGE 컨트롤러 (다음 페이지 상태를 반환)
 PageEnum run_home_page() {
-    int home_selected_index = 0; // 0: INPUT, 1: OUTPUT, 2: BOARD, 3: LOGIN, 4: EXIT
-    const int menu_count = 5;
+    int home_selected_index = 0;
+    const int menu_count = 6;
     int ch;
     
     while (1) {

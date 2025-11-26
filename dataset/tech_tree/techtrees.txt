@@ -1,16 +1,8 @@
-1 AI_Data_Analysis 5
-101 5
-102 4
-201 5
-301 3
-302 7
-2 Hardware_Embedded 4
-103 4
-203 7
-204 5
-303 6
-3 Theoretical_Physics 4
-101 6
-103 6
-202 3
-304 8
+1 Engineering 3
+0 5
+2 4
+4 3
+
+2 BioTrack 2
+6 5
+8 4

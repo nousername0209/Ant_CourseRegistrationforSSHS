@@ -65,7 +65,7 @@
  *         - 과목을 찾으면 해당 SubjectInfo 포인터
  *         - 없으면 NULL
  */
-const SubjectInfo *find_subject_by_id(const SubjectInfo *subjects,
+const SubjectInfo *find_subject_by_id(SubjectInfo *subjects,
                                       int subject_count,
                                       int subject_id);
 
@@ -132,7 +132,7 @@ StatusCodeEnum load_techtrees_from_text(const char *path,
                                     int *out_count);
 
 /**
- * @brief 한 과목의 특정 연도/학기에 대해 z-score와 상위 퍼센트를 계산한다.
+ * @brief 한 과목의 특정 연도/학기에 대해 학생의 원점수에 대한 z-score와 상위 퍼센트를 계산한다.
  *
  * 과목 내부에 저장된 통계(평균, 표준편차)를 사용하여, 정규분포를
  * 가정하고 z-score 및 Top x%를 계산한다.
@@ -210,5 +210,6 @@ StatusCodeEnum rank_techtrees(const TechTree *trees,
                           double *out_scores,
                           int max_out,
                           int *out_returned);
+
 
 #endif 

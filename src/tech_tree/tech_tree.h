@@ -9,14 +9,14 @@
  *
  * 1) 과목 파일 (subjects.txt)
  *    - 빈 줄을 제외한 각 줄 형식:
- *        <id> <name> <credit>
+ *        <id>|<name>|<credit>
  *
  *      예)
- *        44 Math_I 4
- *        45 Math_II 4
+ *        44|수학 I|4
+ *        45|수학 II|4
  *
  *    id     : 정수, 과목 고유 ID
- *    name   : 공백 없는 문자열 (예: Math_I, Advanced_Physics_I)
+ *    name   : 문자열 (예: 수학 I, 생명과학 I 등)
  *    credit : 정수, 학점
  *
  * ----------------------------------------------------------
@@ -42,12 +42,12 @@
  *      <subject_id_N> <weight_N>
  *
  *      예)
- *        1 Engineering 3
+ *        1 물리학 3
  *        49 5
  *        77 4
  *        53 3
  *
- *        2 BioTrack 2
+ *        2 생명과학 2
  *        57 5
  *        63 4
  *
